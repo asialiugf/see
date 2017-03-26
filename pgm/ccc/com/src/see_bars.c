@@ -1387,7 +1387,8 @@ int see_send_bar(see_fut_block_t *p_block,char *pc_msg)
     if(i_rtn != i_size) {
         see_errlog(1000,"see_send_bar: send error !!",RPT_TO_LOG,0,0);
     }
-    usleep(50000);
+    //usleep(50000);
+    usleep(500000);
     return 0;
 }
 
