@@ -500,7 +500,7 @@
         G._barE = G._barE + y;
         G._barB = G._barB + y;
       }
-      G._disLast = G._barE == G._datLen ? 1 : 0; 
+      G._disLast = G._barE == G._datLen ? 1 : 0;
       /*
       G._disLast表示当前是否显示最后一个K柱,最后一个K柱在实际中，可能会因为一直从服务
       器上收到信息而增加。
@@ -879,7 +879,7 @@
       在index.html中的opt.type = 0, 
       然后 this.update(opt) 根据 opt.tpye=0 对 cD[] 进行初始化。cD[]，即canvas Display array !!
     */
-    this.update(opt);     
+    this.update(opt);
     let mainF = cD[0][0];
     let mainB = cD[0][1];
     let sub1F = cD[1][0];
@@ -924,7 +924,7 @@
       }
       return {
         MA: rr,
-        sum: (sum-cc[i-1]), // 前N-1的合值
+        sum: (sum - cc[i - 1]), // 前N-1的合值
         idx: i - 1 // cc.length-1
       };
     }
@@ -935,7 +935,9 @@
       this.sum = r.sum;
       this.idx = r.idx; // length-1 
       this.calcMA = function(x) { // x should be length-1
-        if( x >= cc.length ) { x = cc.length-1; }
+        if (x >= cc.length) {
+          x = cc.length - 1;
+        }
         //console.log("this.idx:" + this.idx + " x: " + x);
         if (x < this.idx) {
           return;
@@ -1183,6 +1185,24 @@
       drawLine(cD[1][0], MA10.MA, "#787878");
     }
 
+    /* ------------ websocket ------------------------------------------------------------------------- */
+
+    const sock = new WebSocket('ws://121.199.28.62:80/api/push/ws');
+
+    // Connection opened
+    sock.addEventListener('open', function(e) {
+      sock.send('{"action":"subs","stamp":"x","data":["TA703","TA705"]}');
+    });
+
+    // Listen for messages
+    sock.addEventListener('message', function(e) {
+      console.log('Message from server', e.data);
+    });
+
+
+    // ping/pong heartbeat
+    //job = setInterval('s.send(\'{"action":"ping"}\')', 5000);
+
     /* -------------------------------------------------------------------------------------------------------------------------- */
 
     function keyPress(e) {
@@ -1263,8 +1283,10 @@
     cvs.addEventListener('wheel', xxxx, false);
     //cvs.addEventListener("mousemove", yyyy, false);
     //cvs.addEventListener("click", kkkkk, false);
-
     drawAll();
+
+
+
   }
   return stockcharts;
 })));
