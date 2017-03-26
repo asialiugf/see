@@ -13,6 +13,34 @@
   ];
 
   /* sample option begin*/
+  /* 
+    下面的 let option = {}
+    是一个option的例子，在 index.html 中 let op =  new barCharts();之后,会用到
+    op.update(option),就是 this.update(opt)的参数。
+
+    其中要注意的是 大Y，是整个Y轴数据，Y.data[0]... Y.data[n]，data数组，表示有多个显示块
+    可以分为 main, sub 两种类型，其中 main 块，主要显示K柱，及相应的指标， sub主要显示副
+    图指标，比如显示：MACD，KDJ等。可以有多个sub类型。
+
+    每个Y.data[0].y，就是每个data的小y,也会有多个数据，比如 主图中的 K柱就要有 open
+    close highest lowest数据，最少四组。 
+    
+    要注意： 在javascript中，数组的let oo = []; let xx = oo ; 这里的 oo 和 xx 是同一组数据，
+    如果更改了oo，则xx 也被更改了。 所以要注意，小y里面有多组数据，其中有几组数据的来源相
+    同的话，注意在程序中要小心，只需要更新一个即可。
+
+    另外，this.update的输入的option，只需要将更新的数据放在option中，不需要所有的数据。
+    比如，初始化时，输入了1000个K柱数据，每次新来一个K柱的数据，则不需要在option 放入1001个数
+    据，只需要放最后一个K柱数据即可。
+
+    还要注意： 不管main, sub，所有的数据来源，其长度必须一致。比如 open close ... 包括
+    MACD的每条线，当前显示第 1001，下一个显示 第1002，所有的数据当前必须是1001长，下一个必须
+    是1002长。即 open.length 和 close.length 还有 sub里面的所有的数据长度，都必须一样长。
+
+    this.update()参数 option.type有三种类型：0，1，2。在后端从服务器送过来的的option数据
+    必须设定type值。具体参看 this.update() 的说明。
+
+  */
   let oo;
   let cc;
   let hh;
@@ -428,6 +456,10 @@
     });
 
     /* set G._curLevel and modify Begin and End index */
+    /*
+       function setCurLevel(x) 会在 G.curLevel = x 时，被调用，它会修改 G._barB,
+       G._barE的值。
+    */
     function setCurLevel(x) {
       if (x < 0) {
         G._curLevel = 0;
@@ -452,7 +484,10 @@
       G._disLast = G._barE == G._datLen ? 1 : 0;
       G._curLen = G._barE - G._barB;
     }
-
+    /*
+       function setBE(m = 0) 在G.barB = 9; 给G.barB赋值时会调用，如果你想把显示的起始
+       位置向前提5个K柱，那可以这样： G.barB = G.barB -5 ;
+    */
     function setBE(m = 0) {
       let y;
       let x = m - G._barB;
@@ -465,7 +500,15 @@
         G._barE = G._barE + y;
         G._barB = G._barB + y;
       }
-      G._disLast = G._barE == G._datLen ? 1 : 0;
+      G._disLast = G._barE == G._datLen ? 1 : 0; 
+      /*
+      G._disLast表示当前是否显示最后一个K柱,最后一个K柱在实际中，可能会因为一直从服务
+      器上收到信息而增加。
+      上面 这一条语句，表示，如果当前显示到最后一个K柱（即 G._barE == G._datLen），则
+      以后一直会显示到最后。  
+      其作用，主要用于：生产环境中，可能会静态观察中间某一段，看完后，又需要回到 一直
+      显示最后一个K柱的变化，G._disLast = 1,能保证 最后一个K柱的变化一直能被显示出来。
+      */
     }
 
     function levelInit() {
@@ -734,6 +777,7 @@
                 G.datLen = cD[i][0].oo.length;
               } else if (cD[i][0].y[j].type == 'h') {
                 cD[i][0].hh = cD[i][0].y[j].data;
+              } else if (cD[i][0].y[j].type == 'l') {
                 cD[i][0].ll = cD[i][0].y[j].data;
               } else if (cD[i][0].y[j].type == 'c') {
                 cD[i][0].cc = cD[i][0].y[j].data;
@@ -827,9 +871,15 @@
 
       //drawAll();
 
-    }
+    } /* end of this.update() */
 
-    this.update(opt);
+    /* 
+      下面this.update(opt);的参数opt是从 function stockcharts(opt, theme) 中来的。
+      stockcharts(); 是在index.html的<script>中，调用 new barCharts()产生的。
+      在index.html中的opt.type = 0, 
+      然后 this.update(opt) 根据 opt.tpye=0 对 cD[] 进行初始化。cD[]，即canvas Display array !!
+    */
+    this.update(opt);     
     let mainF = cD[0][0];
     let mainB = cD[0][1];
     let sub1F = cD[1][0];
