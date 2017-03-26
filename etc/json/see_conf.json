@@ -1,0 +1,54 @@
+{
+    "nanomsg":{
+        "talk":"pair",
+        "pair_url"  :"ipc:///tmp/heaven_pair.ipc",
+        "topy_url"  :"ipc:///tmp/to_py_pair.ipc",
+        "zmq_pubsub_url"  :"tcp://localhost:9021",
+        "pubsub_url":"ipc:///tmp/heaven_pubsub.ipc"
+    },
+    "database":{
+        "name":"mariadb",
+        "mariadb":{
+            "url":"mysql://127.0.0.1/test?user=root&password=123ok"
+        }
+    },
+    "futures":{
+        "TA705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "TA701":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "cs1705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "p1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "l1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "v1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "pp1705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "al1703":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "ni1705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "cu1702":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "au1706":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "bu1706":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "ru1705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "j1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "i1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "CF705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["2f","5f","1h"] }
+    },
+    "get.x":{ "daemon":"yes", "all_in_get":"no","bar_in_get":"yes","stt_in_get":"yes" },
+    "bar.x":{ "daemon":"yes", "all_in_bar":"no","stt_in_bar":"yes" },
+    "stt.x":{ "daemon":"yes", "auto_trade":"no" },
+    "trader.x":{ "daemon":"yes" },
+    "note":{
+        "1":"stt:strategy!",
+        "2":"bar_in_get: calculate K bars in get.x!",
+        "3":"stt_in_get: calculate strategy in get.x!",
+        "4":" -- futures: -- configuration is main conf, -- get.x: bar.x: stt.x: --  is default conf !!",
+        "5":" if bar_in_get is no in get.x, get.x will send tick_data to bar.x !!",
+        "6":" if stt_in_get is no in get.x, get.x will send stt_data to  stt.x !!",
+        "7":" if stt_in_get is no in bar.x, bar,x will send stt_data to  stt.x !!",
+        "8":" stt.x can send data to web for display !!!",
+        "9":" stt.x can get command from web for different strategy !! "
+    },
+    "period_map":{
+        "1s":0,   "2s":1,  "3s":2,  "5s":3,  "10s":4,  "15s":5,  "20s":6,  "30s":7,
+        "1f":8,   "2f":9,  "3f":10, "5f":11, "10f":12, "15f":13, "20f":14, "30f":15,
+        "1h":16,  "2h":17, "3h":18, "4h":19,  "5h":20, "6h":21,   "8h":22, "10h":23, 
+        "12h":24, "1d":25,  "1w":26, "1m":27, "1j":28,  "1y":29, "tick":30
+    }
+}

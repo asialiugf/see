@@ -1,0 +1,20 @@
+[ 测试 ]
+
+1  sss.x 从see/dat/tst_dat目录下，把所有的.bin文件读出，然后发送给rrr.x
+
+   sss.x 首先会从 see/etc/tbl/tick_file_name.txt 读出所有的 see/dat/tst_dat目录下的文件列表。
+
+所以，需要做下面的事情：
+
+
+cd see/dat/tst_dat
+ls * > ~/see/etc/tbl/tick_file_name.txt
+
+sss.x 会把 tst_dat下面的所有的tick....bin文件读出，送给 rrr.x，
+
+rrr.x收到后，会将tick存入到 see/dat/rcv_dat目录下
+
+所以可以比较 see/dat/rcv_dat目录下的 文件  与 see/dat/tst_dat 目录下的文件是否一样，即可看出 rrr.x是否接收正常。
+
+
+

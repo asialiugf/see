@@ -1,0 +1,3 @@
+make -f ccc/Makefile
+make[1]: Entering directory `/home/rabbit/see/pgm'
+cc    -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -I ccc/com/inc -I ccc/ios/inc -I ccc/stt/inc -I /usr/local/include/nanomsg -I /usr/local/include/zdb -I /usr/local/include/errlog -o ccc/com/obj/see_errlog.o  ccc/com/src/see_errlog.c

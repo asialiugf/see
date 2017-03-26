@@ -1,0 +1,29 @@
+#include <see_com_common.h>
+
+TA_Real    closePrice[400];  /*double*/
+TA_Real    out[400];
+TA_Integer outBeg;
+TA_Integer outNbElement;
+/* ... initialize your closing price here... */
+retCode = TA_MA( 0, 399,
+                 &closePrice[0],
+                 30,TA_MAType_SMA,
+                 &outBeg, &outNbElement, &out[0] );
+/* The output is displayed here */
+for( i=0; i < outNbElement; i++ )
+   printf( "Day %d = %f\n", outBeg+i, out[i] );
+
+/* Generated */ TA_RetCode TA_S_STOCH( int    startIdx,
+/* Generated */                        int    endIdx,
+/* Generated */                        const float  inHigh[],
+/* Generated */                        const float  inLow[],
+/* Generated */                        const float  inClose[],
+/* Generated */                        int           optInFastK_Period, /* From 1 to 100000 */
+/* Generated */                        int           optInSlowK_Period, /* From 1 to 100000 */
+/* Generated */                        TA_MAType     optInSlowK_MAType,
+/* Generated */                        int           optInSlowD_Period, /* From 1 to 100000 */
+/* Generated */                        TA_MAType     optInSlowD_MAType,
+/* Generated */                        int          *outBegIdx,
+/* Generated */                        int          *outNBElement,
+/* Generated */                        double        outSlowK[],
+/* Generated */                        double        outSlowD[] )

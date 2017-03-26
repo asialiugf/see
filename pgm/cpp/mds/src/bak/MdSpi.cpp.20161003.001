@@ -1,0 +1,157 @@
+#include "MdSpi.h"
+#include <iostream>
+#include <string.h>
+#include <AAextern.h>
+#include <pthread.h>
+
+extern "C" 
+{
+    #include <see_com_common.h>
+}
+see_bar_t bars[MAX_BARS_LEN] ; 
+int i_pub_sock ;
+int i_msg_len = sizeof( CThostFtdcDepthMarketDataField )  ;
+const char ca_nanomsg_url[] = "ipc:///tmp/pubsub.ipc" ;
+static char ca_tick_file[256] ;
+/* ----------- -------------------*/
+
+using namespace std;
+
+void CMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
+		int nRequestID, bool bIsLast)
+{
+	cerr << "--->>> "<< "OnRspError" << endl;
+	IsErrorRspInfo(pRspInfo);
+}
+
+void CMdSpi::OnFrontDisconnected(int nReason)
+{
+	cerr << "--->>> " << "OnFrontDisconnected" << endl;
+	cerr << "--->>> Reason = " << nReason << endl;
+}
+		
+void CMdSpi::OnHeartBeatWarning(int nTimeLapse)
+{
+	cerr << "--->>> " << "OnHeartBeatWarning" << endl;
+	cerr << "--->>> nTimerLapse = " << nTimeLapse << endl;
+}
+
+void CMdSpi::OnFrontConnected()
+{
+
+    i_pub_sock = see_pubsub_server( ca_nanomsg_url ) ;           // become a nanomsg pub server !!
+ 	ReqUserLogin1();                                             // user login !!!  用户登录请求
+//    cerr << "ppFutureID" << ppFutureID[0] << endl ;  
+//    cerr << "ppFutureID" << ppFutureID[1] << endl ;  
+//    cerr << "ppFutureID" << ppFutureID[2] << endl ;  
+}
+
+void CMdSpi::ReqUserLogin1()
+{
+    int i_rtn ;
+	CThostFtdcReqUserLoginField req;
+
+	memset(&req, 0, sizeof(req));
+	strcpy(req.BrokerID, BROKER_ID);
+	strcpy(req.UserID, INVESTOR_ID);
+	strcpy(req.Password, PASSWORD);
+
+	i_rtn = pUserApi1->ReqUserLogin(&req, ++iRequestID);
+    if ( i_rtn != 0 ) {
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"ReqUserLogin error :%d\n", i_rtn ) ; 
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+    }
+}
+
+void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
+		CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+	cerr << "--->>> " << "OnRspUserLogin" << endl;
+	if (bIsLast && !IsErrorRspInfo(pRspInfo))
+	{
+		pUserApi1->GetTradingDay() ;               // 获取当前交易日
+		SubscribeMarketData1();	                   // 请求订阅行情
+	}
+}
+
+void CMdSpi::SubscribeMarketData1()
+{
+	int i_rtn = 0 ;
+    static char ca_futures[FUTURE_NUMBER][FUTRUE_ID_LEN] ;
+    static char *ppFutureID[FUTURE_NUMBER];   
+
+    i_rtn = see_futures_init(ppFutureID,ca_futures) ;                   // 初始化 future 列表
+    if ( i_rtn != 0 ){
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"main: see_futures_init error : %d\n", i_rtn ) ; 
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+    }
+    
+    int iii = 0 ;
+    while ( ppFutureID[iii] != NULL ) {
+        cerr << "ppFutureID====:    " << ppFutureID[iii] << endl ;  
+        cerr << "strlen(ppFutureID[iii]) : " << strlen(ppFutureID[iii]) << endl ;
+        iii++ ;
+    }
+
+    i_rtn = pUserApi1->SubscribeMarketData(ppFutureID, iInstrumentID);    // 请求订阅行情
+    if ( i_rtn != 0 ) {
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"ubscribeMarketData error :%d\n", i_rtn ) ; 
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+    }
+}
+
+void CMdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+	cerr << "OnRspSubMarketData !!!" << endl;
+    cerr << pRspInfo->ErrorMsg << endl;
+    cerr << "ErrorID:" <<  pRspInfo->ErrorID << endl;
+    cerr << "pSpecificInstrument ->InstrumentID  " << pSpecificInstrument->InstrumentID << endl;
+}
+
+void CMdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+	cerr << "OnRspUnSubMarketData" << endl;
+}
+
+void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
+{
+    // int bytes ;
+    // cerr << "TradingDay" <<  pDepthMarketData->TradingDay << "  " << endl;
+    // cerr << "InstrumentID:" <<  pDepthMarketData->InstrumentID << "  " << endl;
+    // cerr << pDepthMarketData->InstrumentID << "  " << endl;
+    // cerr << pDepthMarketData->HighestPrice << "  " << endl;
+
+    char ca_tmp[3] ;
+    memset( ca_tmp,'\0',3 ) ; 
+    memcpy( ca_tmp,pDepthMarketData->UpdateTime,2 );
+    memset( ca_tick_file,'\0',256 ) ; 
+    sprintf( ca_tick_file, "../../dat/tick-%s-%s-%s-%s.bin",pDepthMarketData->InstrumentID, \
+                                                   pDepthMarketData->TradingDay, \
+                                                   pDepthMarketData->ActionDay, \
+                                                   ca_tmp ) ; 
+    see_save_file(ca_tick_file,(char *)pDepthMarketData,i_msg_len) ;
+/*
+    bytes = nn_send (i_pub_sock, (char *)pDepthMarketData, i_msg_len, 0);         // 收到数据，发送到存储进程 进行存储！
+    if ( bytes != i_msg_len ){
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"nn_send error! :%d\n", bytes ) ; 
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+    }
+*/
+}
+
+void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+	cerr << "OnRspQryDepthMarketData" << endl;
+}
+bool CMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
+{
+	// 如果ErrorID != 0, 说明收到了错误的响应
+	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
+	if (bResult)
+		cerr << "--->>> ErrorID=" << pRspInfo->ErrorID << ", ErrorMsg=" << pRspInfo->ErrorMsg << endl;
+	return bResult;
+}

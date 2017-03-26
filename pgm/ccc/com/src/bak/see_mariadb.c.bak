@@ -1,0 +1,188 @@
+#include <see_com_common.h>
+
+const char          ca_mysql_url[]  = "mysql://127.0.0.1/test?user=root&password=123ok" ;
+char                ca_files[200][512];
+see_config_t        t_conf ;
+char                ca_dirs[53][256] = \
+        {"/home/rabbit/see/dat/rcv_dat/a",
+        "/home/rabbit/see/dat/rcv_dat/ag",
+        "/home/rabbit/see/dat/rcv_dat/al",
+        "/home/rabbit/see/dat/rcv_dat/au",
+        "/home/rabbit/see/dat/rcv_dat/b",
+        "/home/rabbit/see/dat/rcv_dat/bb",
+        "/home/rabbit/see/dat/rcv_dat/bu",
+        "/home/rabbit/see/dat/rcv_dat/c",
+        "/home/rabbit/see/dat/rcv_dat/CF",
+        "/home/rabbit/see/dat/rcv_dat/cs",
+        "/home/rabbit/see/dat/rcv_dat/cu",
+        "/home/rabbit/see/dat/rcv_dat/fb",
+        "/home/rabbit/see/dat/rcv_dat/FG",
+        "/home/rabbit/see/dat/rcv_dat/fu",
+        "/home/rabbit/see/dat/rcv_dat/hc",
+        "/home/rabbit/see/dat/rcv_dat/i",
+        "/home/rabbit/see/dat/rcv_dat/IC",
+        "/home/rabbit/see/dat/rcv_dat/IF",
+        "/home/rabbit/see/dat/rcv_dat/IH",
+        "/home/rabbit/see/dat/rcv_dat/j",
+        "/home/rabbit/see/dat/rcv_dat/jd",
+        "/home/rabbit/see/dat/rcv_dat/jm",
+        "/home/rabbit/see/dat/rcv_dat/JR",
+        "/home/rabbit/see/dat/rcv_dat/l",
+        "/home/rabbit/see/dat/rcv_dat/LR",
+        "/home/rabbit/see/dat/rcv_dat/m",
+        "/home/rabbit/see/dat/rcv_dat/MA",
+        "/home/rabbit/see/dat/rcv_dat/ME",
+        "/home/rabbit/see/dat/rcv_dat/ni",
+        "/home/rabbit/see/dat/rcv_dat/OI",
+        "/home/rabbit/see/dat/rcv_dat/p",
+        "/home/rabbit/see/dat/rcv_dat/pb",
+        "/home/rabbit/see/dat/rcv_dat/PM",
+        "/home/rabbit/see/dat/rcv_dat/pp",
+        "/home/rabbit/see/dat/rcv_dat/rb",
+        "/home/rabbit/see/dat/rcv_dat/RI",
+        "/home/rabbit/see/dat/rcv_dat/RM",
+        "/home/rabbit/see/dat/rcv_dat/RS",
+        "/home/rabbit/see/dat/rcv_dat/ru",
+        "/home/rabbit/see/dat/rcv_dat/SF",
+        "/home/rabbit/see/dat/rcv_dat/SM",
+        "/home/rabbit/see/dat/rcv_dat/sn",
+        "/home/rabbit/see/dat/rcv_dat/SR",
+        "/home/rabbit/see/dat/rcv_dat/T",
+        "/home/rabbit/see/dat/rcv_dat/TA",
+        "/home/rabbit/see/dat/rcv_dat/TC",
+        "/home/rabbit/see/dat/rcv_dat/TF",
+        "/home/rabbit/see/dat/rcv_dat/v",
+        "/home/rabbit/see/dat/rcv_dat/WH",
+        "/home/rabbit/see/dat/rcv_dat/wr",
+        "/home/rabbit/see/dat/rcv_dat/y",
+        "/home/rabbit/see/dat/rcv_dat/ZC",
+        "/home/rabbit/see/dat/rcv_dat/zn"};
+
+
+int
+main(int iArgCnt, char *pcaArgVec[])
+{
+ //   int iRc = 0 ;
+ //   int i = 0 ;
+    int                     i_len ;
+    char                    ca_errmsg[100] ;
+    volatile int                     i ;
+
+    char                    TradingDay[9] ; 
+    char                    UpdateTime[9] ;
+    char                    ca_table[512] ;
+    double OpenPrice;
+    double HighestPrice;
+    double LowestPrice;
+    double ClosePrice;
+    int Volume;
+
+    FILE                   *pf ;
+    char                    ca_line[512] ;
+    char                    ca_state[512] ;
+
+    int ii ;
+
+    int k;
+    for( k=0;k<53;k++ )
+    {
+        printf( ca_dirs[k] );
+    }
+    exit(1);
+
+    see_trave_dir("/home/rabbit/see/dat/rcv_dat/j",&ii,ca_files);
+
+    for( i=0;i<100;i++)
+    {
+        printf( "%s i:%d\n",ca_files[i],i ) ;
+    }
+
+    see_config_init( &t_conf );
+    see_zdb_open( &t_conf );
+
+    for( i=0;i<100;i++)
+    {
+        i_len = strlen( "/home/rabbit/see/dat/rcv_dat/j/1s/j1705-20170117-1s" ) ;
+        if( strncmp("/home/rabbit/see/dat/rcv_dat/j/1s/j1705-20170117-1s", ca_files[i],i_len) != 0 )
+        {
+            //printf ( &ca_files[i][i_len-4] ) ;
+            //printf ( "aaa\n\n" ) ;
+            continue ;
+        }
+
+        pf = fopen(ca_files[i],"r");
+        if (pf == NULL) { 
+            printf( "open file %s error !! errno: %d \n",ca_files[i],errno ) ;
+            continue ;
+        }
+
+        memset( ca_line,'\0',512 ) ;
+        while ( fgets(ca_line,512, pf ) != NULL ){
+            //printf ( ca_line ) ;
+
+            sscanf(ca_line, "%s %s %lf %lf %lf %lf %d", TradingDay, UpdateTime, &OpenPrice, &HighestPrice,
+                                                 &LowestPrice, &ClosePrice, &Volume);
+ 
+            memset(ca_state,'\0',512) ;
+            memset(ca_table,'\0',512) ;
+            memcpy(ca_table,"j1705_1s",8) ;
+
+            sprintf(ca_state,"INSERT INTO %s( TradingDay, UpdateTime, OpenPrice, HighestPrice, \
+                LowestPrice, ClosePrice, Volume) VALUES(?,?,?,?,?,?,?)",ca_table) ;
+            //printf (ca_state) ;
+            //printf ("\n") ;
+            t_conf.z_statement = Connection_prepareStatement(t_conf.z_con,ca_state) ;
+            //PreparedStatement_setString(t_conf.z_statement,1,(char *)ca_future) ;
+            PreparedStatement_setString(t_conf.z_statement,1,(char *)TradingDay) ;
+            PreparedStatement_setString(t_conf.z_statement,2,(char *)UpdateTime) ;       
+            PreparedStatement_setDouble(t_conf.z_statement,3,OpenPrice ) ;       
+            PreparedStatement_setDouble(t_conf.z_statement,4,HighestPrice ) ;       
+            PreparedStatement_setDouble(t_conf.z_statement,5,LowestPrice ) ;       
+            PreparedStatement_setDouble(t_conf.z_statement,6,ClosePrice ) ;       
+            PreparedStatement_setInt(t_conf.z_statement,7,Volume ) ;       
+
+            TRY {
+                PreparedStatement_execute(t_conf.z_statement);
+            }
+            CATCH(SQLException) {
+                sprintf(ca_errmsg,"SQL error: %s\n", Connection_getLastError(t_conf.z_con)); 
+                see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+            }
+            END_TRY;
+            memset( ca_line,'\0',512 ) ;
+        }   
+        fclose(pf) ; 
+    }
+
+     
+    ResultSet_T result = Connection_executeQuery(t_conf.z_con, "select * from j1705_1s");  //输出全部连接数目
+    printf("ALL NUMBE:%d\n",ConnectionPool_size(t_conf.z_pool));                         //输出活动连接数目
+    printf("ACTIVE NUMBER:%d\n",ConnectionPool_active(t_conf.z_pool));
+    while(ResultSet_next(result))                                               //游标滑到下一行
+    {       //获取列名 ResultSet_getColumnName                                  //获取列值 ResultSet_getString
+        printf("column: %s\n",ResultSet_getColumnName(result,2));       //根据列名获取值ResultSet_getStringByName
+        printf("%s ",ResultSet_getStringByName(result,"TradingDay"));      //根据列索引获取列值 ［注意索引是从1开始不是0］
+        printf("%s ",ResultSet_getStringByName(result,"UpdateTime"));      //根据列索引获取列值 ［注意索引是从1开始不是0］
+        printf("o %lf ",ResultSet_getDouble(result,3));
+        printf("h %lf ",ResultSet_getDouble(result,4));
+        printf("v %d\n",ResultSet_getInt(result,7));
+    }   //关闭连接（活动连接－1）
+    
+    see_zdb_close( &t_conf );
+
+    return 0;
+}
+
+/*
+create table j1705_1s(
+    TradingDay              CHAR(8),
+    UpdateTime              CHAR(8),
+    o                       DOUBLE,
+    h                       DOUBLE,
+    l                       DOUBLE,
+    c                       DOUBLE,
+    v                       INT,
+    PRIMARY KEY ( TradingDay,UpdateTime )
+);
+select * from j1705_1s  where TradingDay='20170117' and UpdateTime>'23:29:16' and UpdateTime<'23:29:50' ;
+*/

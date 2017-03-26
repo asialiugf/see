@@ -1,0 +1,16 @@
+cd ~/see/bin/exe
+rm -rf rrr.x
+rm -rf sss.x
+rm -rf ctpget.x
+rm -rf kdj.x
+rm -rf maria.x
+
+cd ~/see/pgm/ccc/com/obj
+rm -rf *.o
+
+cd ~/see/pgm/ccc/stt/obj
+rm -rf *.o
+
+cd ~/see/pgm/cpp/mds/obj
+rm -rf *.o
+

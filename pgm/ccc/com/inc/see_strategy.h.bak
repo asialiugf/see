@@ -1,0 +1,50 @@
+#ifndef _SEE_STRATEGY_H_INCLUDED_
+#define _SEE_STRATEGY_H_INCLUDED_
+
+#include <see_com_common.h>
+
+typedef struct {
+    char                InstrumentID[31];
+    char                TradingDay[9];
+    char                ActionDay[9];
+    char                UpdateTime[9];
+    char                c_save ;                        /* 's' 表示 save  'n' 表示 不需要save */
+    double              o ;                             // open
+    double              c ;                             // close 
+    double              h ;                             // high
+    double              l ;                             // low
+    int                 v ;                             // volume
+} see_stt_data_t ;                                      // 发送给计算策略的进程！！
+
+typedef struct {
+    char        ca_TradingDays  [10000][9] ;
+    char        ca_ActionDays   [10000][9] ;
+    char        ca_UpdateTimes  [10000][9] ;
+    double      oo[10000] ;             // open
+    double      cc[10000] ;             // close 
+    double      hh[10000] ;             // high
+    double      ll[10000] ;             // low
+    int         vv[10000] ;             // volume
+    int         i_cur ;                 /* current point !!!! */
+} see_kkone_t ;
+
+
+typedef struct node  
+{  
+    int             period ;
+    char            ca_table[128] ;
+    struct node    *next;  
+} see_node ;  
+
+/* need to be init !!为每个period分配一个 klist_t !! */
+/* list for record of strategy period, 1f->5f->30f   */
+typedef struct {
+    see_kkone_t         *pt_kkall[31] ;
+    see_node            *list ;
+} see_stt_block_t ;
+
+int see_stt_blk_init ( see_config_t *p_conf, see_stt_block_t *p_stt_blk, int i_idx );
+int see_kkone_init ( see_config_t *p_conf, char *pc_table, int num, see_kkone_t *p_kkone );
+int see_trave_dir(char* path, int *p_count, char pc_files[][512]) ;
+
+#endif

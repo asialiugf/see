@@ -1,0 +1,4 @@
+cc -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -I /usr/local/include/nanomsg -o ps.o  ps.c
+cc -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -I /usr/local/include/nanomsg -o pr.o  pr.c
+cc -pipe -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -lnanomsg -o ps.x ps.o
+cc -pipe -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -lnanomsg -o pr.x pr.o

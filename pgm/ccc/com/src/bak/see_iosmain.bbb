@@ -1,0 +1,263 @@
+#include <see_com_common.h>
+
+const char ca_pubsub_url[] = "ipc:///tmp/pubsub.ipc" ;
+const char ca_mysql_url[]  = "mysql://127.0.0.1/test?user=root&password=root" ;
+
+
+
+int
+main(int iArgCnt, char *pcaArgVec[])
+{
+ //   int iRc = 0 ;
+ //   int i = 0 ;
+    char ca_errmsg[100] ;
+
+    struct timeval start, end;
+    int sock ;
+    struct CThostFtdcDepthMarketDataField market_data ;
+
+    see_signal_init() ;
+
+    see_daemon(1,0) ;
+
+
+    gettimeofday( &start, NULL );
+    printf("start : %lu.%lu\n", start.tv_sec, start.tv_usec);
+    printf(" CThostFtdcDepthMarketDataField: %lu\n ",sizeof(struct CThostFtdcDepthMarketDataField) ) ;
+
+//    see_errlog(1000,"2222-----------------------",RPT_TO_LOG,"5555errr",8);
+//    see_errlog(1000,"market data-----------------------",RPT_TO_LOG,(char *)&market_data,408 ) ;
+
+    gettimeofday( &end, NULL );
+    printf("end   : %lu.%lu\n", end.tv_sec, end.tv_usec);
+
+
+    time_t timer; 
+    time(&timer); 
+    struct tm* t_tm = localtime(&timer); 
+
+    char ca_date[9] ;
+    char ca_time[9] ;
+    memset( ca_date,'\0',9 );
+    memset( ca_time,'\0',9 );
+    strftime(ca_date,9,"%Y%m%d",t_tm);
+    strftime(ca_time,9,"%H:%M:%S",t_tm);
+
+    memset( ca_errmsg,'\0',100 );
+    strftime(ca_errmsg,100,"today is: %Y%m%d-%H:%M:%S",t_tm);
+
+    see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0);
+    printf("today is:%d%d%d\n",t_tm->tm_year+1900,t_tm->tm_mon+1,t_tm->tm_mday) ;
+
+    memset((char *)&market_data,'\0',sizeof(struct CThostFtdcDepthMarketDataField)) ;
+
+    int i = 100 ;
+memcpy(&market_data.TradingDay,ca_date,8) ;    
+memcpy(&market_data.InstrumentID,"su1701",6) ;    
+//market_data.ExchangeID ;    
+//market_data.ExchangeInstID ;    
+market_data.LastPrice =(double) i ;    
+market_data.PreSettlementPrice =(double) i ;    
+market_data.PreClosePrice =(double) i ;    
+market_data.PreOpenInterest =(double) i ;    
+market_data.OpenPrice =(double) i ;    
+market_data.HighestPrice =(double) i ;    
+market_data.LowestPrice =(double) i ;    
+market_data.Volume = i ;    
+market_data.Turnover =(double) i ;    
+market_data.OpenInterest =(double) i ;    
+market_data.ClosePrice =(double) i ;    
+market_data.SettlementPrice =(double) i ;    
+market_data.UpperLimitPrice =(double) i ;    
+market_data.LowerLimitPrice =(double) i ;    
+market_data.PreDelta =(double) i ;    
+market_data.CurrDelta =(double) i ;    
+memcpy(&market_data.UpdateTime,ca_time,8) ;    
+market_data.UpdateMillisec = i ;    
+market_data.BidPrice1 =(double) i ;    
+market_data.BidVolume1 = i ;    
+market_data.AskPrice1 =(double) i ;    
+market_data.AskVolume1 = i ;    
+market_data.BidPrice2 =(double) i ;    
+market_data.BidVolume2 = i ;    
+market_data.AskPrice2 =(double) i ;    
+market_data.AskVolume2 = i ;    
+market_data.BidPrice3 =(double) i ;    
+market_data.BidVolume3 = i ;    
+market_data.AskPrice3 =(double) i ;    
+market_data.AskVolume3 = i ;
+market_data.BidPrice4 =(double) i ;
+market_data.BidVolume4 = i ;
+market_data.AskPrice4 =(double) i ;
+market_data.AskVolume4 = i ;
+market_data.BidPrice5 =(double) i ;
+market_data.BidVolume5 = i ;
+market_data.AskPrice5 =(double) i ;
+market_data.AskVolume5 = i ;
+market_data.AveragePrice =(double) i ;
+memcpy(&market_data.ActionDay,ca_date,8) ;
+
+
+
+    sock = see_pubsub_client( ca_pubsub_url, "iostest" ) ;
+
+    /*
+    while (1)
+    {
+        char *buf = NULL;
+        // printf ("CLIENT : RECEIVED \n");
+        int bytes = nn_recv (sock, &buf, NN_MSG, 0);
+        if ( bytes > 0 ) {
+            printf ("CLIENT (%s): RECEIVED %s\n", "asialine", buf);
+        }
+
+        //--------------------------
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"---------------------- bytes_recieved:%d \n", bytes ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,buf,bytes ) ;
+        //--------------------------
+
+        nn_freemsg (buf);
+    }
+    */
+
+    URL_T url = URL_new("mysql://127.0.0.1/test?user=root&password=root");
+    if(url==NULL) {   
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"mysql://127.0.0.1/test?user=root&password=root: connection error !\n") ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        return -1 ;
+    }
+    ConnectionPool_T pool = ConnectionPool_new(url);
+    ConnectionPool_setInitialConnections(pool,20);              // 设置初始化连接数目
+    ConnectionPool_start(pool);                                 //开启线程池
+    Connection_T con = ConnectionPool_getConnection(pool);      //从线程池中取出连接（活动连接数＋1）
+
+    PreparedStatement_T p = Connection_prepareStatement(con, "INSERT INTO market_data( \
+TradingDay, \
+InstrumentID, \
+ExchangeID,    \
+ExchangeInstID,  \
+LastPrice,         \
+PreSettlementPrice, \
+PreClosePrice,     \
+PreOpenInterest,   \
+OpenPrice,         \
+HighestPrice,      \
+LowestPrice,       \
+Volume,            \
+Turnover,          \
+OpenInterest,      \
+ClosePrice   ,     \
+SettlementPrice,   \
+UpperLimitPrice,   \
+LowerLimitPrice,   \
+PreDelta       ,   \
+CurrDelta      ,   \
+UpdateTime     ,   \
+UpdateMillisec ,   \
+BidPrice1       ,  \
+BidVolume1     ,   \
+AskPrice1      ,   \
+AskVolume1     ,   \
+BidPrice2      ,   \
+BidVolume2     ,   \
+AskPrice2      ,   \
+AskVolume2     ,   \
+BidPrice3      ,   \
+BidVolume3     ,   \
+AskPrice3      ,   \
+AskVolume3     ,   \
+BidPrice4      ,   \
+BidVolume4     ,   \
+AskPrice4      ,   \
+AskVolume4     ,   \
+BidPrice5      ,   \
+BidVolume5     ,   \
+AskPrice5      ,   \
+AskVolume5     ,   \
+AveragePrice   ,   \
+ActionDay, \
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+
+
+    while(1) {
+        char *buf = NULL;
+        int bytes = nn_recv (sock, &buf, NN_MSG, 0);
+        if ( bytes > 0 ) {
+            printf ("CLIENT (%s): RECEIVED %s\n", "asialine", buf);
+        }
+//        PreparedStatement_setString(p, 1, "Kamiya Kaoru");
+//        PreparedStatement_setBlob(p, 2, jpeg, jpeg_size);
+//        PreparedStatement_execute(p);
+PreparedStatement_setString(p,1,market_data.TradingDay) ;
+PreparedStatement_setString(p,2,market_data.InstrumentID) ;      
+PreparedStatement_setString(p,3,market_data.ExchangeID) ;               
+PreparedStatement_setString(p,4,market_data.ExchangeInstID) ;          
+PreparedStatement_setDouble(p,5,market_data.LastPrice) ;               
+PreparedStatement_setDouble(p,6,market_data.PreSettlementPrice   ) ;     
+PreparedStatement_setDouble(p,7,market_data.PreClosePrice  ) ;           
+PreparedStatement_setDouble(p,8,market_data.PreOpenInterest   ) ;        
+PreparedStatement_setDouble(p,9,market_data.OpenPrice     ) ;            
+PreparedStatement_setDouble(p,10,market_data.HighestPrice    ) ;          
+PreparedStatement_setDouble(p,11,market_data.LowestPrice     ) ;          
+PreparedStatement_setInt(p,12,market_data.Volume             ) ;       
+PreparedStatement_setDouble(p,13,market_data.Turnover          ) ;        
+PreparedStatement_setDouble(p,14,market_data.OpenInterest       ) ;       
+PreparedStatement_setDouble(p,15,market_data.ClosePrice         ) ;       
+PreparedStatement_setDouble(p,16,market_data.SettlementPrice   ) ;        
+PreparedStatement_setDouble(p,17,market_data.UpperLimitPrice  ) ;     
+PreparedStatement_setDouble(p,18,market_data.LowerLimitPrice    ) ;       
+PreparedStatement_setDouble(p,19,market_data.PreDelta    ) ;              
+PreparedStatement_setDouble(p,20,market_data.CurrDelta     ) ;            
+PreparedStatement_setString(p,21,market_data.UpdateTime ) ;       
+PreparedStatement_setInt(p,22,market_data.UpdateMillisec    ) ;        
+PreparedStatement_setDouble(p,23,market_data.BidPrice1     ) ;            
+PreparedStatement_setInt(p,24,market_data.BidVolume1      ) ;          
+PreparedStatement_setDouble(p,25,market_data.AskPrice1    ) ;             
+PreparedStatement_setInt(p,26,market_data.AskVolume1      ) ;          
+PreparedStatement_setDouble(p,27,market_data.BidPrice2    ) ;             
+PreparedStatement_setInt(p,28,market_data.BidVolume2      ) ;          
+PreparedStatement_setDouble(p,29,market_data.AskPrice2    ) ;             
+PreparedStatement_setInt(p,30,market_data.AskVolume2      ) ;          
+PreparedStatement_setDouble(p,31,market_data.BidPrice3    ) ;             
+PreparedStatement_setInt(p,32,market_data.BidVolume3    ) ;            
+PreparedStatement_setDouble(p,33,market_data.AskPrice3   ) ;              
+PreparedStatement_setInt(p,34,market_data.AskVolume3     ) ;           
+PreparedStatement_setDouble(p,35,market_data.BidPrice4   ) ;              
+PreparedStatement_setInt(p,36,market_data.BidVolume4    ) ;            
+PreparedStatement_setDouble(p,37,market_data.AskPrice4  ) ;               
+PreparedStatement_setInt(p,38,market_data.AskVolume4     ) ;           
+PreparedStatement_setDouble(p,39,market_data.BidPrice5    ) ;             
+PreparedStatement_setInt(p,40,market_data.BidVolume5      ) ;          
+PreparedStatement_setDouble(p,41,market_data.AskPrice5      ) ;           
+PreparedStatement_setInt(p,42,market_data.AskVolume5        ) ;        
+PreparedStatement_setDouble(p,43,market_data.AveragePrice    ) ;          
+PreparedStatement_setString(p,44,market_data.ActionDay     ) ;            
+        PreparedStatement_execute(p);
+    } /* endof while(1) */
+
+
+
+    /* 
+    ConnectionPool_T pool = ConnectionPool_new(url);
+    // 设置初始化连接数目
+    ConnectionPool_setInitialConnections(pool,20);              //开启线程池
+    ConnectionPool_start(pool);                                 //从线程池中取出连接（活动连接数＋1）
+    Connection_T con = ConnectionPool_getConnection(pool);      //执行SQL语句，返回结果集
+    ResultSet_T result = Connection_executeQuery(con, "select * from t_test");  //输出全部连接数目
+    printf("ALL NUMBE:%d\n",ConnectionPool_size(pool));                         //输出活动连接数目
+    printf("ACTIVE NUMBER:%d\n",ConnectionPool_active(pool));
+    while(ResultSet_next(result))                                               //游标滑到下一行
+    {       //获取列名 ResultSet_getColumnName                                  //获取列值 ResultSet_getString
+        printf("column: %s\n",ResultSet_getColumnName(result,2));       //根据列名获取值ResultSet_getStringByName
+        printf("%s\n",ResultSet_getStringByName(result,"userId"));      //根据列索引获取列值 ［注意索引是从1开始不是0］
+        printf("%s\n",ResultSet_getString(result,3));
+    }   //关闭连接（活动连接－1）
+    */
+    Connection_close(con);  //将连接池与数据库分离
+    ConnectionPool_stop(pool);
+    ConnectionPool_free(&pool);
+    URL_free(&url);
+    return 0;
+}

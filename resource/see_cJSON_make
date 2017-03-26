@@ -1,0 +1,79 @@
+===========================================================================================
+[cJSON]
+    git clone https://github.com/DaveGamble/cJSON.git
+    cd cJSON
+    mkdir build
+    cd build
+    make
+    make install
+
+[root@iZ23psatkqsZ build]# ll
+total 104
+-rw-r--r-- 1 rabbit ctp   667 Jan 10 00:33 cJSONConfig.cmake
+-rw-r--r-- 1 rabbit ctp   367 Jan 10 00:33 cJSONConfigVersion.cmake
+-rwxr-xr-x 1 rabbit ctp 17821 Jan 10 00:33 cJSON_test
+-rw-r--r-- 1 rabbit ctp 12801 Jan 10 00:33 CMakeCache.txt
+drwxr-xr-x 7 rabbit ctp  4096 Jan 10 00:33 CMakeFiles
+-rw-r--r-- 1 rabbit ctp  5280 Jan 10 00:33 cmake_install.cmake
+-rw-r--r-- 1 rabbit ctp   260 Jan 10 00:33 libcjson.pc
+lrwxrwxrwx 1 rabbit ctp    13 Jan 10 00:33 libcjson.so -> libcjson.so.1
+lrwxrwxrwx 1 rabbit ctp    17 Jan 10 00:33 libcjson.so.1 -> libcjson.so.1.2.0
+-rwxr-xr-x 1 rabbit ctp 36001 Jan 10 00:33 libcjson.so.1.2.0
+-rw-r--r-- 1 rabbit ctp  7416 Jan 10 00:33 Makefile
+[root@iZ23psatkqsZ build]# make install
+[ 50%] Built target cjson
+[100%] Built target cJSON_test
+Install the project...
+-- Install configuration: ""
+-- Installing: /usr/local/include/cjson/cJSON.h
+-- Installing: /usr/local/lib/pkgconfig/libcjson.pc
+-- Installing: /usr/local/lib/libcjson.so.1.2.0
+-- Installing: /usr/local/lib/libcjson.so.1
+-- Installing: /usr/local/lib/libcjson.so
+-- Installing: /usr/local/lib/cmake/cJSON/cjson.cmake
+-- Installing: /usr/local/lib/cmake/cJSON/cjson-noconfig.cmake
+-- Installing: /usr/local/lib/cmake/cJSON/cJSONConfig.cmake
+-- Installing: /usr/local/lib/cmake/cJSON/cJSONConfigVersion.cmake
+[root@iZ23psatkqsZ build]# 
+
+    cd cJSON
+    make
+
+
+[rabbit@iZ23psatkqsZ cJSON]$ ll
+total 416
+drwxr-xr-x 3 rabbit ctp  4096 Jan 10 00:34 build
+-rw-r--r-- 1 rabbit ctp 51980 Jan 10 00:24 cJSON.c
+-rw-r--r-- 1 rabbit ctp   782 Jan 10 00:24 cJSONConfig.cmake.in
+-rw-r--r-- 1 rabbit ctp   379 Jan 10 00:24 cJSONConfigVersion.cmake.in
+-rw-r--r-- 1 rabbit ctp  8714 Jan 10 00:24 cJSON.h
+-rw-r--r-- 1 rabbit ctp 30240 Jan 10 00:38 cJSON.o
+-rwxr-xr-x 1 rabbit ctp 36709 Jan 10 00:38 cJSON_test
+-rwxr-xr-x 1 rabbit ctp 46688 Jan 10 00:38 cJSON_test_utils
+-rw-r--r-- 1 rabbit ctp 21598 Jan 10 00:24 cJSON_Utils.c
+-rw-r--r-- 1 rabbit ctp  1661 Jan 10 00:24 cJSON_Utils.h
+-rw-r--r-- 1 rabbit ctp 14280 Jan 10 00:38 cJSON_Utils.o
+-rw-r--r-- 1 rabbit ctp  4087 Jan 10 00:24 CMakeLists.txt
+-rw-r--r-- 1 rabbit ctp  1380 Jan 10 00:24 CONTRIBUTORS.md
+-rw-r--r-- 1 rabbit ctp 31358 Jan 10 00:38 libcjson.a
+-rw-r--r-- 1 rabbit ctp   272 Jan 10 00:24 libcjson.pc.in
+lrwxrwxrwx 1 rabbit ctp    13 Jan 10 00:38 libcjson.so -> libcjson.so.1
+lrwxrwxrwx 1 rabbit ctp    17 Jan 10 00:38 libcjson.so.1 -> libcjson.so.1.2.0
+-rwxr-xr-x 1 rabbit ctp 35975 Jan 10 00:38 libcjson.so.1.2.0
+-rw-r--r-- 1 rabbit ctp 14654 Jan 10 00:38 libcjson_utils.a
+-rw-r--r-- 1 rabbit ctp   319 Jan 10 00:24 libcjson_utils.pc.in
+lrwxrwxrwx 1 rabbit ctp    19 Jan 10 00:38 libcjson_utils.so -> libcjson_utils.so.1
+lrwxrwxrwx 1 rabbit ctp    23 Jan 10 00:38 libcjson_utils.so.1 -> libcjson_utils.so.1.2.0
+-rwxr-xr-x 1 rabbit ctp 22500 Jan 10 00:38 libcjson_utils.so.1.2.0
+-rw-r--r-- 1 rabbit ctp  1091 Jan 10 00:24 LICENSE
+-rw-r--r-- 1 rabbit ctp  4146 Jan 10 00:24 Makefile
+-rw-r--r-- 1 rabbit ctp 12619 Jan 10 00:24 README.md
+-rw-r--r-- 1 rabbit ctp 11413 Jan 10 00:24 test.c
+drwxr-xr-x 2 rabbit ctp  4096 Jan 10 00:24 tests
+-rw-r--r-- 1 rabbit ctp  8281 Jan 10 00:24 test_utils.c
+[rabbit@iZ23psatkqsZ cJSON]$ 
+
+    ./cJSON_test
+    ./cJSON_test_utils
+
+========================================================================

@@ -1,0 +1,165 @@
+#include <see_com_common.h>
+
+const char ca_pubsub_url[] = "ipc:///tmp/heaven.ipc" ;
+const char ca_mysql_url[]  = "mysql://127.0.0.1/test?user=root&password=root" ;
+static char ca_tick_file[512] ;
+
+
+static char   ca_futures[FUTURE_NUMBER][FUTRUE_ID_LEN] ;
+static char * pp_futures[FUTURE_NUMBER];
+
+static see_bar_t * pp_bars[FUTURE_NUMBER][BAR_1Y][2] ;
+static see_future_block_t * pp_f_blocks[FUTURE_NUMBER] ;
+
+static int i_index ;
+
+int
+main(int iArgCnt, char *pcaArgVec[])
+{
+    int i_rtn =0 ;
+    char ca_errmsg[100] ;
+    int sock ;
+    char *buf = NULL;
+    struct CThostFtdcDepthMarketDataField * market_data ;
+
+//    see_signal_init() ;                 // 需要详细考虑 
+//    signal(SIGHUP, SIG_IGN);
+//    signal(SIGPIPE, SIG_IGN);
+    see_daemon(1,0) ;
+
+    i_rtn = see_futures_init(pp_futures,ca_futures) ;                 // 初始化 future 列表
+    if ( i_rtn != 0 ){
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"main: see_futures_init error : %d\n", i_rtn ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+    }
+
+/* 
+    int i = 0 ;
+    int j = 0 ;
+    while ( pp_futures[i] != NULL ) {                                          // 为每个future 每个周期 创建0和1两个bar
+        j = 0 ;
+        while ( j <= BAR_1Y ) {
+            pp_bars[i][j][0] = see_create_bar( pp_futures[i],(char)j );
+            pp_bars[i][j][1] = see_create_bar( pp_futures[i],(char)j );
+            j++ ;
+        }
+        i++ ;
+    }
+*/
+
+
+/* --------- create future block for each future ------------ begin ------------ */
+    int i = 0 ;
+    while ( pp_futures[i] != NULL ) {
+        FUTURE_BLOCK = malloc(sizeof(see_future_block_t)) ;
+        if (FUTURE_BLOCK == NULL ) {
+            see_errlog( 1000,"create future block error!\n",RPT_TO_LOG,0,0 ) ;
+        }
+        memcpy(FUTURE_BLOCK->InstrumentID,pp_futures[i],FUTRUE_ID_LEN) ;
+        
+        i++ ;
+    }
+/* --------- create future block for each future ------------ end ------------ */
+
+/* 要初始化 pp_bars[i][j][0] pp_bars[i][j][1] */ 
+
+
+
+
+    sock = see_pubsub_client( ca_pubsub_url, "iostest" ) ;
+
+    while (1)                                                         //  接收数据 并进行处理 
+    {
+        struct timeval start, end;
+
+        gettimeofday( &start, NULL );
+        int bytes = nn_recv (sock, &buf, NN_MSG, 0);                  // 如果没有数据，进程会等在这里，这时
+                                                                      // 如果收到signal 后，会进入到自己写的信号处理程序
+                                                                      // 然后程序会往下走，buf没有分配内存，所以会出报SIGSEG信号。
+                                                                      // 如果在前面 忽略如SIGHUP信号，则不会进入到 信号处理程序
+        gettimeofday( &end,NULL );
+        market_data = (struct CThostFtdcDepthMarketDataField *)buf ; 
+        sprintf( ca_errmsg,"=== market_data->Volume ==== %d \n",market_data->Volume ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+
+/* -------- save tick data ------------begin -------------- */
+        char ca_tmp[3] ;
+        memset( ca_tmp,'\0',3 ) ;
+        memcpy( ca_tmp,market_data->UpdateTime,2 );
+        memset( ca_tick_file,'\0',512 ) ;
+        sprintf( ca_tick_file, "../../dat/rcv_dat/tick-%s-%s-%s-%s.bin",market_data->InstrumentID, \
+                                                   market_data->TradingDay, \
+                                                   market_data->ActionDay, \
+                                                   ca_tmp ) ;
+        see_save_file(ca_tick_file,buf,bytes) ;
+/* -------- save tick data ------------ end -------------- */
+
+//        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,buf,408 ) ;
+/*------------
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"===iosmain recieved :====  \n" ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,buf,408 ) ;
+        sprintf( ca_errmsg,"=== market_data->Volume ==== %d \n",market_data->Volume ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        sprintf( ca_errmsg,"=== market_data->LastPrice ==== %10.2f \n",market_data->LastPrice ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        sprintf( ca_errmsg,"=== market_data->PreSettlementPrice ==== %10.2f \n",market_data->PreSettlementPrice ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        sprintf( ca_errmsg,"=== market_data->PreClosePrice ==== %10.2f \n",market_data->PreClosePrice ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        sprintf( ca_errmsg,"=== market_data->OpenPrice ==== %10.2f \n",market_data->OpenPrice ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        sprintf( ca_errmsg,"=== market_data->HighestPrice ==== %10.2f \n",market_data->HighestPrice ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        sprintf( ca_errmsg,"=== market_data->LowestPrice ==== %10.2f \n",market_data->LowestPrice ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        if ( market_data->ClosePrice < 10000000000000 && market_data->ClosePrice > -10000000000000 ){
+            sprintf( ca_errmsg,"=== market_data->ClosePrice ==== %10.2f \n",market_data->ClosePrice ) ;
+            see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        } else {
+            sprintf( ca_errmsg,"=== market_data->ClosePrice ==== NULL !!! \n" ) ;
+            see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        }
+----------- */
+
+        i_index = 0 ;                                       // 取得某个期货合约 所在数组  pp_bars[FUTURE_NUMBER][BAR_1Y][2] 的位置
+        while (pp_futures[i_index] != NULL ) {
+            if (strcmp(pp_futures[i_index],market_data->InstrumentID) == 0 ){
+                break ;
+            }
+            i_index ++ ;
+        }
+
+/*   这里要开始计算 K线了 */
+/*---------------------------*/
+        int j = 0 ;                               // j 从 tick 1s 2s 5s 10s 到 1f 5f ... 1h... 1y 
+        int ww = 0 ;                              // see_calc_bar 返回值确定 bar[0]是不是要存储！
+        for ( j = 0 ; j<= BAR_1Y; j++ ) {
+            ww = see_calc_bar( buf,pp_bars[i_index][j][0],pp_bars[i_index][j][1],(char)j ) ;
+            if ( ww == 1 ) {
+               // see_save_file(ca_tick_file,buf,bytes) ;
+            }
+        }
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"===  see_calc_bar ========= :%s  --  %s \n", \
+                                                     pp_bars[i_index][BAR_5S][0]->InstrumentID, \
+                                                     pp_bars[i_index][BAR_5S][0]->UpdateTime ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+/*---------------------------*/
+
+
+        nn_freemsg (buf);
+
+
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"==== time =========: sec:%lu usec:%lu \n",end.tv_sec-start.tv_sec,end.tv_usec-start.tv_usec ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+
+
+        usleep(2500) ;
+
+    }
+
+    return SEE_OK;
+}

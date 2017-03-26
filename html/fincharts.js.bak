@@ -1,0 +1,1299 @@
+/* charmi liu version 1.0 */
+(function(global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global.barCharts = factory());
+}(this, (function() {
+  'use strict';
+  let data0 = 0;
+  let data1 = 0;
+  let data2 = 0;
+
+  let SERIES_TYPE = [
+    'bar',
+    'candlestick',
+    'line'
+  ];
+
+
+  let O = {
+    K: 1234,
+    curP: 600,
+    curD: 50,
+    cvsW: 1200,
+    cvsH: 600,
+    //maxLen: 10000,
+    minLen: 100,
+    maxLevel: 0,
+    minLevel: 0,
+    curLevel: 10, //keep
+    step: 10,
+    oo: [],
+    hh: [],
+    ll: [],
+    cc: [],
+    AB: [],
+    X: {},
+    Y: {
+      data: [{
+        height: 100,
+        type: 'candlestick',
+        x: 2,
+        y: data0
+      }, {
+        height: 100,
+        type: 'bar',
+        x: 3,
+        y: data1
+      }, {
+        height: 100,
+        type: 'line',
+        y: data2
+      }]
+    }
+  };
+
+  function stockcharts(cvs, opt, theme) {
+
+    let mn;
+    let R = Math.round;
+    let F = Math.floor;
+    let cvsW = 1200,
+      cvsH = 600,
+      //maxLen = 10000, //屏幕显示最大的K数量,实际从后台传过来的数据可大可小
+      //minLen = 100, //
+      curLen, //keep
+      curP, // 屏幕位置
+      //currentBar = minLen / 2, //keep
+      mouseX = cvsW / 2, //temp keep
+      mouseY = cvsH / 2, //temp keep
+      minLevel,
+      curLevel = 10, //temp keep
+      maxLevel = 100,
+      P = [], //记录屏幕px位置对应的K数组下标
+      step = 10;
+    let X,
+      Y,
+      oo = [],
+      hh = [],
+      ll = [],
+      cc = [];
+    //this.cvs = cvs;
+    //this.O = opt;
+    //this.theme = theme;
+    let tWid = window.devicePixelRatio;
+    //cvs.width = O.cvsW;
+    //cvs.height = O.cvsH;
+    //cvs.style.width = O.cvsW / tWid + "px";
+    //cvs.style.height = O.cvsH / tWid + "px";
+    let i = 0;
+
+    /* define G global var !!!! ------------------------------------------------------- */
+    let tW = window.innerWidth > 200 ? window.innerWidth : 200; //total width
+    let H1 = window.innerHeight * 0.60 > 350 ? R(window.innerHeight * 0.60 / 10) * 10 : 350; // candle window height
+    let H2 = window.innerHeight * 0.35 > 200 ? R(window.innerHeight * 0.35 / 10) * 10 : 200; // MACD KDJ window height
+    tW = tW / tWid;
+    H1 = H1 / tWid;
+    H2 = H2 / tWid;
+    let topW = tW;
+    let botW = tW;
+    let topH = 0 / tWid;
+    let botH = 30 / tWid;
+    let leftW = 60 / tWid;
+    let rightW = 200 / tWid;
+    let scrollFH = 15 / tWid;
+    let scrollBH = 15 / tWid;
+
+    let mainFW = tW - rightW - leftW,
+      mainFH = H1,
+      mainBW = tW - rightW,
+      mainBH = H1,
+
+      scrollFW = mainFW,
+      scrollBW = mainBW,
+
+      subFW = mainFW,
+      subFH = H2,
+      subBW = mainBW,
+      subBH = H2,
+
+      sttFW = mainFW,
+      sttFH = mainFH,
+      sttBW = mainBW,
+      sttBH = mainBH,
+
+      backFW = mainFW,
+      backFH = H1 + topH + scrollFH + H2 * 3 + botH,
+      backBW = mainBW,
+      backBH = backFH,
+
+      leftH = backFH - topH - botH,
+      rightH = backFH - topH - botH;
+
+
+    let G = {
+      wH: 1200,
+      wW: window.innerWidth > 1200 ? window.innerWidth : 1200,
+      cH: this.wH,
+      cW: this.wW,
+      cvsS: [], // canvas array !! cvsS[0]: main cvsS !
+      _winX: 0,
+      _winY: 0,
+      _maxLen: 20000, //  max data len
+      _disLen: 20000, //  max display len
+      _disLast: 1, //  display the most right bar !
+      _barW: 0,
+      _barB: 0,
+      _barE: 1000,
+      _minLevel: 0, // min display Level
+      _curLevel: 0, // current display Level
+      _maxLevel: 10, // max display Level
+      hFst: [],
+      lFst: [],
+      idxHeadFst: 0,
+      idxTailFst: 0,
+      hSnd: [],
+      lSnd: [],
+      idxHeadSnd: 0,
+      idxTailSnd: 0,
+      hlLen: 20
+    };
+
+    let cvsS = {
+      topNav: {
+        backgroundColor: "#111111",
+        zIndex: 105,
+        border: 0,
+        top: 0,
+        left: 0,
+        width: topW,
+        height: topH
+      },
+      leftNav: {
+        backgroundColor: "#222222",
+        zIndex: 101,
+        top: topH,
+        left: 0,
+        width: leftW,
+        height: leftH
+      },
+      rightNav: {
+        backgroundColor: "#222222",
+        zIndex: 101,
+        top: topH,
+        left: tW - rightW,
+        width: rightW,
+        height: rightH
+      },
+      botNav: {
+        backgroundColor: "#111111",
+        zIndex: 105,
+        top: backFH - botH,
+        left: 0,
+        width: botW,
+        height: botH
+      },
+      mainB: {
+        backgroundColor: "#000000",
+        //backgroundColor: "#776633",
+        zIndex: 96,
+        top: topH,
+        left: 0,
+        width: mainBW,
+        height: mainBH
+      },
+      mainF: {
+        backgroundColor: "transparent",
+        //backgroundColor: "#776633",
+        zIndex: 98,
+        top: topH,
+        left: leftW,
+        width: mainFW,
+        height: mainFH
+      },
+      scrollB: {
+        backgroundColor: "#229999",
+        zIndex: 99,
+        top: topH + mainFH,
+        left: 0,
+        width: scrollBW,
+        height: scrollBH
+      },
+      scrollF: {
+        backgroundColor: "#229999",
+        zIndex: 100,
+        top: topH + mainFH,
+        left: leftW,
+        width: scrollFW,
+        height: scrollFH
+      },
+      sub1B: {
+        backgroundColor: "transparent",
+        zIndex: 94,
+        top: topH + H1 + scrollFH,
+        left: 0,
+        width: subBW,
+        height: subBH
+      },
+      sub1F: {
+        backgroundColor: "transparent",
+        zIndex: 95,
+        top: topH + H1 + scrollFH,
+        left: leftW,
+        width: subFW,
+        height: subFH
+      },
+      sub2B: {
+        backgroundColor: "transparent",
+        zIndex: 12,
+        top: topH + H1 + scrollFH + H2,
+        left: 0,
+        width: subBW,
+        height: subBH
+      },
+      sub2F: {
+        backgroundColor: "transparent",
+        zIndex: 12,
+        top: topH + H1 + scrollFH + H2,
+        left: leftW,
+        width: subFW,
+        height: subFH
+      },
+      sub3B: {
+        backgroundColor: "transparent",
+        zIndex: 12,
+        top: topH + H1 + scrollFH + H2 * 2,
+        left: 0,
+        width: subBW,
+        height: subBH
+      },
+      sub3F: {
+        backgroundColor: "transparent",
+        zIndex: 12,
+        top: topH + H1 + scrollFH + H2 * 2,
+        left: leftW,
+        width: subFW,
+        height: subFH
+      },
+      sttB: {
+        backgroundColor: "#222222",
+        zIndex: 16,
+        top: topH,
+        left: 0,
+        width: sttBW,
+        height: sttBH
+      },
+      sttF: {
+        backgroundColor: "#222222",
+        zIndex: 16,
+        top: topH,
+        left: leftW,
+        width: sttFW,
+        height: sttFH
+      },
+      backB: {
+        backgroundColor: "#000000",
+        zIndex: -101,
+        top: 0,
+        left: 0,
+        width: backBW,
+        height: backBH
+      },
+      backF: {
+        backgroundColor: "transparent",
+        zIndex: 97,
+        top: 0,
+        left: leftW,
+        width: backFW,
+        height: backFH
+      }
+    }
+
+    Object.defineProperties(G, {
+      "disLast": {
+        set: function(x) {
+          this._disLast = x;
+        },
+        get: function() {
+          return this._disLast;
+        },
+        enumerable: true,
+        configurable: true
+      },
+      "curLevel": {
+        set: function(x) {
+          setCurLevel(x);
+        },
+        get: function() {
+          return this._curLevel;
+        },
+        enumerable: true,
+        configurable: true
+      },
+      "minLevel": {
+        set: function(x) {
+          this._minLevel = x;
+        },
+        get: function() {
+          return this._minLevel;
+        },
+        enumerable: true,
+        configurable: true
+      },
+      "maxLevel": {
+        set: function(x) {
+          this._maxLevel = x;
+        },
+        get: function() {
+          return this._maxLevel;
+        },
+        enumerable: true,
+        configurable: true
+      },
+      "barW": {
+        set: function(x) {
+          this._barW = x;
+        },
+        get: function() {
+          return this._barW;
+        },
+        enumerable: true,
+        configurable: true
+      },
+      "barB": {
+        set: function(x) {
+          this._barB = x;
+        },
+        get: function() {
+          return this._barB;
+        },
+        enumerable: true,
+        configurable: true
+      },
+      "barE": {
+        set: function(x) {
+          this._barE = x;
+        },
+        get: function() {
+          return this._barE;
+        },
+        enumerable: true,
+        configurable: true
+      },
+      "maxLen": {
+        set: function(x) {
+          this._maxLen = x;
+        },
+        get: function() {
+          return this._maxLen;
+        },
+        enumerable: true,
+        configurable: true
+      },
+      "disLen": {
+        set: function(x) {
+          this._disLen = x;
+        },
+        get: function() {
+          return this._disLen;
+        },
+        enumerable: true,
+        configurable: true
+      }
+    });
+
+    /* set G._curLevel and modify Begin and End index */
+    function setCurLevel(x) {
+      if (x < 0) {
+        G._curLevel = 0;
+      } else if (x > G._maxLevel) {
+        G._curLevel = G._maxLevel;
+      } else {
+        G._curLevel = x;
+      }
+      console.log(" xxxxxxxxxxxxxxx " + x);
+      console.log(" G._curLevel " + G._curLevel);
+      let dataLen = Math.min(O.AB[G._curLevel][2], G._disLen, O.oo.length);
+      G._barW = O.AB[G._curLevel][0] > 0 ? O.AB[G._curLevel][0] : 1;
+      G._barE = R((dataLen + G._barB + G._barE) / 2);
+      G._barB = G._barE - dataLen;
+      if (G._barB < 0) {
+        G._barB = 0;
+        G._barE = dataLen;
+      };
+      if (G._barE >= O.oo.length || G._disLast == 1) {
+        G._barE = O.oo.length;
+        G._barB = O.oo.length - dataLen;
+      }
+      G._disLast = G._barE == O.hh.length ? 1 : 0;
+      G._curLen = G._barE - G._barB;
+    }
+    /* define G global var !!!! ------------------------------------------------------- */
+    /* initial highest data and lowest data in G.hFst[] G.lFst[] G.hSnd[] G.lSnd G.iFst G.iSnd */
+    this.initHL = function() {
+      let i = 0,
+        j = 0;
+      let h = [],
+        l = [];
+      let hmax, lmin;
+      G.idxHeadFst = 0;
+      G.idxTailFst = 0;
+      for (i = 0; i < Math.ceil(O.hh.length / G.hlLen); i++) {
+        j = i * G.hlLen;
+        if ((j + G.hlLen) <= O.hh.length) {
+          h = O.hh.slice(j, j + G.hlLen);
+          l = O.ll.slice(j, j + G.hlLen);
+        } else {
+          h = O.hh.slice(j, O.hh.length);
+          l = O.ll.slice(j, O.hh.length);
+          G.idxTailFst = O.hh.length - j; //最后一个格里面没有满，其数量就是 idxTailFst，每G.hlLen个数一个格
+        }
+        hmax = Math.max.apply(null, h);
+        lmin = Math.min.apply(null, l);
+        G.hFst.push(hmax);
+        G.lFst.push(lmin);
+      }
+      /* 第二级还没有计算!!!*/
+      G.idxHeadSnd = 0;
+      G.idxTailSnd = 0;
+      for (i = 0; i < Math.ceil(G.hFst.length / G.hlLen); i++) {
+        j = i * G.hlLen;
+        console.log(j);
+        //console.log(O.hh[j]);
+        if ((j + G.hlLen) <= G.hFst.length) {
+          h = G.hFst.slice(j, j + G.hlLen);
+          l = G.lFst.slice(j, j + G.hlLen);
+        } else {
+          h = G.hFst.slice(j, O.hh.length);
+          l = G.lFst.slice(j, O.hh.length);
+          G.idxTailSnd = G.hFst.length - j; //最后一个格里面没有满，其数量就是 idxTailSnd，每G.hlLen个数一个格
+        }
+        hmax = Math.max.apply(null, h);
+        lmin = Math.min.apply(null, l);
+        G.hSnd.push(hmax);
+        G.lSnd.push(lmin);
+      }
+    }
+
+    this.updateHL = function(n = 0) {
+      let i = 0;
+    }
+
+    /*
+        function _backCvs() {
+          let cvs = new createCvs("backCvs");
+          cvs[0].width = G.wW;
+          cvs[0].height = 600;
+          cvs[0].style.zIndex = -100;
+          cvs[0].style.top = 0;
+          cvs[0].style.left = 0;
+          cvs[0].style.backgroundColor = "#220022";
+          this.disp = function() {
+            cvs[1].strokeStyle = 'red';
+            cvs[1].lineWidth = 1;
+            cvs[1].beginPath();
+            cvs[1].moveTo(0, 0);
+            cvs[1].lineTo(100, 100);
+            cvs[1].closePath();
+            cvs[1].stroke();
+          }
+          this.mouseMove = function(x, y) {
+            cvs[1].clearRect(0, 0, backW, backH);
+            cvs[1].fillStyle = "#773388";
+            cvs[1].fillRect(x, 0, 1, backH);
+            cvs[1].fillRect(0, y, backW, 1);
+          }
+        }
+
+        function _subCvs(id, type) {
+          this.type = type;
+          let cvs = new createCvs1(id);
+          cvs[0].width = G.wW;
+          cvs[0].height = 300;
+          cvs[0].style.zIndex = 1;
+          cvs[0].style.top = 0;
+          cvs[0].style.left = 0;
+          cvs[0].style.backgroundColor = "#220022";
+          this.disp = function() {
+            cvs[1].strokeStyle = 'red';
+            cvs[1].lineWidth = 1;
+            cvs[1].beginPath();
+            cvs[1].moveTo(0, 0);
+            cvs[1].lineTo(100, 100);
+            cvs[1].closePath();
+            cvs[1].stroke();
+          }
+          this.mouseMove = function(x, y) {
+            cvs[1].clearRect(0, 0, 1200, 600);
+            cvs[1].fillStyle = "#773388";
+            cvs[1].fillRect(x, 0, 1, 600);
+            cvs[1].fillRect(0, y, 1200, 1);
+          }
+        }
+        */
+
+    /* canvas function begin !! ----------------------------------------------- */
+    function createCvs(id, c = {}) {
+      let canvas = document.createElement("canvas");
+      document.body.appendChild(canvas);
+      let ctx = canvas.getContext("2d");
+      canvas.style.backgroundColor = c.backgroundColor;
+      canvas.style.visibility = "visible";
+      canvas.style.position = "absolute";
+      //canvas.style.border = c.border;
+      canvas.style.zIndex = c.zIndex;
+      canvas.style.left = c.left;
+      canvas.style.top = c.top;
+      canvas.width = c.width;
+      canvas.height = c.height;
+      canvas.id = id;
+      return [canvas, ctx, id];
+    }
+
+    function _topNav() {
+      let cvs = new createCvs("topNav", cvsS.topNav);
+      this.cvs = cvs;
+      //cvs[0].style.position = "fixed";
+      let ctx = cvs[1];
+      ctx.fillStyle = "#AA0000";
+      ctx.fillRect(0, topH - 1, topW, 1);
+    }
+    let topNav = new _topNav();
+
+    function _leftNav() {
+      let cvs = new createCvs("leftNav", cvsS.leftNav);
+      this.cvs = cvs;
+      //cvs[0].style.position = "fixed";
+      let ctx = cvs[1];
+      ctx.fillStyle = "#AA0000";
+      ctx.fillRect(0, topH + 200, leftW, 1);
+    }
+    //let leftNav = new _leftNav();
+
+    function _rightNav() {
+      let cvs = new createCvs("rightNav", cvsS.rightNav);
+      this.cvs = cvs;
+      //cvs[0].style.position = "fixed";
+    }
+    let rightNav = new _rightNav();
+
+    function _botNav() {
+      let cvs = new createCvs("botNav", cvsS.botNav);
+      this.cvs = cvs;
+    }
+    let botNav = new _botNav();
+
+    function _mainF() {
+      let c = new createCvs("mainF", cvsS.mainF);
+      this.cvs = c[0];
+      this.ctx = c[1];
+      this.id = c[2];
+      this.mn = [];
+      //cvs[0].style.position = "fixed";
+      this.cvs.addEventListener("mousemove", mouseMove, false);
+      this.cvs.addEventListener("mouseleave", mouseMove, false);
+      //cvs.addEventListener("mouseout", mouseMove, false);
+      this.cvs.addEventListener('wheel', xxxx, false);
+      //this.ctx.fillStyle = "#773388";
+      //this.ctx.fillRect(0, 100, 500, 20);
+    }
+    let mainF = new _mainF();
+
+    function _mainB() {
+      let i = 0;
+      let cvs = new createCvs("mainB", cvsS.mainB);
+      this.cvs = cvs;
+      this.ctx = cvs[1];
+      this.scale = [];
+      this.mn = [];
+      //cvs[0].style.position = "fixed";
+      cvs[0].addEventListener("mousemove", mouseMove, false);
+      cvs[0].addEventListener('wheel', xxxx, false);
+
+      this.init = function() {
+        cvs[1].fillStyle = "#773388";
+        this.scale.push([30, "100%"]);
+        this.scale.push([R(30 + (mainBH - 60) * 0.191), "19.1%"]);
+        this.scale.push([R(30 + (mainBH - 60) * 0.382), "38.2%"]);
+        this.scale.push([R(30 + (mainBH - 60) * 0.500), "50.0%"]);
+        this.scale.push([R(30 + (mainBH - 60) * 0.618), "61.8%"]);
+        this.scale.push([R(30 + (mainBH - 60) * 0.809), "80.9%"]);
+        this.scale.push([mainBH - 30, "00.0%"]);
+
+        cvs[1].fillStyle = "#773388";
+        cvs[1].font = "14px";
+        cvs[1].fillRect(leftW - 2, 0, 1, mainBH);
+        for (i = 0; i < this.scale.length; i++) {
+          cvs[1].fillStyle = "#773388";
+          cvs[1].fillRect(leftW - 6, this.scale[i][0], 4, 1);
+          cvs[1].fillStyle = "#222222";
+          cvs[1].fillRect(leftW - 1, this.scale[i][0], mainBW - leftW, 1);
+          cvs[1].fillStyle = "#AAAAAA";
+          cvs[1].fillText(this.scale[i][1], leftW - 38, this.scale[i][0]);
+        }
+      }
+      this.init();
+    }
+    let mainB = new _mainB();
+
+
+    function _scrollB() {
+      let cvs = new createCvs("scrollB", cvsS.scrollB);
+      this.cvs = cvs;
+      //cvs[0].style.position = "fixed";
+    }
+    let scrollB = new _scrollB();
+
+    function _scrollF() {
+      let cvs = new createCvs("scrollF", cvsS.scrollF);
+      this.cvs = cvs;
+      //cvs[0].style.position = "fixed";
+    }
+    let scrollF = new _scrollF();
+
+    function _sub1B() {
+      let cvs = new createCvs("sub1B", cvsS.sub1B);
+      this.cvs = cvs;
+      this.ctx = cvs[1];
+      this.scale = [];
+      //cvs[0].style.position = "fixed";
+      cvs[0].addEventListener("mousemove", mouseMove, false);
+      cvs[0].addEventListener('wheel', xxxx, false);
+
+      this.init = function() {
+        this.ctx.fillStyle = "#AA0000";
+        this.ctx.fillRect(0, subBH - 1, subBW, 1);
+        cvs[1].fillStyle = "#773388";
+        this.scale.push([30, "100%"]);
+        this.scale.push([R(30 + (subBH - 60) * 0.191), "19.1%"]);
+        this.scale.push([R(30 + (subBH - 60) * 0.382), "38.2%"]);
+        this.scale.push([R(30 + (subBH - 60) * 0.500), "50.0%"]);
+        this.scale.push([R(30 + (subBH - 60) * 0.618), "61.8%"]);
+        this.scale.push([R(30 + (subBH - 60) * 0.809), "80.9%"]);
+        this.scale.push([subBH - 30, "00.0%"]);
+
+        cvs[1].fillStyle = "#773388";
+        cvs[1].font = "14px";
+        cvs[1].fillRect(leftW - 2, 0, 1, subBH);
+        for (i = 0; i < this.scale.length; i++) {
+          cvs[1].fillStyle = "#773388";
+          cvs[1].fillRect(leftW - 6, this.scale[i][0], 4, 1);
+          cvs[1].fillStyle = "#222222";
+          cvs[1].fillRect(leftW - 1, this.scale[i][0], subBW - leftW, 1);
+          cvs[1].fillStyle = "#AAAAAA";
+          cvs[1].fillText(this.scale[i][1], leftW - 38, this.scale[i][0]);
+        }
+      }
+      this.init();
+    }
+    let sub1B = new _sub1B();
+
+    function _sub1F() {
+      let canvas = new createCvs("sub1F", cvsS.sub1F);
+      this.cvs = canvas[0];
+      this.ctx = canvas[1];
+      this.ctx.fillStyle = "#AA0000";
+      this.ctx.fillRect(0, subFH - 1, subFW, 1);
+      this.cvs.addEventListener("mousemove", mouseMove, false);
+      this.cvs.addEventListener('wheel', xxxx, false);
+    }
+
+    let sub1F = new _sub1F();
+
+    function _subB() {
+      let cvs = new createCvs("subB", cvsS.subB);
+      this.cvs = cvs;
+      cvs[0].addEventListener("mousemove", mouseMove, false);
+      cvs[0].addEventListener('wheel', xxxx, false);
+    }
+
+    function _subC() {
+      let cvs = new createCvs("subC", cvsS.subC);
+      this.cvs = cvs;
+      cvs[0].addEventListener("mousemove", mouseMove, false);
+      cvs[0].addEventListener('wheel', xxxx, false);
+    }
+
+    function _stt() {
+      let cvs = new createCvs("stt", cvsS.stt);
+      this.cvs = cvs;
+      cvs[0].addEventListener("mousemove", mouseMove, false);
+      cvs[0].addEventListener('wheel', xxxx, false);
+    }
+
+    function _backF() {
+      let cvs = new createCvs("backF", cvsS.backF);
+      this.cvs = cvs;
+      //cvs[0].style.position = "fixed";
+      this.mouseMove = function(x, y) {
+        cvs[1].clearRect(0, 0, backFW, backFH);
+        cvs[1].fillStyle = "#773388";
+        cvs[1].fillRect(x, 0, 1, backFH);
+        cvs[1].fillRect(0, y, backFW, 1);
+      }
+    }
+    let backF = new _backF();
+
+    function _backB() {
+      let cvs = new createCvs("backB", cvsS.backB);
+      this.cvs = cvs;
+      //cvs[0].style.position = "fixed";
+      this.mouseMove = function(x, y) {
+        cvs[1].clearRect(0, 0, backBW, backBH);
+        cvs[1].fillStyle = "#773388";
+        cvs[1].fillRect(x, 0, 1, 600);
+        cvs[1].fillRect(0, y, 1200, 1);
+      }
+    }
+    let backB = new _backB();
+
+    /* canvas function end !! ----------------------------------------------- */
+
+    function levelInit() {
+      let x = 0;
+      for (i = 18; i >= 11; i--) {
+        let a1 = 2 * i + 1;
+        let sp = R(i / 5);
+        O.AB.push([a1, sp, F(mainFW / (a1 + sp))]);
+      }
+
+      for (i = 10; i >= 2; i--) {
+        let a1 = 2 * i + 1;
+        O.AB.push([a1, 2, F(mainFW / (a1 + 2))]); // 1px 空
+        O.AB.push([a1, 1, F(mainFW / (a1 + 1))]);
+      }
+      let rate = 1.1;
+      let baseLen = mainFW / 5;
+      for (i = 0; i <= 5; i++) {
+        O.AB.push([3, 0, F(baseLen)]);
+        baseLen = baseLen * rate;
+      }
+      for (i = 0; i <= 37; i++) {
+        O.AB.push([1, 0, F(baseLen)]);
+        baseLen = baseLen * rate;
+      }
+    } /* levelInit() */
+
+    function OInit(opt = {}, O = {}) {
+      let i = 0,
+        len = 0;
+      if (opt.X) {
+        O.X = opt.X;
+        X = opt.X;
+      }
+      if (opt.Y) {
+        O.Y = opt.Y;
+        Y = opt.Y;
+        len = O.Y.data[0].y.length;
+        O.oo = O.Y.data[0].oo; // 是同一个，不是新创建O.oo
+        O.hh = O.Y.data[0].hh;
+        O.ll = O.Y.data[0].ll;
+        O.cc = O.Y.data[0].cc;
+        if (O.oo.length > G.maxLen) {
+          for (i = 0; i < (O.oo.length - G.maxLen); i++) {
+            O.oo.shift();
+            O.hh.shift();
+            O.ll.shift();
+            O.cc.shift();
+          }
+        }
+      }
+      O.Z = 567;
+      O.K = opt.K || 1000;
+      levelInit();
+
+      G.curLevel = 0;
+      //G.curLevel = G.curLevel ;  //这个赋值，用来更新 G.barB B.barE !!
+      G.maxLevel = O.AB.length - 1;
+    }
+
+    this.updateData = function() {
+      /*
+      有几种情况
+          1、从服务器收到一个新的数据，只有一个，且是新加到数组中。
+          2、从服务器收到一个数据，这个数据只是更新数组中的最后一个数据，数组长度不变。
+          3、从服务器一次收到多个数据，更新了原数组中的最后一个数据，并增加新的数据，数组长度改变。
+      动作如下：
+          1、要更新G.hFst,G.lFst G.hSnd G.lSnd 最大值 最小值记录数组
+          2、更新 G.barB B.barE ( 用setCurLevel 来更新: G.curLevel = G.curLevel ; )
+          3、所有以上的改变，都要重绘图！ disLast = 1;
+          4、子图也要重绘。
+      */
+    }
+
+    function calcYscale1(height, b, e, hh, ll, hFst, lFst, hSnd, lSnd) {
+      let top = 30;
+      let down = 30;
+
+      let bFst, eFst;
+      let bSnd, eSnd;
+      let hmax, lmin;
+
+      let h1, h2, h3, h4, h5;
+      let l1, l2, l3, l4, l5;
+      let hh1, hh2, hh3, hh4, hh5;
+      let ll1, ll2, ll3, ll4, ll5;
+
+      bFst = F((b + G.idxHeadFst) / G.hlLen);
+      eFst = F((e + G.idxHeadFst) / G.hlLen);
+      bSnd = F((bFst + G.idxTailFst) / G.hlLen);
+      eSnd = F((eFst + G.idxTailFst) / G.hlLen);
+
+      if ((eSnd - bSnd) >= 0 && (eSnd - bSnd) <= 1) {
+        if ((eFst - bFst) >= 0 && (eFst - bFst) <= 1) {
+          hh3 = hh.slice(b, e);
+          ll3 = ll.slice(b, e);
+          hmax = Math.max.apply(null, hh3);
+          lmin = Math.min.apply(null, ll1);
+        } else if ((eFst - bFst) > 1) {
+          hh1 = hh.slice(b, ((bFst + 1) * G.hlLen - G.idxHeadFst));
+          ll1 = ll.slice(b, ((bFst + 1) * G.hlLen - G.idxHeadFst));
+          h1 = Math.max.apply(null, hh1);
+          l1 = Math.min.apply(null, ll1);
+
+          hh3 = hFst.slice(bFst + 1, eFst);
+          ll3 = lFst.slice(bFst + 1, eFst);
+          h3 = Math.max.apply(null, hh3);
+          l3 = Math.min.apply(null, ll3);
+
+          hh5 = hh.slice((eFst * G.hlLen - G.idxHeadFst), e);
+          ll5 = ll.slice((eFst * G.hlLen - G.idxHeadFst), e);
+          h5 = Math.max.apply(null, hh5);
+          l5 = Math.min.apply(null, ll5);
+
+          hmax = Math.max(h1, h3, h5);
+          lmin = Math.min(l1, l3, l5);
+
+        } else {
+          console.log("error!!");
+        }
+      } else if ((eSnd - bSnd) > 1) {
+        hh1 = hh.slice(b, ((bFst + 1) * G.hlLen - G.idxHeadFst));
+        ll1 = ll.slice(b, ((bFst + 1) * G.hlLen - G.idxHeadFst));
+        h1 = Math.max.apply(null, hh1);
+        l1 = Math.min.apply(null, ll1);
+
+        hh2 = hFst.slice((bFst + 1), ((bSnd + 1) * G.hlLen - G.idxHeadSnd));
+        ll2 = lFst.slice((bFst + 1), ((bSnd + 1) * G.hlLen - G.idxHeadSnd));
+        h2 = Math.max.apply(null, hh2);
+        l2 = Math.min.apply(null, ll2);
+
+        hh3 = hSnd.slice(bSnd + 1, eSnd);
+        ll3 = lSnd.slice(bSnd + 1, eSnd);
+        h3 = Math.max.apply(null, hh3);
+        l3 = Math.min.apply(null, ll3);
+
+        hh4 = hFst.slice((eSnd * G.hlLen - G.idxHendSnd), eFst);
+        ll4 = lFst.slice((eSnd * G.hlLen - G.idxHendSnd), eFst);
+        h4 = Math.max.apply(null, hh4);
+        l4 = Math.min.apply(null, ll4);
+
+        hh5 = hh.slice((eFst * G.hlLen - G.idxHeadFst), e);
+        ll5 = ll.slice((eFst * G.hlLen - G.idxHeadFst), e);
+        h5 = Math.max.apply(null, hh5);
+        l5 = Math.min.apply(null, ll5);
+        hmax = Math.max(h1, h2, h3, h4, h5);
+        lmin = Math.min(l1, l2, l3, l4, l5);
+      } else {
+        console.log("error!!");
+      }
+      console.log("8888888----------------888888888888:" + hmax + " : " + lmin);
+      let m = (top + down - height) / (hmax - lmin);
+      //let n = height * down - m * lmin;
+      let n = height - down - m * lmin;
+      let scale = [];
+      scale.push([R(top), hmax]);
+      scale.push([R(height - down), lmin]);
+      return [m, n];
+    }
+
+    function calcYscale(height, b, e, hh, ll) {
+      //let top = 0.05;
+      //let down = 0.95;
+      let top = 30;
+      let down = 30;
+      let h = [];
+      h = hh.slice(b, e);
+      let l = [];
+      if (ll == undefined) {
+        l = h;
+      } else {
+        l = ll.slice(b, e);
+      }
+      console.time("bbbbbbb");
+      let hmax = Math.max.apply(null, h);
+      let lmin = Math.min.apply(null, l);
+      console.timeEnd("bbbbbbb");
+      //let m = (height * (top - down)) / (hmax - lmin);
+      let m = (top + down - height) / (hmax - lmin);
+      //let n = height * down - m * lmin;
+      let n = height - down - m * lmin;
+      let scale = [];
+      scale.push([R(top), hmax]);
+      scale.push([R(height - down), lmin]);
+      return [m, n];
+    }
+
+    function calcYscale0(height, hh, ll) {
+      let top = 30;
+      let down = 30;
+      if (ll == undefined) {
+        ll = hh;
+      }
+      let hmax = Math.max.apply(null, hh);
+      let lmin = Math.min.apply(null, ll);
+      let m = (top + down - height) / (hmax - lmin);
+      let n = height - down - m * lmin;
+      return [m, n];
+    }
+
+    OInit(opt, O);
+    //this.initHL();
+    //calcYscale1(100, 5, 100, O.hh, O.ll, G.hFst, G.lFst, G.hSnd, G.lSnd);
+    //console.log(G.hFst);
+    //console.log(G.lFst);
+
+    /* set Begin and End index  平移，所以只有一个参数 */
+    this.setBE = function(x = 0) {
+      let y;
+      if (x > 0) {
+        y = (G.barE + x) < O.hh.length ? x : O.hh.length - G.barE;
+        G.barE = G.barE + y;
+        G.barB = G.barB + y;
+      } else if (x < 0) {
+        y = (G.barB + x) > 0 ? x : 0 - G.barB;
+        G.barE = G.barE + y;
+        G.barB = G.barB + y;
+      }
+      G.disLast = G.barE == O.hh.length ? 1 : 0;
+    }
+
+    let kkuu = 0;
+
+    function drawLine(ctx, dd, mn) {
+      let i = 0;
+      console.time("uuuuuuuu");
+      ctx.beginPath();
+      let v = R(mn[0] * dd[G.barB] + mn[1]);
+      ctx.moveTo(P[0], v + 50);
+      for (i = G.barB + 1; i < G.barE; i++) {
+        v = R(mn[0] * dd[i] + mn[1]);
+        ctx.lineTo(P[i - G.barB], v + 50);
+      }
+      ctx.strokeStyle = "#880088";
+      ctx.stroke();
+      ctx.closePath();
+      console.timeEnd("uuuuuuuu");
+    }
+
+
+    function drawCandle(cvs, ctx) {
+      let oo = [],
+        hh = [],
+        ll = [],
+        cc = [];
+      let idxB;
+      let idxE;
+      let posB;
+      let position,
+        halfBarW = (G.barW - 1) / 2;
+      //let ctx = sub1F.ctx;
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+      let o, h, l, c, dif1, dif2;
+      let PP = [];
+
+      P.length = 0;
+
+      posB = -1;
+      idxB = G.barB;
+
+      for (i = G.barB; i < G.barE; i++) {
+        position = F(((i - G.barB) / O.AB[G.curLevel][2]) * cvs.width);
+        P[i - G.barB] = position + halfBarW;
+        if (position == posB && i != (G.barE - 1)) {
+          continue;
+        } else {
+          //let ooo = O.oo[idxB];
+          let h1 = O.hh.slice(idxB, i + 1)
+          let l1 = O.ll.slice(idxB, i + 1)
+          let hhh = Math.max.apply(null, h1);
+          let lll = Math.min.apply(null, l1);
+          //let ccc = O.cc[i];
+
+          hh.push(hhh);
+          ll.push(lll);
+          oo.push(O.oo[idxB]);
+          cc.push(O.cc[i]);
+
+          PP.push(position + halfBarW);
+
+          posB = position;
+          idxB = i + 1;
+        }
+      }
+
+      console.time("---calc time::::::::");
+      mn = calcYscale0(cvs.height, hh, ll);
+      console.timeEnd("---calc time::::::::");
+      for (i = 0; i < hh.length; i++) {
+        if (halfBarW != 0) {
+          o = R(mn[0] * oo[i] + mn[1]);
+          c = R(mn[0] * cc[i] + mn[1]);
+          dif1 = c - o;
+          if (dif1 == 0) {
+            dif1 = 1;
+          }
+        }
+        h = R(mn[0] * hh[i] + mn[1]);
+        l = R(mn[0] * ll[i] + mn[1]);
+        dif2 = l - h;
+        if (dif2 == 0) {
+          dif2 = 1;
+        }
+
+        if (cc[i] < oo[i]) {
+          ctx.fillStyle = "#008888";
+          if (halfBarW != 0) {
+            ctx.fillRect(PP[i] - halfBarW, o, G.barW, dif1);
+            ctx.fillRect(PP[i], h, 1, dif2);
+          } else {
+            ctx.fillRect(PP[i], h, 1, dif2);
+          }
+        } else {
+          ctx.fillStyle = "#880000";
+          if (halfBarW != 0) {
+            ctx.fillRect(PP[i] - halfBarW, c, G.barW, 0 - dif1);
+            ctx.fillRect(PP[i], h, 1, dif2);
+          } else {
+            ctx.fillRect(PP[i], h, 1, dif2);
+          }
+        }
+      }
+
+
+      //drawLine(ctx, O.hh, mn);
+      //drawLine(ctx, O.cc, mn);
+      drawLine(ctx, O.ll, mn);
+    }
+
+
+
+    this.drawCandle0 = function() {
+      kkuu++;
+      let idxB;
+      let idxE;
+      let posB;
+      let position,
+        halfBarW = (G.barW - 1) / 2;
+      //let ctx = cvs.getContext('2d');
+      let ctx = mainF.ctx;
+      //ctx.clearRect(0, 0, mainFW, mainFH);
+      ctx.clearRect(0, 0, mainF.cvs.width, mainF.cvs.height);
+
+      let oo = O.oo.slice(G.barB, G.barE),
+        hh = O.hh.slice(G.barB, G.barE),
+        ll = O.ll.slice(G.barB, G.barE),
+        cc = O.cc.slice(G.barB, G.barE),
+        o, h, l, c, dif1, dif2;
+
+      P.length = 0;
+      //mn = calcYscale(mainFH, G.barB, G.barE, O.hh, O.ll);
+      console.time("calc time::::::::");
+      mn = calcYscale0(mainFH, hh, ll);
+      console.timeEnd("calc time::::::::");
+      //console.log( "len:::::::::::::" + hh.length );
+      //mn = calcYscale1(mainFH, G.barB, G.barE, O.hh, O.ll, G.hFst, G.lFst, G.hSnd, G.lSnd);
+
+      posB = -1;
+      idxB = 0;
+      let countt = 0;
+      for (i = 0; i < oo.length; i++) {
+        position = F((i / O.AB[G.curLevel][2]) * mainFW);
+        P[i] = position + halfBarW;
+        if (position == posB && i != (oo.length - 1)) {
+          //console.log ( "==: "+ oo[i] + "  " + hh[i] + "  " + ll[i] + "  " + cc[i] ) ;
+          //console.log ( "==: " + idxB + "  " + i );
+          continue;
+        } else {
+          let ooo = oo[idxB];
+          let h1 = hh.slice(idxB, i + 1)
+          let l1 = ll.slice(idxB, i + 1)
+          let hhh = Math.max.apply(null, h1);
+          let lll = Math.min.apply(null, l1);
+          let ccc = cc[i];
+
+          //console.log ( "++ "+ countt + "   " + idxB + "  " + (i+1) );
+          //console.log ( "++ " + h1 + "  " + l1 );
+          //console.log ( "++: "+ ooo + "  " + hhh + "  " + lll + "  " + ccc ) ;
+          countt++;
+
+          if (halfBarW != 0) {
+            o = R(mn[0] * ooo + mn[1]);
+            c = R(mn[0] * ccc + mn[1]);
+            dif1 = c - o;
+            if (dif1 == 0) {
+              dif1 = 1;
+            }
+          }
+          h = R(mn[0] * hhh + mn[1]);
+          l = R(mn[0] * lll + mn[1]);
+          dif2 = l - h;
+          if (dif2 == 0) {
+            dif2 = 1;
+          }
+
+          //console.time("fillRect : ");
+          if (ccc < ooo) {
+            ctx.fillStyle = "#008888";
+            if (halfBarW != 0) {
+              ctx.fillRect(position, o, G.barW, dif1);
+              ctx.fillRect(position + halfBarW, h, 1, dif2);
+            } else {
+              ctx.fillRect(position, h, 1, dif2);
+            }
+          } else {
+            ctx.fillStyle = "#880000";
+            if (halfBarW != 0) {
+              ctx.fillRect(position, c, G.barW, 0 - dif1);
+              ctx.fillRect(position + halfBarW, h, 1, dif2);
+            } else {
+              ctx.fillRect(position, h, 1, dif2);
+            }
+          }
+          //console.timeEnd("fillRect : ");
+
+          posB = position;
+          idxB = i + 1;
+        }
+
+        //   position = F(F(x * O.AB[G.curLevel][2] / mainFW) * mainFW / O.AB[G.curLevel][2]);
+        /*
+           反求：
+           如果 O.AB[G.curLevel][2] 比 mainFW 小的话：
+           position = F(F(x * O.AB[G.curLevel][2] / mainFW) * mainFW / O.AB[G.curLevel][2]);
+           x:在屏上取得的X坐标
+        */
+
+        //console.log(O.Y.data[0].h[i]);
+        //console.log("uu" + uu);
+      } /* for */
+      //console.log(P);
+      //drawLine(ctx, O.hh, mn);
+      //drawLine(ctx, O.cc, mn);
+      drawLine(ctx, O.ll, mn);
+
+    }
+
+    //let drawCandle = this.drawCandle;
+    let drawCandle0 = this.drawCandle0;
+    let setBE = this.setBE;
+
+    function keyPress(e) {
+      let keyID = e.keyCode ? e.keyCode : e.which;
+      if (keyID === 38 || keyID === 87) { // up arrow and W
+        if (G.curLevel > 0) {
+          G.curLevel = G.curLevel - 1;
+          console.log("++++++++++++++++ " + G.curLevel);
+          console.log("++++++++++++++++ " + G._curLevel);
+          drawCandle(sub1F.cvs, sub1F.ctx);
+          drawCandle0();
+        }
+        e.preventDefault();
+      }
+      if (keyID === 39 || keyID === 68) { // right arrow and D
+        /*
+        if (G.barE < O.hh.length) {
+          G.barE++;
+          G.barB++;
+        };
+        */
+        setBE(G.curLevel);
+        console.log(" G.disLast:  " + G.disLast);
+        drawCandle(mainF.cvs,mainF.ctx);
+        e.preventDefault();
+      }
+      if (keyID === 40 || keyID === 83) { // down arrow and S
+        if (G.curLevel < G.maxLevel) {
+          G.curLevel = G.curLevel + 1;
+          console.time("i0000000000000000000: ");
+          drawCandle(sub1F.cvs, sub1F.ctx);
+          console.timeEnd("i0000000000000000000: ");
+          console.time("i1111111111111111111: ");
+          drawCandle0();
+          console.timeEnd("i1111111111111111111: ");
+        }
+        e.preventDefault();
+      }
+      if (keyID === 37 || keyID === 65) { // left arrow and A
+        setBE(-G.curLevel);
+        console.log(" G.disLast:  " + G.disLast);
+        drawCandle(mainF.cvs,mainF.ctx);
+        e.preventDefault();
+      }
+    }
+
+    function xxxx(e) {
+      console.log(e.deltaX);
+      console.log(e.deltaY);
+      if (e.deltaY > 0) { // 向下
+        setBE(-50);
+      } else {
+        setBE(50);
+      }
+      drawCandle();
+      e.preventDefault();
+    }
+
+    function mouseMove(e) {
+      let mousePos = getMousePos(backF.cvs[0], e);
+      // console.log(mousePos);
+      //show1(mousePos.x, mousePos.y);
+      backF.mouseMove(mousePos.x, mousePos.y);
+    }
+
+
+    backF.cvs[0].addEventListener("mousemove", mouseMove, false);
+
+    function getMousePos(cvs, e) {
+      let r = cvs.getBoundingClientRect();
+      return {
+        x: e.clientX - r.left * (cvs.width / r.width),
+        y: e.clientY - r.top * (cvs.height / r.height)
+      }
+    }
+
+
+
+    //mn = calcYscale(cvs.height, 0, O.hh.length, O.hh, O.ll);
+
+    //this.drawCandle1(0, 51, 0);
+    //setLevel(G.curLevel);
+    //G.curLevel = 0;
+    //let backCvs = new _backCvs();
+    //backCvs.disp();
+    this.drawCandle0();
+    //setInterval(this.drawCandle(1, 1), 100);
+
+    // key eee - use DOM element as object
+    cvs.addEventListener('keydown', keyPress, true);
+    cvs.focus();
+    // key eee - use window as object
+    window.addEventListener('keydown', keyPress, true);
+
+    //cvs.addEventListener("mousedown", doMouseDown, false);
+    //cvs.addEventListener('mousemove', doMouseMove, false);
+    //cvs.addEventListener('mouseup', doMouseUp, false);
+    cvs.addEventListener('wheel', xxxx, false);
+    //cvs.addEventListener("mousemove", yyyy, false);
+    //cvs.addEventListener("click", kkkkk, false);
+
+
+
+  }
+  return stockcharts;
+})));
+/*
+1、begin and end index 这两个全局变量 在显示之前需要更新好。
+
+*/

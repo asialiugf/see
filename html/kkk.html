@@ -1,0 +1,31 @@
+<html>
+<body>
+</body>
+
+<script> 
+window.onload = function() { 
+  FFLine2(0,0,100,100) 
+}; 
+function FFLine2(x1,y1,x2,y2){//firefox画线 
+    let cvsObj=document.createElement("canvas"); 
+document.body.appendChild(cvsObj); 
+    let cvs=cvsObj.getContext("2d"); 
+         
+    cvsObj.style.position="absolute"; 
+    cvsObj.style.visibility="visible"; 
+    cvsObj.style.position = "absolute";
+    cvsObj.style.border = "1px solid";
+    cvsObj.style.backgroundColor = "#550000";
+         
+    cvs.width=100; 
+    cvs.height=100; 
+    cvs.strokeStyle='red'; 
+    cvs.lineWidth=1; 
+    cvs.beginPath(); 
+    cvs.moveTo(0,0); 
+        cvs.lineTo(100,100); 
+        cvs.closePath(); 
+        cvs.stroke();    
+}        
+</script> 
+</html>

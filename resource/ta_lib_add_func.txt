@@ -1,0 +1,402 @@
+[root@iZ23psatkqsZ ta_func]# cp ta_STOCH.c ta_KDJ.c
+[root@iZ23psatkqsZ ta_func]# 
+[root@iZ23psatkqsZ ta_func]# pwd
+/root/ta-lib/src/ta_func
+[root@iZ23psatkqsZ ta_func]# 
+
+
+
+
+[root@iZ23psatkqsZ ta_abstract]# 
+[root@iZ23psatkqsZ ta_abstract]# grep STOCH * | more
+excel_glue.c:EXCEL_GLUE_CODE_WITH_8_PARAM(STOCH)
+excel_glue.c:EXCEL_GLUE_CODE_WITH_6_PARAM(STOCHF)
+excel_glue.c:EXCEL_GLUE_CODE_WITH_5_PARAM(STOCHRSI)
+grep: frames: Is a directory
+Binary file libta_abstract_gc_la-table_s.o matches
+Binary file libta_abstract_gc_la-ta_frame.o matches
+Binary file libta_abstract_gc_la-ta_func_api.o matches
+Binary file libta_abstract_gc_la-ta_group_idx.o matches
+Binary file libta_abstract_la-table_s.o matches
+Binary file libta_abstract_la-ta_frame.o matches
+Binary file libta_abstract_la-ta_func_api.o matches
+Binary file libta_abstract_la-ta_group_idx.o matches
+grep: tables: Is a directory
+ta_group_idx.c:extern const TA_FuncDef TA_DEF_STOCH;
+ta_group_idx.c:extern const TA_FuncDef TA_DEF_STOCHF;
+ta_group_idx.c:extern const TA_FuncDef TA_DEF_STOCHRSI;
+ta_group_idx.c:&TA_DEF_STOCH,
+ta_group_idx.c:&TA_DEF_STOCHF,
+ta_group_idx.c:&TA_DEF_STOCHRSI,
+ta_java_defs.h:#define TA_STOCH_Lookback stochLookback
+ta_java_defs.h:#define TA_STOCH stoch
+ta_java_defs.h:#define TA_STOCHF_Lookback stochFLookback
+ta_java_defs.h:#define TA_STOCHF stochF
+ta_java_defs.h:#define TA_STOCHRSI_Lookback stochRsiLookback
+ta_java_defs.h:#define TA_STOCHRSI stochRsi
+grep: templates: Is a directory
+[root@iZ23psatkqsZ ta_abstract]# 
+
+
+
+
+EXCEL_GLUE_CODE_WITH_8_PARAM(STOCH)
+EXCEL_GLUE_CODE_WITH_8_PARAM(KDJ)
+EXCEL_GLUE_CODE_WITH_6_PARAM(STOCHF)
+EXCEL_GLUE_CODE_WITH_5_PARAM(STOCHRSI)
+EXCEL_GLUE_CODE_WITH_2_PARAM(SUB)
+
+
+
+
+ot@iZ23psatkqsZ ta_abstract]# vi ta_group_idx.c
+
+extern const TA_FuncDef TA_DEF_SQRT;
+extern const TA_FuncDef TA_DEF_STDDEV;
+extern const TA_FuncDef TA_DEF_STOCH;
+extern const TA_FuncDef TA_DEF_KDJ;
+extern const TA_FuncDef TA_DEF_STOCHF;
+extern const TA_FuncDef TA_DEF_STOCHRSI;
+extern const TA_FuncDef TA_DEF_SUB;
+extern const TA_FuncDef TA_DEF_SUM;
+
+
+[root@iZ23psatkqsZ ta_abstract]#  vi ta_java_defs.h
+
+#define TA_STDDEV stdDev
+#define TA_STOCH_Lookback stochLookback
+#define TA_STOCH stoch
+#define TA_KDJ_Lookback kdjLookback
+#define TA_KDJ kdj
+#define TA_STOCHF_Lookback stochFLookback
+#define TA_STOCHF stochF
+#define TA_STOCHRSI_Lookback stochRsiLookback
+#define TA_STOCHRSI stochRsi
+
+
+[root@iZ23psatkqsZ frames]# vi ta_frame.c
+
+/* Generated */ TA_RetCode TA_KDJ_FramePP( const TA_ParamHolderPriv *params,
+/* Generated */                           int            startIdx,
+/* Generated */                           int            endIdx,
+/* Generated */                           int           *outBegIdx,
+/* Generated */                           int           *outNBElement )
+/* Generated */ {
+/* Generated */    return TA_KDJ(
+/* Generated */               startIdx,
+/* Generated */               endIdx,
+/* Generated */               params->in[0].data.inPrice.high, /* inHigh */
+/* Generated */               params->in[0].data.inPrice.low, /* inLow */
+/* Generated */               params->in[0].data.inPrice.close, /* inClose */
+/* Generated */               params->optIn[0].data.optInInteger, /* optInFastK_Period*/
+/* Generated */               params->optIn[1].data.optInInteger, /* optInSlowK_Period*/
+/* Generated */               (TA_MAType)params->optIn[2].data.optInInteger, /* optInSlowK_MAType*/
+/* Generated */               params->optIn[3].data.optInInteger, /* optInSlowD_Period*/
+/* Generated */               (TA_MAType)params->optIn[4].data.optInInteger, /* optInSlowD_MAType*/
+/* Generated */               outBegIdx,
+/* Generated */               outNBElement,
+/* Generated */               params->out[0].data.outReal, /*  outSlowK */
+/* Generated */               params->out[1].data.outReal /*  outSlowD */ );
+/* Generated */ }
+/* Generated */ unsigned int TA_KDJ_FramePPLB( const TA_ParamHolderPriv *params )
+/* Generated */ {
+/* Generated */    return TA_KDJ_Lookback(params->optIn[0].data.optInInteger, /* optInFastK_Period*/
+/* Generated */                       params->optIn[1].data.optInInteger, /* optInSlowK_Period*/
+/* Generated */                       (TA_MAType)params->optIn[2].data.optInInteger, /* optInSlowK_MAType*/
+/* Generated */                       params->optIn[3].data.optInInteger, /* optInSlowD_Period*/
+/* Generated */                       (TA_MAType)params->optIn[4].data.optInInteger /* optInSlowD_MAType*/ );
+/* Generated */ }
+
+[root@iZ23psatkqsZ frames]# ll
+total 268
+-rw-r--r-- 1 heaven ctp 196809 Nov  6 21:09 ta_frame.c
+-rw-r--r-- 1 heaven ctp  73531 Nov  6 21:11 ta_frame.h
+[root@iZ23psatkqsZ frames]# vi ta_frame.h
+
+/* Generated */ TA_RetCode TA_KDJ_FramePP( const TA_ParamHolderPriv *params,
+/* Generated */                           int            startIdx,
+/* Generated */                           int            endIdx,
+/* Generated */                           int           *outBegIdx,
+/* Generated */                           int           *outNBElement )
+;
+/* Generated */ unsigned int TA_KDJ_FramePPLB( const TA_ParamHolderPriv *params )
+;
+
+
+
+[root@iZ23psatkqsZ tables]# grep STOCH *
+table_s.c:/* STOCH BEGIN */
+table_s.c:static const TA_InputParameterInfo    *TA_STOCH_Inputs[]    =
+table_s.c:static const TA_OutputParameterInfo   *TA_STOCH_Outputs[]   =
+table_s.c:static const TA_OptInputParameterInfo *TA_STOCH_OptInputs[] =
+table_s.c:DEF_FUNCTION( STOCH,                   /* name */
+table_s.c:/* STOCH END */
+table_s.c:/* STOCHF BEGIN */
+table_s.c:static const TA_InputParameterInfo    *TA_STOCHF_Inputs[]    =
+table_s.c:static const TA_OutputParameterInfo   *TA_STOCHF_Outputs[]   =
+table_s.c:static const TA_OptInputParameterInfo *TA_STOCHF_OptInputs[] =
+table_s.c:DEF_FUNCTION( STOCHF,                   /* name */
+table_s.c:/* STOCHF END */
+table_s.c:/* STOCHRSI BEGIN */
+table_s.c:static const TA_InputParameterInfo    *TA_STOCHRSI_Inputs[]    =
+table_s.c:static const TA_OutputParameterInfo   *TA_STOCHRSI_Outputs[]   =
+table_s.c:static const TA_OptInputParameterInfo *TA_STOCHRSI_OptInputs[] =
+table_s.c:DEF_FUNCTION( STOCHRSI,                        /* name */
+table_s.c:/* STOCHRSI END */
+table_s.c:   ADD_TO_TABLE(STOCH),
+table_s.c:   ADD_TO_TABLE(STOCHF),
+table_s.c:   ADD_TO_TABLE(STOCHRSI),
+[root@iZ23psatkqsZ tables]# 
+
+
+
+
+
+vi table_k.c ------------------------------------------------------------------------
+
+
+/* KDJ BEGIN */
+static const TA_OptInputParameterInfo TA_DEF_UI_FastK_Period =
+{
+   TA_OptInput_IntegerRange, /* type */
+   "optInFastK_Period",           /* paramName */
+   0,                        /* flags */
+
+   "Fast-K Period", /* displayName */
+   (const void *)&TA_DEF_TimePeriod_Positive, /* dataSet */
+   5, /* defaultValue */
+   "Time period for building the Fast-K line", /* hint */
+
+   NULL /* CamelCase name */
+};
+
+static const TA_OptInputParameterInfo TA_DEF_UI_SlowK_Period =
+{
+   TA_OptInput_IntegerRange, /* type */
+   "optInSlowK_Period",       /* paramName */
+   0,                        /* flags */
+
+   "Slow-K Period",     /* displayName */
+   (const void *)&TA_DEF_TimePeriod_Positive, /* dataSet */
+   3, /* defaultValue */
+   "Smoothing for making the Slow-K line. Usually set to 3", /* hint */
+
+   NULL /* CamelCase name */
+};
+
+static const TA_OptInputParameterInfo TA_DEF_UI_SlowD_Period =
+{
+   TA_OptInput_IntegerRange, /* type */
+   "optInSlowD_Period",           /* paramName */
+   0,                        /* flags */
+
+   "Slow-D Period",            /* displayName */
+   (const void *)&TA_DEF_TimePeriod_Positive, /* dataSet */
+   3, /* defaultValue */
+   "Smoothing for making the Slow-D line", /* hint */
+
+   NULL /* CamelCase name */
+};
+
+const TA_OptInputParameterInfo TA_DEF_UI_SlowK_MAType =
+{
+   TA_OptInput_IntegerList, /* type */
+   "optInSlowK_MAType",     /* paramName */
+   0,                       /* flags */
+
+   "Slow-K MA",                /* displayName */
+   (const void *)&TA_MA_TypeList, /* dataSet */
+   0, /* defaultValue = simple average */
+   "Type of Moving Average for Slow-K", /* hint */
+
+   NULL /* CamelCase name */
+};
+
+const TA_OptInputParameterInfo TA_DEF_UI_SlowD_MAType =
+{
+   TA_OptInput_IntegerList, /* type */
+   "optInSlowD_MAType",     /* paramName */
+   0,                       /* flags */
+
+   "Slow-D MA",                /* displayName */
+   (const void *)&TA_MA_TypeList, /* dataSet */
+   0, /* defaultValue = simple average */
+   "Type of Moving Average for Slow-D", /* hint */
+
+   NULL /* CamelCase name */
+};
+
+const TA_OutputParameterInfo TA_DEF_UI_Output_SlowK =
+                               { TA_Output_Real, "outSlowK", TA_OUT_DASH_LINE };
+
+const TA_OutputParameterInfo TA_DEF_UI_Output_SlowD =
+                               { TA_Output_Real, "outSlowD", TA_OUT_DASH_LINE };
+
+static const TA_InputParameterInfo    *TA_KDJ_Inputs[]    =
+{
+  &TA_DEF_UI_Input_Price_HLC,
+  NULL
+};
+
+static const TA_OutputParameterInfo   *TA_KDJ_Outputs[]   =
+{
+  &TA_DEF_UI_Output_SlowK,
+  &TA_DEF_UI_Output_SlowD,
+  NULL
+};
+
+static const TA_OptInputParameterInfo *TA_KDJ_OptInputs[] =
+{ &TA_DEF_UI_FastK_Period,
+  &TA_DEF_UI_SlowK_Period,
+  &TA_DEF_UI_SlowK_MAType,
+  &TA_DEF_UI_SlowD_Period,
+  &TA_DEF_UI_SlowD_MAType,
+  NULL
+};
+
+DEF_FUNCTION( KDJ,                   /* name */
+              TA_GroupId_MomentumIndicators, /* groupId */
+              "Stochastic",             /* hint */
+              "Kdj",                  /* CamelCase name */
+              0                         /* flags */
+             );
+/* KDJ END */
+
+
+const TA_FuncDef *TA_DEF_TableK[] =
+{
+   ADD_TO_TABLE(KAMA),
+   ADD_TO_TABLE(KDJ),
+   NULL
+};
+
+vi table_k.c ------------------------------------------------------------------------
+
+
+
+
+[root@iZ23psatkqsZ include]# vi ta_func.h
+
+TA_RetCode TA_KDJ( int    startIdx,
+                     int    endIdx,
+                     const double inHigh[],
+                     const double inLow[],
+                     const double inClose[],
+                     int           optInFastK_Period, /* From 1 to 100000 */
+                     int           optInSlowK_Period, /* From 1 to 100000 */
+                     TA_MAType     optInSlowK_MAType,
+                     int           optInSlowD_Period, /* From 1 to 100000 */
+                     TA_MAType     optInSlowD_MAType,
+                     int          *outBegIdx,
+                     int          *outNBElement,
+                     double        outSlowK[],
+                     double        outSlowD[] );
+
+TA_RetCode TA_S_KDJ( int    startIdx,
+                       int    endIdx,
+                       const float  inHigh[],
+                       const float  inLow[],
+                       const float  inClose[],
+                       int           optInFastK_Period, /* From 1 to 100000 */
+                       int           optInSlowK_Period, /* From 1 to 100000 */
+                       TA_MAType     optInSlowK_MAType,
+                       int           optInSlowD_Period, /* From 1 to 100000 */
+                       TA_MAType     optInSlowD_MAType,
+                       int          *outBegIdx,
+                       int          *outNBElement,
+                       double        outSlowK[],
+                       double        outSlowD[] );
+
+int TA_KDJ_Lookback( int           optInFastK_Period, /* From 1 to 100000 */
+                     int           optInSlowK_Period, /* From 1 to 100000 */
+                     TA_MAType     optInSlowK_MAType,
+                     int           optInSlowD_Period, /* From 1 to 100000 */
+                     TA_MAType     optInSlowD_MAType );
+
+
+=================================
+
+[root@iZ23psatkqsZ ta-lib]# 
+[root@iZ23psatkqsZ ta-lib]# ./autogen.sh
+aclocal
+aclocal: warning: autoconf input should be named 'configure.ac', not 'configure.in'
+autoheader
+libtoolize --copy --force
+libtoolize: putting auxiliary files in `.'.
+libtoolize: copying file `./ltmain.sh'
+libtoolize: Consider adding `AC_CONFIG_MACRO_DIR([m4])' to configure.in and
+libtoolize: rerunning libtoolize, to keep the correct libtool macros in-tree.
+libtoolize: Consider adding `-I m4' to ACLOCAL_AMFLAGS in Makefile.am.
+automake -a -c
+automake: warning: autoconf input should be named 'configure.ac', not 'configure.in'
+configure.in:9: warning: AM_INIT_AUTOMAKE: two- and three-arguments forms are deprecated.  For more info, see:
+configure.in:9: http://www.gnu.org/software/automake/manual/automake.html#Modernize-AM_005fINIT_005fAUTOMAKE-invocation
+automake: warning: autoconf input should be named 'configure.ac', not 'configure.in'
+src/tools/gen_code/Makefile.am:6: warning: compiling 'gen_code.c' with per-target flags requires 'AM_PROG_CC_C_O' in 'configure.in'
+autoconf
+[root@iZ23psatkqsZ ta-lib]# 
+[root@iZ23psatkqsZ ta-lib]# ll
+
+
+================================
+
+drwxr-xr-x 2 heaven ctp    4096 Nov  6 21:56 tables
+-rw-r--r-- 1 heaven ctp   18333 Nov  6 21:55 ta_def_ui.c
+-rw-r--r-- 1 heaven ctp   10734 Nov  6 21:57 ta_def_ui.h
+
+/* Outputs. */
+extern const TA_OutputParameterInfo TA_DEF_UI_Output_Real;
+extern const TA_OutputParameterInfo TA_DEF_UI_Output_Integer;
+extern const TA_OutputParameterInfo TA_DEF_UI_Output_Lines;
+extern const TA_OutputParameterInfo TA_DEF_UI_Output_SlowK;
+extern const TA_OutputParameterInfo TA_DEF_UI_Output_SlowD;
+
+
+=====================================================
+ta_def_ui.c" 590L, 19146C written
+/*****************************************************
+ * Define from here the TA_OptInputParameterInfo.
+ ****************************************************/
+
+const TA_OptInputParameterInfo TA_DEF_UI_SlowK_MAType =
+{
+   TA_OptInput_IntegerList, /* type */
+   "optInSlowK_MAType",     /* paramName */
+   0,                       /* flags */
+
+   "Slow-K MA",                /* displayName */
+   (const void *)&TA_MA_TypeList, /* dataSet */
+   0, /* defaultValue = simple average */
+   "Type of Moving Average for Slow-K", /* hint */
+
+   NULL /* CamelCase name */
+};
+
+const TA_OptInputParameterInfo TA_DEF_UI_SlowD_MAType =
+{
+   TA_OptInput_IntegerList, /* type */
+   "optInSlowD_MAType",     /* paramName */
+   0,                       /* flags */
+
+   "Slow-D MA",                /* displayName */
+   (const void *)&TA_MA_TypeList, /* dataSet */
+   0, /* defaultValue = simple average */
+   "Type of Moving Average for Slow-D", /* hint */
+
+   NULL /* CamelCase name */
+};
+
+
+===========================================
+
+
+extern const TA_OptInputParameterInfo TA_DEF_UI_SlowK_MAType;
+extern const TA_OptInputParameterInfo TA_DEF_UI_SlowD_MAType;
+
+-rw-r--r-- 1 heaven ctp   10860 Nov  6 22:03 ta_def_ui.h
+
+=========================================
+
+ta_func/ //////   vi Makefile.am
+
+

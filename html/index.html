@@ -1,0 +1,488 @@
+<html>
+
+<head>
+  <!--  <script src="vue.js"></script> -->
+  <script src="fincharts.js">
+  </script>
+</head>
+
+<body>
+  <!--
+  <
+  div id = "app-5" >
+  <
+  p >
+  {
+    {
+      message
+    }
+  } < /p> <
+  button v - on: click = "reverseMessage" > Reverse Message < /button> <
+  /div> <
+  div id = "app-6" >
+  <
+  p >
+  {
+    {
+      message
+    }
+  } < /p> <
+  button v - on: click = "reverseMessage" > Reverse Message < /button> <
+  /div>
+
+-->
+
+  <ul id="test">
+    <li> item 1 </li>
+    <li> item 2 </li>
+    <li> item 3 </li>
+  </ul>
+</body>
+<script>
+  /*
+                                                                    var test = document.getElementById("test");
+
+
+                                                                    // this handler will be executed only once when the cursor moves over the unordered list
+                                                                    test.addEventListener("mouseenter", function(event)
+                                                                    {
+                                                                      // highlight the mouseenter target
+                                                                      event.target.style.color = "purple";
+
+                                                                      // reset the color after a short delay
+                                                                      setTimeout(function()
+                                                                      {
+                                                                        event.target.style.color = "";
+                                                                      }, 50);
+                                                                    }, false);
+
+
+                                                                    // this handler will be executed every time the cursor is moved over a different list item
+                                                                    test.addEventListener("mouseover", function(event)
+                                                                    {
+                                                                      // highlight the mouseover target
+                                                                      event.target.style.color = "orange";
+
+                                                                      // reset the color after a short delay
+                                                                      setTimeout(function()
+                                                                      {
+                                                                        event.target.style.color = "";
+                                                                      }, 500);
+                                                                    }, false);
+                                                            window.onload = function()
+                                                            {
+                                                              FFLine2(0, 0, 100, 100)
+                                                            };
+
+                                                            function FFLine2(x1, y1, x2, y2)
+                                                            { //firefox画线 
+                                                              let cvsObj = document.createElement("canvas");
+                                                              document.body.appendChild(cvsObj);
+                                                              let cvs = cvsObj.getContext("2d");
+
+                                                              cvsObj.style.position = "absolute";
+                                                              cvsObj.style.visibility = "visible";
+                                                              cvsObj.style.position = "absolute";
+                                                              cvsObj.style.border = "1px solid";
+                                                              cvsObj.style.backgroundColor = "#550000";
+
+                                                              cvs.width = 100;
+                                                              cvs.height = 100;
+                                                              cvs.strokeStyle = 'red';
+                                                              cvs.lineWidth = 1;
+                                                              cvs.beginPath();
+                                                              cvs.moveTo(0, 0);
+                                                              cvs.lineTo(100, 100);
+                                                              cvs.closePath();
+                                                              cvs.stroke();
+                                                            }
+                                                                  */
+</script>
+
+<canvas id="cvs" width="600" height="300" style="position:absolute;background-color:transparent;"> A Drawing of something </canvas>
+
+<script>
+  'use strict';
+
+  /*
+    (function(kkk)
+    {
+      kkk.ff = 999;
+    }(this));
+
+    alert(ff);
+
+    let bb = 10000;
+    var cc = 40000;
+
+    function ch()
+    {
+      bb = 9999;
+      cc = 9999;
+    }
+
+
+    function dd(xx)
+    {
+      xx = 6;
+      alert(xx);
+      alert("xx + ::: " + xx);
+    }
+
+
+    function fun()
+    {
+      return this;
+    }
+    console.assert(fun() === undefined);
+    console.assert(fun.call(2) === 2);
+    console.assert(fun.apply(null) === null);
+    console.assert(fun.call(undefined) === undefined);
+    console.assert(fun.bind(true)() === true);
+
+    let a = 10000;
+
+    function test()
+    {
+      alert("intest object is :  " + this);
+      alert("this.a in test: " + this.a);
+      alert(a);
+      a = 5;
+      alert(a);
+      a = 8;
+      alert(a);
+      alert("1111----" + this.a);
+
+      function mmm()
+      {
+        let a = 9;
+        alert(a);
+        //alert("2222----" + this.a);
+      };
+      mmm();
+      alert("in test:" + a);
+    };
+
+    function test1()
+    {
+      alert("in test1" + this.a);
+    };
+
+
+    let obj = {
+      a: 6,
+      b: test
+    };
+
+
+    let obj1 = {
+      a: 9
+    };
+    //obj1.tt = test1;
+
+    //obj1.tt();
+
+    //alert( " enter into test() !!!" );
+    //test();
+    let win = window;
+    //win.test();
+    window.test();
+    //obj1.test();
+    obj.b();
+    //new test();
+    alert("last" + a);
+    alert("last this.a: " + this.a);
+  */
+</script>
+<script>
+  /*
+                                                                    var app5 = new window.Vue(
+                                                                    {
+                                                                      el: '#app-5',
+                                                                      data:
+                                                                      {
+                                                                        message: 'Hello Vue.js!'
+                                                                      },
+                                                                      methods:
+                                                                      {
+                                                                        reverseMessage: function()
+                                                                        {
+                                                                          this.message = this.message.split('').reverse().join('')
+                                                                        }
+                                                                      }
+                                                                    });
+
+                                                                    var app6 = new window.Vue(
+                                                                    {
+                                                                      el: '#app-6',
+                                                                      data:
+                                                                      {
+                                                                        message: 'Hello Vue.js!'
+                                                                      },
+                                                                      methods:
+                                                                      {
+                                                                        reverseMessage: function()
+                                                                        {
+                                                                          this.message = this.message.split('').reverse().join('')
+                                                                        }
+                                                                      }
+                                                                    })
+                                                                  */
+
+  function round(d)
+  {
+    return Math.round(100 * d) / 100;
+  }
+
+
+  let dateData = [];
+  let ohlcData = [];
+  let oo = [];
+  let hh = [];
+  let ll = [];
+  let cc = [];
+  let mm = [];
+  let volumeData = [];
+  let date = new Date(2010, 0, 1);
+  let high = Math.random() * 40;
+  let open = high - Math.random();
+  let low = open - Math.random();
+  let close = (high - low) * Math.random() + low;
+  let volume = 100 + 15 * Math.random();
+  dateData.push(date);
+  ohlcData.push([round(high) + 1000, round(low) + 1000, round(close) +
+    1000,
+    round(open) + 1000
+  ]);
+  oo.push(round(close) + 1000);
+  hh.push(round(high) + 1000);
+  ll.push(round(low) + 1000);
+  cc.push(round(open) + 1000);
+  mm.push(round(open) + 1000);
+  volumeData.push(round(volume) + 1000);
+
+  for (let day = 2; day <= 20000; day++)
+  {
+    date = new Date(2010, 0, day);
+    high = open + Math.random();
+    open = high - Math.random();
+    low = open - Math.random();
+    let oldOpen = open;
+    close = (high - low) * Math.random() + low;
+    if (low > oldOpen)
+    {
+      low = oldOpen;
+    }
+    volume = volume + 10 * Math.random() - 5;
+    dateData.push(date);
+    ohlcData.push([round(high) + 1000, round(low) + 1000, round(close) +
+      1000,
+      round(open) + 1000
+    ]);
+    oo.push(round(close) + 1000);
+    hh.push(round(high) + 1000);
+    ll.push(round(low) + 1000);
+    cc.push(round(open) + 1000);
+    mm.push(round(open) + 1000);
+    volumeData.push(round(volume) + 1000);
+  }
+
+  let option = {
+    type: 0,
+    X:
+    {
+      data: [
+      {
+        x: dateData
+      },
+      {
+        x: dateData
+      }]
+    },
+    Y:
+    {
+      data: [
+      {
+        title: '中国联通',
+        type: 'candle',
+        position: 'main',
+        kedu: [],
+        x: 2,
+        y: [
+        {
+          type: 'o',
+          data: oo
+        },
+        {
+          type: 'h',
+          data: hh
+        },
+        {
+          type: 'l',
+          data: ll
+        },
+        {
+          type: 'c',
+          data: cc
+        },
+        {
+          title: 'MA5',
+          type: 'line',
+          data: mm 
+        }]
+      },
+      {
+        title: 'Vol',
+        position: 'sub',
+        kedu: [],
+        x: 3,
+        y: [
+        {
+          type: 'bar',
+          data: volumeData
+        },
+        {
+          type: 'line',
+          data: [1, 1] // ma5
+        }]
+      },
+      {
+        title: 'MACD',
+        position: 'sub',
+        y: [
+        {
+          title: 'diff',
+          type: 'line',
+          data: oo
+        },
+        {
+          title: 'dea',
+          type: 'line',
+          data: cc
+        }]
+      }]
+    }
+  };
+
+  let ooo = [];
+  let hhh = [];
+  let ccc = [];
+  let lll = [];
+  let mmm = [];
+
+  /*
+    for (let i = 0; i < 1; i++)
+    {
+      ooo.push(oo[i]);
+      hhh.push(hh[i]);
+      lll.push(ll[i]);
+      ccc.push(cc[i]);
+    }
+  */
+
+  let option1 = {
+    type: 1,
+    X:
+    {
+      data: [
+      {
+        x: dateData
+      },
+      {
+        x: dateData
+      }]
+    },
+    Y:
+    {
+      data: [
+      {
+        title: '中国联通',
+        type: 'candle',
+        position: 'main',
+        kedu: [],
+        x: 2,
+        y: [
+        {
+          type: 'o',
+          data: ooo
+        },
+        {
+          type: 'h',
+          data: hhh
+        },
+        {
+          type: 'l',
+          data: lll
+        },
+        {
+          type: 'c',
+          data: ccc
+        },
+        {
+          title: 'MA5',
+          type: 'line',
+          data: mmm 
+        }]
+      },
+      {
+        title: 'Vol',
+        position: 'sub',
+        kedu: [],
+        x: 3,
+        y: [
+        {
+          type: 'bar',
+          data: volumeData
+        },
+        {
+          type: 'line',
+          data: [1, 1] // ma5
+        }]
+      },
+      {
+        title: 'MACD',
+        position: 'sub',
+        y: [
+        {
+          title: 'diff',
+          type: 'line',
+          data: ooo
+        },
+        {
+          title: 'dea',
+          type: 'line',
+          data: ccc
+        }]
+      }]
+    }
+  };
+
+
+
+  //let cvs = document.getElementById('cvs');
+  let op = new barCharts(option);
+
+  let i = 0;
+
+  function zz()
+  {
+    ooo.length = 0;
+    hhh.length = 0;
+    lll.length = 0;
+    ccc.length = 0;
+    mmm.length = 0;
+    ooo.push(oo[i]);
+    hhh.push(hh[i]);
+    lll.push(ll[i]);
+    ccc.push(cc[i]);
+    mmm.push(mm[i]);
+    i++;
+    if( i%2 ==0 ) { option1.type = 1; } else{ option1.type = 2;}
+    //option1.type = 2;
+    console.log( "ooo: " + ooo + " ooo: " + hhh +  " lll: " + lll + " ccc: " + ccc )
+    op.update(option1);
+  }
+  setInterval(zz, 100);
+</script>
+
+</html>

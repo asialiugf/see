@@ -1,0 +1,181 @@
+// testTraderApi.cpp : 定义控制台应用程序的入口点。
+//
+#include <iostream>
+#include <string.h>
+#include "ThostFtdcMdApi.h"
+#include "MdSpi.h"
+#include <pthread.h>
+#include <unistd.h>
+
+extern "C"
+{
+    #include <see_com_common.h>
+}
+char ca_errmsg[256] ;
+
+/* =========== testing ================== */
+int pub_sock ;
+int msg_len = sizeof( CThostFtdcDepthMarketDataField ) ;
+const char myurl1[] = "ipc:///tmp/pubsub.ipc" ;
+/* =========== testing ================== */
+
+using namespace std;
+
+CThostFtdcMdApi* pUserApi1;                             // UserApi对象
+
+char FRONT_ADDR1[] = "tcp://180.168.146.187:10010";		// 前置地址
+char FRONT_ADDR2[] = "tcp://180.168.146.187:10011";		// 前置地址
+char FRONT_ADDR3[] = "tcp://218.202.237.33:10012";		// 前置地址
+
+TThostFtdcBrokerIDType	 BROKER_ID = "9999";			// 经纪公司代码
+TThostFtdcInvestorIDType INVESTOR_ID = "068520";		// 投资者代码
+TThostFtdcPasswordType   PASSWORD = "*****";		    // 用户密码
+
+char ca_futures[FUTURE_NUMBER][FUTRUE_ID_LEN] ;
+char *ppFutureID[FUTURE_NUMBER];                        // 行情订阅列表
+
+int iInstrumentID = 3;									// 行情订阅数量
+int iRequestID = 1;                                     // 请求编号
+
+int
+main(int argc,char *argv[])
+{
+
+    see_signal_init() ;
+ 
+    see_daemon(1,0) ;
+
+/* ---------- 测试 开始------------------ */ 
+    int i_rtn = 0 ;
+    int bytes ;
+    static char ca_futures_test[FUTURE_NUMBER][FUTRUE_ID_LEN] ;
+    static char *pp_futures_test[FUTURE_NUMBER];
+    static char ca_tick_file_list[] = "../../etc/tbl/tick_file_name.txt" ;
+    static char ca_line[100] ;
+    static char ca_tick_file[256] ;
+    FILE *pf ;
+    FILE *pf_tick_file ;
+    CThostFtdcDepthMarketDataField market_data ;
+
+    pub_sock = see_pubsub_server( myurl1 ) ;
+
+    i_rtn = see_futures_init(pp_futures_test,ca_futures_test) ;                   // 初始化 future 列表
+    if ( i_rtn != 0 ){
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"main: see_futures_init error : %d\n", i_rtn ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+    }
+
+    pf = fopen(ca_tick_file_list,"r");
+    if (pf == NULL) {
+        see_errlog(1000,"open future table error!!",RPT_TO_LOG,0,0) ;
+        return -1 ;
+    }   
+    memset( ca_line,'\0',100 ) ; 
+    while ( fgets(ca_line, 100, pf ) != NULL ){
+        int len = strlen(ca_line)-1 ;
+        ca_line[len] = '\0' ;
+        memset( ca_tick_file,'\0',256 ) ; 
+        strcat( ca_tick_file,(char *)"../../dat/") ;
+        strcat( ca_tick_file,ca_line ) ;
+        
+
+        pf_tick_file = fopen(ca_tick_file,"rb");
+        if (pf_tick_file == NULL) {
+            see_errlog(1000,(char *)"open future table error!!",RPT_TO_LOG,0,0) ;
+            return -1 ;
+        }
+
+        while ( (i_rtn = fread(&market_data,sizeof(CThostFtdcDepthMarketDataField),1,pf_tick_file)) != 0 ) 
+        {
+            bytes = nn_send (pub_sock, (char *) &market_data, msg_len, 0);
+            if ( bytes == msg_len ){
+                memset( ca_errmsg,'\0',100 );
+                sprintf( ca_errmsg,"------msg_len:%d bytes_send:%d number:%d \n", msg_len,bytes,i ) ; 
+                see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+            }
+        }
+        fclose(pf_tick_file);
+        memset( ca_line,'\0',100 ) ; 
+        
+    }   
+    fclose(pf);
+
+    sleep(2);
+    exit (0) ;
+
+
+
+    int i = 0 ;
+    int j = 0 ;
+    while(1) {
+      for(j=0;j<2;j++){
+        time_t timer;
+        time(&timer);
+        struct tm* t_tm = localtime(&timer);
+        char ca_date[9] ;
+        char ca_time[9] ;
+        int ii ;
+
+
+        t_tm->tm_sec = i%60 ;
+        ii = i/60 ;
+        t_tm->tm_min = ii%60 ;
+        ii = i/3600 ;
+        t_tm->tm_hour = ii%60 ;
+
+        memset( ca_date,'\0',9 );
+        memset( ca_time,'\0',9 );
+        strftime(ca_date,9,"%Y%m%d",t_tm);
+        strftime(ca_time,9,"%H:%M:%S",t_tm);
+        see_errlog(1000,ca_date,RPT_TO_LOG,0,0 ) ;
+
+        memset((char *)&market_data,'\0',msg_len) ;
+
+        memcpy(&market_data.TradingDay,ca_date,8) ;
+        memcpy(&market_data.InstrumentID,"ag1704",6) ;
+        memcpy(&market_data.UpdateTime,ca_time,8) ;    
+        market_data.UpdateMillisec = j%2*500;        
+        market_data.Volume = i%5 ;
+        market_data.AskPrice1 =(double) i ;
+        market_data.BidPrice1 =(double) i ;
+        memcpy(&market_data.ActionDay,ca_date,8) ;
+
+
+        bytes = nn_send (pub_sock, (char *) &market_data, msg_len, 0);
+        if ( bytes == msg_len ){
+            memset( ca_errmsg,'\0',100 );
+            sprintf( ca_errmsg,"------msg_len:%d bytes_send:%d number:%d \n", msg_len,bytes,i ) ; 
+            see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        }
+        //usleep(10);
+      } 
+        i++ ;
+        if ( i == 1000 ) {
+            sleep(1) ;
+            exit (0);
+        }
+    }
+/*  ------------测试 结束 ----------------  */
+
+    iInstrumentID = 100;
+	pUserApi1 = CThostFtdcMdApi::CreateFtdcMdApi("1.con");			// 创建UserApi
+	CThostFtdcMdSpi* pUserSpi1 = new CMdSpi();                      // 创建UserSpi  可以创建多个
+	pUserApi1->RegisterSpi(pUserSpi1);      						// 注册事件类
+	pUserApi1->RegisterFront(FRONT_ADDR2);	           				// connect
+
+	pUserApi1->Init();
+    cout << "after Init() !" << endl;
+
+    pthread_t pthID = pthread_self();
+    cerr << "================main 02 =============================  pthId:" << pthID << endl;
+
+	pUserApi1->Join();
+    cout << "after Join() !" << endl;
+
+    pthID = pthread_self();
+    cerr << "03 pthId:" << pthID << endl;
+
+    //	pUserApi->Release();
+
+} /* end of main() */

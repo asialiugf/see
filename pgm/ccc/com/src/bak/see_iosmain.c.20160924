@@ -1,0 +1,152 @@
+#include <see_com_common.h>
+
+const char ca_pubsub_url[] = "ipc:///tmp/pubsub.ipc" ;
+const char ca_mysql_url[]  = "mysql://127.0.0.1/test?user=root&password=root" ;
+static char ca_tick_file[512] ;
+
+/*
+static see_bar_t see_bar_1s[100] ; 
+static see_bar_t see_bar_5s[100] ;
+static see_bar_t see_bar_10s[100] ;
+static see_bar_t see_bar_15s[100] ;
+static see_bar_t see_bar_30s[100] ;
+static see_bar_t see_bar_1f[100] ;
+static see_bar_t see_bar_3f[100] ;
+static see_bar_t see_bar_5f[100] ;
+static see_bar_t see_bar_10f[100] ;
+static see_bar_t see_bar_15f[100] ;
+static see_bar_t see_bar_30f[100] ;
+static see_bar_t see_bar_1h[100] ;
+static see_bar_t see_bar_2h[100] ;
+static see_bar_t see_bar_3h[100] ;
+static see_bar_t see_bar_4h[100] ;
+static see_bar_t see_bar_d[100] ;
+static see_bar_t see_bar_w[100] ;
+static see_bar_t see_bar_m[100] ;
+static see_bar_t see_bar_s[100] ;
+static see_bar_t see_bar_y[100] ;
+*/
+
+int
+main(int iArgCnt, char *pcaArgVec[])
+{
+ //   int iRc = 0 ;
+ //   int i = 0 ;
+    char ca_errmsg[100] ;
+    int sock ;
+    struct CThostFtdcDepthMarketDataField * market_data1 ;
+
+    see_signal_init() ;                 // 需要详细考虑 
+    signal(SIGHUP, SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
+
+    see_daemon(1,0) ;
+
+    sock = see_pubsub_client( ca_pubsub_url, "iostest" ) ;
+
+    /*
+     bar_init() ;  // 
+     */
+
+
+    URL_T url = URL_new("mysql://127.0.0.1/test?user=root&password=root");
+    if(url==NULL) {   
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"mysql://127.0.0.1/test?user=root&password=root: connection error !\n") ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        return -1 ;
+    }
+    ConnectionPool_T pool = ConnectionPool_new(url);            // create pool
+    ConnectionPool_setInitialConnections(pool,20);              // 设置初始化连接数目
+    ConnectionPool_start(pool);                                 //开启线程池
+    Connection_T con = ConnectionPool_getConnection(pool);      //从线程池中取出连接（活动连接数＋1）
+
+/*
+    PreparedStatement_T p1 = Connection_prepareStatement(con, "INSERT INTO tick_data( \
+                             TradingDay, \
+                             UpdateTime, \
+                             UpdateMillisec, \
+                             TickData) \
+                             VALUES(?,?,?,?)") ;
+*/
+
+
+    while (1)                                  //  接收数据 并进行处理 
+    {
+        char *buf = NULL;
+        struct timeval start, end;
+
+        gettimeofday( &start, NULL );
+        int bytes = nn_recv (sock, &buf, NN_MSG, 0);                  // 如果没有数据，进程会等在这里，这时
+                                                                      // 如果收到signal 后，会进入到自己写的信号处理程序
+                                                                      // 然后程序会往下走，buf没有分配内存，所以会出报SIGSEG信号。
+                                                                      // 如果在前面 忽略如SIGHUP信号，则不会进入到 信号处理程序
+        gettimeofday( &end,NULL );
+
+
+        market_data1 = (struct CThostFtdcDepthMarketDataField *)buf ; 
+
+/*---------------------------*/
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"==== iosmain ===== ================ recieved: %d \n",market_data1->AskVolume5 ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+/*---------------------------*/
+
+        char ca_tmp[3] ;
+        memset( ca_tmp,'\0',3 ) ;
+        memcpy( ca_tmp,market_data1->UpdateTime,2 );
+        memset( ca_tick_file,'\0',512 ) ;
+        sprintf( ca_tick_file, "tick-%s-%s-%s.bin",market_data1->InstrumentID, \
+                                                   market_data1->TradingDay, \
+                                                   ca_tmp ) ;
+
+
+        see_save_file(ca_tick_file,buf,bytes) ;
+
+
+        /*
+        TRY {
+            PreparedStatement_setString(p1,1,(char *)market_data1->TradingDay) ;
+            PreparedStatement_setString(p1,2,(char *)market_data1->UpdateTime ) ;       
+            PreparedStatement_setInt(p1,3,market_data1->UpdateMillisec    ) ;        
+            PreparedStatement_setBlob(p1,4,buf,408) ;        
+            PreparedStatement_execute(p1);
+        }
+        CATCH(SQLException) {
+            sprintf(ca_errmsg,"SQL error: %s\n", Connection_getLastError(con)); 
+            see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        }
+        END_TRY;
+        */
+
+        nn_freemsg (buf);
+
+
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"==== time =========: sec:%lu usec:%lu \n",end.tv_sec-start.tv_sec,end.tv_usec-start.tv_usec ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+
+
+       // usleep(2000) ;
+
+    }
+
+
+    /* 
+    ResultSet_T result = Connection_executeQuery(con, "select * from t_test");  //输出全部连接数目
+    printf("ALL NUMBE:%d\n",ConnectionPool_size(pool));                         //输出活动连接数目
+    printf("ACTIVE NUMBER:%d\n",ConnectionPool_active(pool));
+    while(ResultSet_next(result))                                               //游标滑到下一行
+    {       //获取列名 ResultSet_getColumnName                                  //获取列值 ResultSet_getString
+        printf("column: %s\n",ResultSet_getColumnName(result,2));       //根据列名获取值ResultSet_getStringByName
+        printf("%s\n",ResultSet_getStringByName(result,"userId"));      //根据列索引获取列值 ［注意索引是从1开始不是0］
+        printf("%s\n",ResultSet_getString(result,3));
+    }   //关闭连接（活动连接－1）
+    */
+
+    Connection_close(con);                                              //将连接池与数据库分离
+    ConnectionPool_stop(pool);
+    ConnectionPool_free(&pool);
+    URL_free(&url);
+    return 0;
+}

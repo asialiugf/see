@@ -1,0 +1,581 @@
+yum -y install mariadb mariadb-server
+[root@iZ23psatkqsZ ~]# systemctl start mariadb
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# systemctl enable mariadb
+[root@iZ23psatkqsZ ~]# mysql -u root
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 5
+Server version: 5.5.52-MariaDB MariaDB Server
+
+Copyright (c) 2000, 2016, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> 
+MariaDB [(none)]>
+[root@iZ23psatkqsZ ~]# mysql_secure_installation
+
+
+[root@iZ23psatkqsZ ~]#  
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# vi /etc/my.cnf
+[mysqld]
+datadir=/var/lib/mysql
+  cket=/var/lib/mysql/mysql.sock
+▽ Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links=0
+# Settings user and group are ignored when systemd is used.
+# If you need to run mysqld under a different user or group,
+# customize your systemd unit file for mariadb according to the
+# instructions in http://fedoraproject.org/wiki/Systemd
+init_connect='SET collation_connection = utf8_unicode_ci'
+init_connect='SET NAMES utf8'
+character-set-server=utf8
+collation-server=utf8_unicode_ci
+skip-character-set-client-handshake
+
+[mysqld_safe]
+log-error=/var/log/mariadb/mariadb.log
+pid-file=/var/run/mariadb/mariadb.pid
+
+#
+# include all files from the config directory
+#
+!includedir /etc/my.cnf.d
+
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# vi /etc/my.cnf.d/client.cnf
+#
+  These two groups are read by the client library
+▽ Use it for options that affect all clients, but not the server
+#
+
+
+[client]
+
+# This group is not read by mysql client library,
+# If you use the same .cnf file for MySQL and MariaDB,
+# use it for MariaDB-only client options
+default-character-set=utf8
+
+[client-mariadb]
+
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+[root@iZ23psatkqsZ ~]# vi /etc/my.cnf.d/mysql-clients.cnf
+#
+# These groups are read by MariaDB command-line tools
+# Use it for options that affect only one utility
+#
+
+[mysql]
+
+default-character-set=utf8
+[mysql_upgrade]
+
+[mysqladmin]
+
+[mysqlbinlog]
+
+[mysqlcheck]
+
+[mysqldump]
+
+[mysqlimport]
+
+[mysqlshow]
+
+[mysqlslap]
+
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+~                                                                                                                                            
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# systemctl restart mariadb
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# mysql -u root            
+ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# mysql -u root -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 3
+Server version: 5.5.52-MariaDB MariaDB Server
+
+Copyright (c) 2000, 2016, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> 
+MariaDB [(none)]> 
+MariaDB [(none)]> show variables like "%character%";show variables like "%collation%";
++--------------------------+----------------------------+
+| Variable_name            | Value                      |
++--------------------------+----------------------------+
+| character_set_client     | utf8                       |
+| character_set_connection | utf8                       |
+| character_set_database   | utf8                       |
+| character_set_filesystem | binary                     |
+| character_set_results    | utf8                       |
+| character_set_server     | utf8                       |
+| character_set_system     | utf8                       |
+| character_sets_dir       | /usr/share/mysql/charsets/ |
++--------------------------+----------------------------+
+8 rows in set (0.00 sec)
+
++----------------------+-----------------+
+| Variable_name        | Value           |
++----------------------+-----------------+
+| collation_connection | utf8_unicode_ci |
+| collation_database   | utf8_unicode_ci |
+| collation_server     | utf8_unicode_ci |
++----------------------+-----------------+
+3 rows in set (0.00 sec)
+
+MariaDB [(none)]>
+
+
+
+闲置已久的空间环境配置忘得差不多了，今天得空整理，重置了磁盘重新搭建环境，首先在CentOS 7.0安装MariaDB的数据库，在这里记录下安装过程，以便以后查看。
+1、安装MariaDB
+安装命令
+yum -y install mariadb mariadb-server
+安装完成MariaDB，首先启动MariaDB
+systemctl start mariadb
+设置开机启动
+systemctl enable mariadb
+接下来进行MariaDB的相关简单配置
+mysql_secure_installation
+首先是设置密码，会提示先输入密码
+Enter current password for root (enter for none):<–初次运行直接回车
+设置密码
+Set root password? [Y/n] <– 是否设置root用户密码，输入y并回车或直接回车
+New password: <– 设置root用户的密码
+Re-enter new password: <– 再输入一次你设置的密码
+其他配置
+Remove anonymous users? [Y/n] <– 是否删除匿名用户，回车
+Disallow root login remotely? [Y/n] <–是否禁止root远程登录,回车,
+Remove test database and access to it? [Y/n] <– 是否删除test数据库，回车
+Reload privilege tables now? [Y/n] <– 是否重新加载权限表，回车
+初始化MariaDB完成，接下来测试登录
+mysql -uroot -ppassword
+完成。
+ 
+2、配置MariaDB的字符集
+文件/etc/my.cnf
+vi /etc/my.cnf
+在[mysqld]标签下添加
+init_connect='SET collation_connection = utf8_unicode_ci' 
+init_connect='SET NAMES utf8' 
+character-set-server=utf8 
+collation-server=utf8_unicode_ci 
+skip-character-set-client-handshake
+文件/etc/my.cnf.d/client.cnf
+vi /etc/my.cnf.d/client.cnf
+在[client]中添加
+default-character-set=utf8
+文件/etc/my.cnf.d/mysql-clients.cnf
+vi /etc/my.cnf.d/mysql-clients.cnf
+在[mysql]中添加
+default-character-set=utf8
+ 全部配置完成，重启mariadb
+systemctl restart mariadb
+之后进入MariaDB查看字符集
+mysql> show variables like "%character%";show variables like "%collation%";
+显示为
+
++--------------------------+----------------------------+
+| Variable_name            | Value                      |
++--------------------------+----------------------------+
+| character_set_client    | utf8                      |
+| character_set_connection | utf8                      |
+| character_set_database  | utf8                      |
+| character_set_filesystem | binary                    |
+| character_set_results    | utf8                      |
+| character_set_server    | utf8                      |
+| character_set_system    | utf8                      |
+| character_sets_dir      | /usr/share/mysql/charsets/ |
++--------------------------+----------------------------+
+8 rows in set (0.00 sec)
++----------------------+-----------------+
+| Variable_name        | Value          |
++----------------------+-----------------+
+| collation_connection | utf8_unicode_ci |
+| collation_database  | utf8_unicode_ci |
+| collation_server    | utf8_unicode_ci |
++----------------------+-----------------+
+3 rows in set (0.00 sec)
+字符集配置完成。
+ 
+3、添加用户，设置权限
+创建用户命令
+mysql>create user username@localhost identified by 'password';
+直接创建用户并授权的命令
+mysql>grant all on *.* to username@localhost indentified by 'password';
+授予外网登陆权限 
+mysql>grant all privileges on *.* to username@'%' identified by 'password';
+授予权限并且可以授权
+mysql>grant all privileges on *.* to username@'hostname' identified by 'password' with grant option;
+简单的用户和权限配置基本就这样了。
+其中只授予部分权限把 其中 all privileges或者all改为select,insert,update,delete,create,drop,index,alter,grant,references,reload,shutdown,process,file其中一部分。
+Linux系统教程：如何检查MariaDB服务端版本  http://www.linuxidc.com/Linux/2015-08/122382.htm
+MariaDB Proxy读写分离的实现 http://www.linuxidc.com/Linux/2014-05/101306.htm
+Linux下编译安装配置MariaDB数据库的方法 http://www.linuxidc.com/Linux/2014-11/109049.htm
+CentOS系统使用yum安装MariaDB数据库 http://www.linuxidc.com/Linux/2014-11/109048.htm
+安装MariaDB与MySQL并存 http://www.linuxidc.com/Linux/2014-11/109047.htm
+Ubuntu 上如何将 MySQL 5.5 数据库迁移到 MariaDB 10  http://www.linuxidc.com/Linux/2014-11/109471.htm
+[翻译]Ubuntu 14.04 (Trusty) Server 安装 MariaDB  http://www.linuxidc.com/Linux/2014-12/110048htm
+MariaDB 的详细介绍：请点这里
+MariaDB 的下载地址：请点这里
+更多CentOS相关信息见CentOS 专题页面 http://www.linuxidc.com/topicnews.aspx?tid=14
+本文永久更新链接地址：http://www.linuxidc.com/Linux/2016-03/128880.htm
+
+
+
+
+
+
+
+[root@iZ23psatkqsZ ~]# mysqladmin -u root -p create testdb1
+Enter password: 
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# 
+[root@iZ23psatkqsZ ~]# mysqladmin -u root -p create testdb1
+Enter password: 
+mysqladmin: CREATE DATABASE failed; error: 'Can't create database 'testdb1'; database exists'
+[root@iZ23psatkqsZ ~]#
+
+
+[root@iZ23psatkqsZ ~]#  mysql -u root -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 8
+Server version: 5.5.52-MariaDB MariaDB Server
+
+Copyright (c) 2000, 2016, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show databases
+    -> ;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| test               |
+| testdb1            |
++--------------------+
+5 rows in set (0.00 sec)
+
+MariaDB [(none)]>
+
+二、MariaDB的创建、删除、选择及数据类型使用详解（注：本文演示为root权限）
+（1）MariaDB创建数据库
+    1.1：使用mysqladmin创建数据库           
+[root@test01 10.19.166.166 ~ ] 
+# mysqladmin -u root -p create testdb1
+Enter password:   // 此处填写MariaDB数据库的密码
+
+[root@test01 10.19.166.166 ~ ] 
+# mysql
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mydb               |
+| mysql              |
+| performance_schema |
+| test               |
+| testdb             |
+| testdb1            |<---创建的好的库
++--------------------+
+   1.2：登录MariaDB库创建
+MariaDB [(none)]> create database testdb2;
+Query OK, 1 row affected (0.00 sec)
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mydb               |
+| mysql              |
+| performance_schema |
+| test               |
+| testdb             |
+| testdb1            |
+| testdb2            |<---创建好的库
++--------------------+
+（2）MariaDB删除数据库
+    2.1：使用mysqladmin删除数据库
+[root@test01 10.19.166.166 ~ ] 
+# mysqladmin -u root -p drop testdb1
+Enter password: //输入数据库密码
+
+//执行完上面的删除命令后，会出现一个提示框，提示是否确认删除此数据库
+Dropping the database is potentially a very bad thing to do.
+Any data stored in the database will be destroyed.
+
+Do you really want to drop the ‘testdb1‘ database [y/N] y   //删除
+Database "testdb1" dropped
+    登录查看
+MariaDB [(none)]> show databases; //确认testdb1已被删除 
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mydb               |
+| mysql              |
+| performance_schema |
+| test               |
+| testdb             |
+| testdb2            |
++--------------------+
+  2.2：登录MariaDB库删除
+MariaDB [(none)]> drop database testdb2;
+Query OK, 0 rows affected (0.00 sec)
+
+MariaDB [(none)]> show databases; //确认testdb2已被删除
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mydb               |
+| mysql              |
+| performance_schema |
+| test               |
+| testdb             |
++--------------------+
+（3）MariaDB选择数据库，查看选择库下面的所有表
+MariaDB [(none)]> show databases;  //查看所有库
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mydb               |
+| mysql              |
+| performance_schema |
+| test               |
+| testdb             |
++--------------------+
+7 rows in set (0.00 sec)
+
+MariaDB [(none)]> use mydb //选择mydb数据库 
+Database changed   
+MariaDB [mydb]> show tables;   //查看mydb数据库下面所有表信息
++----------------+
+| Tables_in_mydb |
++----------------+
+| ssc            |
+| t1             |
+| tb2            |
+| tb4            |
+| tb5            |
++----------------+
+5 rows in set (0.00 sec)
+（4）MariaDB数据类型
+MariaDB中定义的数据字段的类型对数据库优化非常重要
+MariaDB支持多种类型，大致可以分为三类：数值、日期/时间和字符串（字符类型）
+   4.1 数值型
+类型    大小    范围（有符号）  范围（无符号）  用途
+TINYINT 1字节   （-128,127）    （0,255）   小整数值
+SMALLINT    2字节   （-32 768,32767）   （0,65 535）    大整数值
+MEDIUMINT   3 字节  (-8 388 608，8 388 607) (0，16 777 215) 大整数值
+INT或INTEGER    4 字节  (-2 147 483 648，2 147 483 647) (0，4 294 967 295)  大整数值
+BIGINT  8 字节  (-9 233 372 036 854 775 808，9 223 372 036 854 775 807) (0，18 446 744 073 709 551 615) 极大整数值
+FLOAT   4 字节  (-3.402 823 466 E+38，1.175 494 351 E-38)，0，(1.175 494 351 E-38，3.402 823 466 351 E+38)  0，(1.175 494 351 E-38，3.402 823 466 E+38) 单精度
+浮点数值
+DOUBLE  8 字节  (1.797 693 134 862 315 7 E+308，2.225 073 858 507 201 4 E-308)，0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308)   0，(2.225 073 858 507 201 4 E-308，1.797 693 134 862 315 7 E+308)   双精度
+浮点数值
+DECIMAL 对DECIMAL(M,D) ，如果M>D，为M+2否则为D+2    依赖于M和D的值  依赖于M和D的值  小数值
+   
+    4.2 日期和时间类型
+表示时间值的日期和时间类型为DATETIME、DATE、TIMESTAMP、TIME和YEAR。
+每个时间类型有一个有效值范围和一个"零"值，当指定不合法的MySQL不能表示的值时使用"零"值。
+TIMESTAMP类型有专有的自动更新特性，将在后面描述。
+类型    大小（字节）    范围    格式    用途
+DATE    3   1000-01-01/9999-12-31   YYYY-MM-DD  日期值
+TIME    3   ‘-838:59:59‘/‘838:59:59‘    HH:MM:SS    时间值或持续时间
+YEAR    1   1901/2155   YYYY    年份值
+DATETIME    8   1000-01-01 00:00:00/9999-12-31 23:59:59 YYYY-MM-DD HH:MM:SS 混合日期和时间值
+TIMESTAMP   8   1970-01-01 00:00:00/2037 年某时 YYYYMMDD HHMMSS 混合日期和时间值，时间戳
+   
+    4.3 字符串类型
+字符串类型指CHAR、VARCHAR、BINARY、VARBINARY、BLOB、TEXT、ENUM和SET。该节描述了这些类型如何工作以及如何在查询中使用这些类型。
+类型    大小    用途
+CHAR    0-255字节   定长字符串
+VARCHAR 0-255字节   变长字符串
+TINYBLOB    0-255字节   不超过 255 个字符的二进制字符串
+TINYTEXT    0-255字节   短文本字符串
+BLOB    0-65 535字节    二进制形式的长文本数据
+TEXT    0-65 535字节    长文本数据
+MEDIUMBLOB  0-16 777 215字节    二进制形式的中等长度文本数据
+MEDIUMTEXT  0-16 777 215字节    中等长度文本数据
+LOGNGBLOB   0-4 294 967 295字节 二进制形式的极大文本数据
+LONGTEXT    0-4 294 967 295字节 极大文本数据
+CHAR和VARCHAR类型类似，但它们保存和检索的方式不同。它们的最大长度和是否尾部空格被保留等方面也不同。在存储或检索过程中不进行大小写转换。
+
+BINARY和VARBINARY类类似于CHAR和VARCHAR，不同的是它们包含二进制字符串而不要非二进制字符串。也就是说，它们包含字节字符串而不是字符字符串。这说明它们没有字符集，并且排序和比较基于列值字节的数值值。
+BLOB是一个二进制大对象，可以容纳可变数量的数据。有4种BLOB类型：TINYBLOB、BLOB、MEDIUMBLOB和LONGBLOB。它们只是可容纳值的最大长度不同。
+
+有4种TEXT类型：TINYTEXT、TEXT、MEDIUMTEXT和LONGTEXT。这些对应4种BLOB类型，有相同的最大长度和存储需求。
+CREATE TABLE  mytesttable  (
+   mop_provinceId  int(11) NOT NULL AUTO_INCREMENT,
+   mop_provinceNameCn  varchar(240) DEFAULT NULL,
+   mop_provinceNameEn  varchar(240) DEFAULT NULL,
+   mop_provinceAbb  varchar(240) DEFAULT NULL COMMENT 'Short string',
+   mop_provinceDesCn  text,
+   mop_provinceDesEn  text,
+   mop_provinceStatus  int(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY ( mop_provinceId ),
+  UNIQUE KEY  mop_provinceId_UNIQUE  ( mop_provinceId ),
+  UNIQUE KEY  mop_provinceAbb_UNIQUE  ( mop_provinceAbb )
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
+
+
+
+1.  //date  
+2.  CREATE TABLE insect  
+3.  (  
+4.      id INT UNSIGNED NOT NULL AUTO_INCREMENT,  
+5.      PRIMARY KEY (id),  
+6.      name VARCHAR(30) NOT NULL, # type of insect  
+7.      date DATE NOT NULL, # date collected  
+8.      origin VARCHAR(30) NOT NULL # where collected  
+9.  );  
+10. INSERT INTO insect (name,date,origin) VALUES('cricket','2010-09-11','basement')  
+11. INSERT INTO insect (name,date,origin) VALUES('cricket','2010/09/11','basement');  
+12. INSERT INTO insect (name,date,origin) VALUES('cricket','2010:09:11','basement');  
+13. INSERT INTO insect (name,date,origin) VALUES('cricket','2010:09:111','basement');  
+14. select * from insect;  
+15.   
+16. //date datetime time timestamp  
+17. CREATE TABLE temporal_val  
+18. (  
+19.     d       DATE,  
+20.     dt      DATETIME,  
+21.     t       TIME,  
+22.     ts      TIMESTAMP 
+23. );  
+24. INSERT INTO temporal_val (d, dt, t, ts) VALUES('1970-01-01','1884-01-01 12:00:00','13:00:00','1980-01-01 02:00:00'),  
+25. ('1999-01-01','1860-01-01 12:00:00','19:00:00','2021-01-01 03:00:00'),  
+26. ('1981-01-01','1871-01-01 12:00:00','03:00:00','1975-01-01 04:00:00'),  
+27. ('1964-01-01','1899-01-01 12:00:00','01:00:00','1985-01-01 05:00:00');  
+28. INSERT INTO temporal_val (d, dt, t) VALUES('1970-01-01','1884-01-01 12:00:00','13:00:00');  
+29. INSERT INTO temporal_val (d) VALUES('1970-01-01');  
+30. SELECT * FROM temporal_val;  
+31. SELECT * FROM temporal_val ORDER BY dt;  
+32.   
+33. Function        Description  
+34. NOW()           Returns the current date and time  
+35. CURDATE()       Returns the current date  
+36. CURTIME()       Returns the current time  
+37. DATE()          Extracts the date part of a date or date/time expression  
+38. EXTRACT()       Returns a single part of a date/time  
+39. DATE_ADD()      Adds a specified time interval to a date  
+40. DATE_SUB()      Subtracts a specified time interval from a date  
+41. DATEDIFF()      Returns the number of days between two dates  
+42. DATE_FORMAT()   Displays date/time data in different formats  
+43.   
+44. mysql> select NOW(),CURDATE(),CURTIME();  
+45. +---------------------+------------+-----------+  
+46. | NOW()               | CURDATE()  | CURTIME() |  
+47. +---------------------+------------+-----------+  
+48. | 2014-06-20 22:54:13 | 2014-06-20 | 22:54:13  |  
+49. +---------------------+------------+-----------+  
+50. 1 row in set (0.00 sec)  
+51.   
+52. CREATE TABLE Orders  
+53. (  
+54. OrderId int NOT NULL,  
+55. ProductName varchar(50) NOT NULL,  
+56. OrderDate datetime NOT NULL DEFAULT NOW(),  
+57. PRIMARY KEY (OrderId)  
+58. )  
+
+
+
+MariaDB [test]> 
+MariaDB [test]> show tables
+    -> ;
++----------------+
+| Tables_in_test |
++----------------+
+| temporal_val   |
++----------------+
+1 row in set (0.00 sec)
+
+MariaDB [test]> 
+MariaDB [test]> desc temporal_val
+    -> ;
++-------+-----------+------+-----+-------------------+-----------------------------+
+| Field | Type      | Null | Key | Default           | Extra                       |
++-------+-----------+------+-----+-------------------+-----------------------------+
+| d     | date      | YES  |     | NULL              |                             |
+| dt    | datetime  | YES  |     | NULL              |                             |
+| t     | time      | YES  |     | NULL              |                             |
+| ts    | timestamp | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++-------+-----------+------+-----+-------------------+-----------------------------+
+4 rows in set (0.00 sec)
+
+MariaDB [test]>
+
+
+
+==================================================================
+
+SELECT * FROM j1705_1s ORDER BY  UpdateTime desc LIMIT 6;
+
+select count(*) from ( SELECT * FROM j1705_1s ORDER BY  UpdateTime desc LIMIT 6  ) ;

@@ -1,0 +1,308 @@
+#include <see_com_common.h>
+
+const char ca_pubsub_url[] = "ipc:///tmp/heaven.ipc" ;
+const char ca_mysql_url[]  = "mysql://127.0.0.1/test?user=root&password=root" ;
+
+static char   ca_futures [FUTURE_NUMBER][FUTRUE_ID_LEN] ;
+static char * pp_futures [FUTURE_NUMBER];
+
+static see_fut_block_t      * pt_blocks[FUTURE_NUMBER] ;
+static see_hours_t      t_hours[SEE_HOUR_TYPE_NUM] ;  /* 和../../etc/tbl/see_trade_time 里面的行数一致！   */
+
+char ca_errtmp[512] ;
+
+double   hh[10000] ;
+double   ll[10000] ;
+double   cc[10000] ;
+double   oo[10000] ;
+
+int
+main(int iArgCnt, char *pcaArgVec[])
+{
+    int i_rtn =0 ;
+    int i =0 ;
+    int idx =0 ;
+    int sock ;
+    int bytes ;
+    char    ca_UpdateTime[9];
+    char    ca_TradingDay[9]; 
+    int uiui;
+    int mimi;
+
+    char *buf = NULL;
+
+    if( iArgCnt<=1 )
+    {
+        printf("Arg error!\n");
+        return -1;
+        see_errlog(1000,"Arg error!\n",RPT_TO_LOG,0,0);
+    }
+
+    struct CThostFtdcDepthMarketDataField * market_data ;
+
+    see_signal_init() ;                 // 需要详细考虑 
+    signal(SIGHUP, SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
+    see_daemon(1,0) ;
+
+    /* --------- future list init from  etc/tbl/see_future_table ------ begin ------ */
+    i_rtn = see_futures_init(pp_futures,ca_futures) ;                 // 初始化 future 列表
+    if ( i_rtn != 0 ){
+        memset( ca_errmsg,'\0',512 );
+        sprintf( ca_errmsg,"main: see_futures_init error : %d\n", i_rtn ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+    }
+
+    see_trading_hours_init( &t_hours[0] ) ;
+
+    int i00 = 0 ;
+    int i11 = 0 ;
+    while( t_hours[i00].pt_segments[0] != NULL )
+    {
+        i11 = 0 ;
+        while ( t_hours[i00].pt_segments[i11] != NULL )
+        {
+            memset( ca_errmsg,'\0',1024 );
+            sprintf( ca_errmsg,"hoursoooooooooooooo : i00:%d i11:%d,i_hour_type:%d begin:%s %s 15F:%s %s 30F:%s %s 1H:%s %s 2H:%s %s 3H:%s %s 4H:%s %s 5H:%s %s 1D:%s %s",
+                i00,i11,t_hours[i00].i_hour_type,
+                t_hours[i00].pt_segments[i11]->ca_b,
+                t_hours[i00].pt_segments[i11]->ca_e,
+                t_hours[i00].pt_segments[i11]->ca_15F_start,
+                t_hours[i00].pt_segments[i11]->ca_15F_end,
+                t_hours[i00].pt_segments[i11]->ca_30F_start,
+                t_hours[i00].pt_segments[i11]->ca_30F_end,
+                t_hours[i00].pt_segments[i11]->ca_1H_start,
+                t_hours[i00].pt_segments[i11]->ca_1H_end,
+                t_hours[i00].pt_segments[i11]->ca_2H_start,
+                t_hours[i00].pt_segments[i11]->ca_2H_end,
+                t_hours[i00].pt_segments[i11]->ca_3H_start,
+                t_hours[i00].pt_segments[i11]->ca_3H_end,
+                t_hours[i00].pt_segments[i11]->ca_4H_start,
+                t_hours[i00].pt_segments[i11]->ca_4H_end,
+                t_hours[i00].pt_segments[i11]->ca_5H_start,
+                t_hours[i00].pt_segments[i11]->ca_5H_end,
+                t_hours[i00].pt_segments[i11]->ca_1D_start,
+                t_hours[i00].pt_segments[i11]->ca_1D_end ) ;
+            see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+            i11++ ;
+        } 
+        i00++ ;
+    } 
+    
+
+
+    /* --------- create K bar for each future ------------ begin ------------ */
+
+    i = 0 ;
+    while ( pp_futures[i] != NULL ) {
+
+        pt_blocks[i] = malloc(sizeof(see_fut_block_t)) ;                      //为每个future分配了一个k bar, 用于计算不同周期的K柱.
+        if (pt_blocks[i] == NULL ) {
+            see_errlog( 1000,"create k bar error!\n",RPT_TO_LOG,0,0 ) ;
+        }
+        see_block_init( pt_blocks[i], pp_futures[i], &t_hours[0] ) ;
+        memset( ca_errmsg,'\0',1024 );
+        sprintf( ca_errmsg,"oooooooooooottttt:%c %s i_hour_type:%d pt_hour->i_hour_type: %c begin:%s end:%s 1D: %s %s ",
+                    pt_blocks[i]->trade_time.c_hour_type,pt_blocks[i]->InstrumentID,
+                    pt_blocks[i]->i_hour_type,
+                    pt_blocks[i]->pt_hour->i_hour_type,
+                    pt_blocks[i]->pt_hour->pt_segments[0]->ca_b,
+                    pt_blocks[i]->pt_hour->pt_segments[0]->ca_e,
+                    pt_blocks[i]->pt_hour->pt_segments[0]->ca_1D_start,
+                    pt_blocks[i]->pt_hour->pt_segments[0]->ca_1D_end) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+
+        int u ;
+        for ( u=0;u<5;u++){
+            memset( ca_errmsg,'\0',512 );
+            sprintf( ca_errmsg,"time ---------------- : %d begin: %d end: %d \n",u,pt_blocks[i]->trade_time.time_segment[u].b, \
+                                                                               pt_blocks[i]->trade_time.time_segment[u].e) ;
+            see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        }   
+        i++ ;
+    }
+
+
+    /* --------- create K bar for each future ------------ end ------------ */
+
+
+if(  memcmp(pcaArgVec[1],"0",1)==0 )
+{
+    printf("\n === Get tick data from nanomsg !!!\n") ;
+
+    memset(ca_UpdateTime,'\0',9) ;
+    memset(ca_TradingDay,'\0',9) ;
+
+    sock = see_pubsub_client( ca_pubsub_url, "iostest" ) ;
+
+    while (1)                                                         //  接收数据 并进行处理 
+    {
+        bytes = nn_recv (sock, &buf, NN_MSG, 0);                      // 如果没有数据，进程会等在这里，这时
+                                                                      // 如果收到signal 后，会进入到自己写的信号处理程序
+                                                                      // 然后程序会往下走，buf没有分配内存，所以会出报SIGSEG信号。
+                                                                      // 如果在前面 忽略如SIGHUP信号，则不会进入到 信号处理程序
+        // gettimeofday( &end,NULL );
+        market_data = (struct CThostFtdcDepthMarketDataField *)buf ; 
+
+        /* -------- save tick data ------------begin -------------- */
+        // see_save_tick(buf,bytes) ;
+        bytes ++ ;
+        /* -------- save tick data ------------ end -------------- */
+        
+        see_disp_tick(buf);
+
+        /* -----------------------  异常处理 ------------------------- */
+        if( memcmp(ca_UpdateTime,"22:59",5) ==0 && memcmp(market_data->UpdateTime,"23:29",5) ==0  ) {continue;} //异常处理
+        if( memcmp(market_data->TradingDay,ca_TradingDay,8) ==0 )
+        {
+            uiui = see_time_to_int(market_data->UpdateTime) ;
+            mimi = see_time_to_int(ca_UpdateTime) ;
+            if ( uiui < mimi ) { continue; }
+        }  // 异常处理：下一个K的时间比前一个K的时间还早，那就直接返回。
+        memcpy(ca_TradingDay,market_data->TradingDay,8);
+        memcpy(ca_UpdateTime,market_data->UpdateTime,8);
+        /* -----------------------  异常处理 ------------------------- */
+
+
+        /*--------- 这里要开始计算 K线了 ------------------*/
+        idx = see_get_future_index(pp_futures,market_data->InstrumentID) ;   // idx 合约所在的数组下标
+//        see_calc_k_bar(pt_blocks[idx],buf,0) ;  // 这里的0表示tick 1表示 1S 2S 5S 10S 15S 30S 1F 2F 3F 5F
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_2S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_3S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_5S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_10S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_15S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_30S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_2F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_3F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_5F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_10F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_15F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_30F) ;
+        see_calc_k_bar(pt_blocks[idx],buf,BAR_1H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_2H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_3H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_4H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_5H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1D) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1W) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1J) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1Y) ;
+
+//        see_save_k_bar(pt_blocks[idx]) ;
+//        see_run_strategy(pt_blocks[idx]) ;
+
+        nn_freemsg (buf);
+    } /* endof while(1) */
+}
+
+
+struct timeval start, end;
+gettimeofday( &start, NULL );
+
+if( memcmp(pcaArgVec[1],"1",1)==0 )
+{
+    printf("\n === Get tick data from ../dat/tst_dat/* !!!\n") ;
+
+    int msg_len = sizeof( struct CThostFtdcDepthMarketDataField ) ;
+
+    int i_count ;
+
+    static char ca_tick_file_list[] = "../../etc/tbl/tick_file_name.txt" ;
+    static char ca_line[100] ;
+    static char ca_tick_file[512] ;
+    FILE *pf ;
+    FILE *pf_tick_file ;
+    struct CThostFtdcDepthMarketDataField * t_data ;
+    struct CThostFtdcDepthMarketDataField tick_data ;
+
+    pf = fopen(ca_tick_file_list,"r");
+    if (pf == NULL) {
+        see_errlog(1000,(char *)"open future table error!!",RPT_TO_LOG,0,0) ;
+        return -1 ;
+    }
+    memset( ca_line,'\0',100 ) ;
+
+    memset(ca_UpdateTime,'\0',9) ;
+    memset(ca_TradingDay,'\0',9) ;
+
+    i_count = 0 ;
+    while ( fgets(ca_line, 100, pf ) != NULL ){
+        int len = strlen(ca_line)-1 ;
+        ca_line[len] = '\0' ;
+        memset( ca_tick_file,'\0',512 ) ;
+        strcat( ca_tick_file,(char *)"../../dat/tst_dat/") ;
+        strcat( ca_tick_file,ca_line ) ;
+    
+        pf_tick_file = fopen(ca_tick_file,"rb");
+        if (pf_tick_file == NULL) {
+            see_errlog(1000,(char *)"open future table error!!",RPT_TO_LOG,0,0) ;
+            return -1 ;
+        }
+
+        while ( (i_rtn = fread(&tick_data,msg_len,1,pf_tick_file)) != 0 )
+        {
+            t_data = &tick_data ;
+            buf = (char *) &tick_data ;
+            tick_data.BidVolume5 = i_count ;
+
+            //see_disp_tick( (char*) &tick_data );
+
+            /* -----------------------  异常处理 ------------------------- */
+            if( memcmp(ca_UpdateTime,"22:59",5) ==0 && memcmp(t_data->UpdateTime,"23:29",5) ==0  ) {continue;} //异常处理
+            if( memcmp(t_data->TradingDay,ca_TradingDay,8) ==0 )
+            {
+                uiui = see_time_to_int(t_data->UpdateTime) ;
+                mimi = see_time_to_int(ca_UpdateTime) ;
+                if ( uiui < mimi ) { continue; }
+            }  // 异常处理：下一个K的时间比前一个K的时间还早，那就直接返回。
+            memcpy(ca_TradingDay,t_data->TradingDay,8);
+            memcpy(ca_UpdateTime,t_data->UpdateTime,8);
+            /* -----------------------  异常处理 ------------------------- */
+
+
+            i_count++ ;
+
+            idx = see_get_future_index(pp_futures,t_data->InstrumentID) ;   // idx 合约所在的数组下标
+//        see_calc_k_bar(pt_blocks[idx],buf,0) ;  // 这里的0表示tick 1表示 1S 2S 5S 10S 15S 30S 1F 2F 3F 5F
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_2S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_3S) ;
+        see_calc_k_bar(pt_blocks[idx],buf,BAR_5S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_10S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_15S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_30S) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_2F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_3F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_5F) ;
+//       see_calc_k_bar(pt_blocks[idx],buf,BAR_10F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_15F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_30F) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_2H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_3H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_4H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_5H) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1D) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1W) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1J) ;
+//        see_calc_k_bar(pt_blocks[idx],buf,BAR_1Y) ;
+
+//        see_save_k_bar(pt_blocks[idx]) ;
+//        see_run_strategy(pt_blocks[idx]) ;
+
+        }
+        fclose(pf_tick_file);
+    }
+    fclose(pf);
+}
+    gettimeofday( &end,NULL );
+    memset( ca_errmsg,'\0',100 );
+    sprintf( ca_errmsg,"==== calc-time =========: sec:%lu usec:%lu \n",end.tv_sec-start.tv_sec,end.tv_usec-start.tv_usec ) ;
+    see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+
+    return SEE_OK;
+}

@@ -1,0 +1,7 @@
+# cd include
+# cp errlog.h /usr/include
+# cd ../src
+# make
+# cp ./liberrlog.a /usr/local/lib
+
+gcc -o liberrlog.so -shared -fPIC errlog.c

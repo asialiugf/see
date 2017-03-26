@@ -1,0 +1,24 @@
+{
+    "multi_period":"yes",
+    "period":["1f","5f","30f"],
+    "period_1f":{
+        
+    },
+    "public":{
+        "polyfit":{ "order":2, "count":10,
+            "positive_slope_range":[1.0,5.0],
+            "negative_slope_range":[-1.0,-1.5],
+        },
+        "kdj":{
+            "line-top":100, "line-middle":50, "line_bottom":10,
+            "kdj_number":3, "kdj_times":5,
+            "kdj1_para":{ "RSV_period":9, "K_period":3, "D_period":3, "J_EMA_period":5 },
+            "kdj2_para":{ "RSV_period":9, "K_period":3, "D_period":3, "J_EMA_period":5 },
+            "kdj3_para":{ "RSV_period":9, "K_period":3, "D_period":3, "J_EMA_period":5 },
+            "kdj4_para":{ "RSV_period":9, "K_period":3, "D_period":3, "J_EMA_period":5 },
+            "kdj5_para":{ "RSV_period":9, "K_period":3, "D_period":3, "J_EMA_period":5 },
+        },
+        "macd":{
+        }
+    },
+}

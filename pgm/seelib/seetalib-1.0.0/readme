@@ -1,0 +1,7 @@
+# cd include
+# cp see-talib.h /usr/include
+# cd ../src
+# make
+# cp ./libsee-talib.a /usr/local/lib
+
+gcc -o libsee_talib.so -shared -fPIC see_talib.c

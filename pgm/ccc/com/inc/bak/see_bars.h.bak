@@ -1,0 +1,351 @@
+
+/*
+ *  * Copyright (C) asialine
+ *   * Copyright (C) seeme,Inc.
+ *    */
+
+
+#ifndef _SEE_BARS_H_INCLUDED_
+#define _SEE_BARS_H_INCLUDED_
+
+#include <see_com_common.h>
+
+#define  SEE_HOUR_TYPE_NUM 20
+#define  SEE_SGM_NUM       50
+#define  MAX_BARS_LEN      1000000
+
+#define  BARS_TICK_LEN     1
+#define  BARS_1S_LEN       1000000
+#define  BARS_2S_LEN       1000000
+#define  BARS_3S_LEN       1000000
+#define  BARS_5S_LEN       1000000
+#define  BARS_10S_LEN      1000000
+#define  BARS_15S_LEN      1000000
+#define  BARS_30S_LEN      1000000
+#define  BARS_1F_LEN       1000000
+#define  BARS_2F_LEN       1000000
+#define  BARS_3F_LEN       1000000
+#define  BARS_5F_LEN       900000
+#define  BARS_10F_LEN      450000
+#define  BARS_15F_LEN      300000
+#define  BARS_30F_LEN      150000
+#define  BARS_1H_LEN       60000
+#define  BARS_2H_LEN       40000
+#define  BARS_3H_LEN       30000
+#define  BARS_4H_LEN       20000
+#define  BARS_5H_LEN       20000
+#define  BARS_1D_LEN       10000
+#define  BARS_1W_LEN       2000
+#define  BARS_1M_LEN       500
+#define  BARS_1J_LEN       200
+#define  BARS_1Y_LEN       50
+#define  BLOCK_BAR_LEN      1000000
+
+#define  K_LEN             10000
+
+/*
+   注意：
+    下面的定义，与数组下标是严格一致的。
+    block->bar_block[0]  = block->bar_block[BAR_1S] 
+    block->bar_block[13]  = block->bar_block[BAR_15F] 
+    各种函数的 period 也用的是下面的定义。
+ 
+*/
+#define  BAR_1S       0 
+#define  BAR_2S       1 
+#define  BAR_3S       2
+#define  BAR_5S       3
+#define  BAR_10S      4
+#define  BAR_15S      5
+#define  BAR_20S      6
+#define  BAR_30S      7
+#define  BAR_1F       8
+#define  BAR_2F       9
+#define  BAR_3F       10
+#define  BAR_5F       11
+#define  BAR_10F      12
+#define  BAR_15F      13
+#define  BAR_20F      14
+#define  BAR_30F      15
+#define  BAR_1H       16
+#define  BAR_2H       17
+#define  BAR_3H       18
+#define  BAR_4H       19
+#define  BAR_5H       20
+#define  BAR_6H       21
+#define  BAR_8H       22
+#define  BAR_10H      23
+#define  BAR_12H      24
+#define  BAR_1D       25
+#define  BAR_1W       26
+#define  BAR_1M       27
+#define  BAR_1J       28
+#define  BAR_1Y       29
+#define  BAR_TICK     30
+
+#define  BAR_SECOND        's'
+#define  BAR_MINUTE        'f'
+#define  BAR_HOUR          'h'
+#define  BAR_DAY           'd'
+#define  BAR_WEEK          'w'
+#define  BAR_MONTH         'm'
+#define  BAR_SEASON        'j'
+#define  BAR_YEAR          'y'
+
+#define  BAR_SAVE_YES     ‘'y'
+#define  BAR_SAVE_NO       'n'
+
+#define SEG_0       0
+#define SEG_1       1
+#define SEG_2       2
+#define SEG_3       3
+#define SEG_4       4
+#define SEG_5       5
+#define SEG_6       6
+#define SEG_7       7
+#define SEG_8       8
+#define SEG_9       9
+
+#define NO_SEG_0       -1
+#define NO_SEG_1       -1
+#define NO_SEG_2       -2
+#define NO_SEG_3       -3
+#define NO_SEG_4       -4
+#define NO_SEG_5       -5
+#define NO_SEG_6       -6
+#define NO_SEG_7       -7
+#define NO_SEG_8       -8
+#define NO_SEG_9       -9
+
+#define SAME_SEG_0       0
+#define SAME_SEG_1       1
+#define SAME_SEG_2       2
+#define SAME_SEG_3       3
+#define SAME_SEG_4       4
+#define SAME_SEG_5       5
+#define SAME_SEG_6       6
+#define SAME_SEG_7       7
+#define SAME_SEG_8       8
+#define SAME_SEG_9       9
+
+#define SAME_NO_SEG_0       -1
+#define SAME_NO_SEG_1       -1
+#define SAME_NO_SEG_2       -2
+#define SAME_NO_SEG_3       -3
+#define SAME_NO_SEG_4       -4
+#define SAME_NO_SEG_5       -5
+#define SAME_NO_SEG_6       -6
+#define SAME_NO_SEG_7       -7
+#define SAME_NO_SEG_8       -8
+#define SAME_NO_SEG_9       -9
+
+#define SEE_MKT_OPEN       10000        /*  market openning */
+#define SEE_MKT_CLOSE      10001        /*  market closed   */
+#define SEE_SAME_SEG          10002
+#define SEE_DIFF_SEG          10003
+#define SEE_SAME_NO_SEG       10004
+#define SEE_DIFF_NO_SEG       10005
+#define SEE_SAME_KBAR         10006
+#define SEE_DIFF_KBAR         10007
+
+#define SEE_START_TICK        10008   // 开机后第一个交易时间段内的tick 
+
+typedef struct  {
+    char c_oc_flag ;    /* 'o':open   ;c':close */
+    char ca_b[9] ;      /* ca_begin             */
+    char ca_e[9] ;      /* ca_end               */
+    int  i_b ;          /* int begin */
+    int  i_e ;          /* int end */
+
+    char ca_15F_start[9] ;
+    char ca_20F_start[9] ;
+    char ca_30F_start[9] ;
+    char ca_1H_start[9] ;
+    char ca_2H_start[9] ;
+    char ca_3H_start[9] ;
+    char ca_4H_start[9] ;
+    char ca_5H_start[9] ;
+    char ca_1D_start[9] ;
+
+    char ca_15F_end[9] ;
+    char ca_20F_end[9] ;
+    char ca_30F_end[9] ;
+    char ca_1H_end[9] ;
+    char ca_2H_end[9] ;
+    char ca_3H_end[9] ;
+    char ca_4H_end[9] ;
+    char ca_5H_end[9] ;
+    char ca_1D_end[9] ;
+
+    int i_15F_start ;
+    int i_20F_start ;
+    int i_30F_start ;
+    int i_1H_start ;
+    int i_2H_start ;
+    int i_3H_start ;
+    int i_4H_start ;
+    int i_5H_start ;
+    int i_1D_start ;
+
+    int i_15F_end ;
+    int i_20F_end ;
+    int i_30F_end ;
+    int i_1H_end ;
+    int i_2H_end ;
+    int i_3H_end ;
+    int i_4H_end ;
+    int i_5H_end ;
+    int i_1D_end ;
+} see_segment_st ;   // 用于记录时间段，目前每个交易时间段为15分钟
+
+typedef struct  {
+    int i_hour_type ;
+    see_segment_st *  pt_segments[SEE_SGM_NUM] ;
+} see_hours_t ;     // 交易时间，用于记录一天的所有的交易时间段  每个期货品种有一个 see_fut_block_t，这个结构中会包含 
+
+
+typedef struct {
+//    char    InstrumentID[31];
+    char    TradingDay[9]; 
+    char    ActionDay[9]; 
+    char    ca_btime[9];   //begin time
+    char    ca_etime[9];  //end time
+    double  o ;             // open
+    double  c ;             // close 
+    double  h ;             // high
+    double  l ;             // low
+    int     v ;             // volume
+    int     vsum ;         // keep volume sum
+} see_bar_t ;
+
+typedef struct {
+    char    InstrumentID[31];
+    char    TradingDay[9];
+    char    ActionDay[9]; 
+    char    UpdateTime[9];
+    double  o ;             // open
+    double  c ;             // close 
+    double  h ;             // high
+    double  l ;             // low
+    int     v ;             // volume
+} see_bar_save_t ;
+
+typedef struct  {
+    char        TradingDay[9];
+    char        ActionDay[9];
+    char        UpdateTime[9];
+    double      oo[10000] ;             // open
+    double      cc[10000] ;             // close 
+    double      hh[10000] ;             // high
+    double      ll[10000] ;             // low
+    int         vv[10000] ;             // volume
+} see_klist_t ;
+
+typedef struct {
+    see_bar_t           bar0 ;
+    see_bar_t           bar1 ;
+    char                c_save ;                    /* 's' 表示 save  'n' 表示 不需要save */
+    int                 i_bar_type ;                // 1 2 3 5 10 15   这个值可以用来计算 新来的tick是不是在同一个K
+    char                c_bar_type ;                // S F H D W M J Y  BAR_SECOND BAR_MINUTE ...
+    see_klist_t         t_klist ;                  // 1s 2s 3s ... 1f 2f 3f 5f ... 1h 5h ... 1y tick
+} see_bar_block_t ;                         // 每个period有一个bar_block
+
+
+typedef struct  {
+    char                InstrumentID[31];
+    char                ca_home[512];                   // 用于记录"/home/rabbit/see/dat/rcv_dat/au" 需要初始化
+    int                 i_hour_type ;                   // 每个品种的交易时间类型不一样，有的到23:00结束，有的到 01:00
+    char                c_oc_flag ;                     //  'o' 'c' 用于记录 收到的tick是不是在交易时间段内 每收到一个记一次
+    int                 i_sgm_idx ;                     // 用于记录收到tick时，是在哪个交易时间段内 每收到一个记一次
+    see_hours_t         *pt_hour ;                      // 每个品种的交易时间类型 不一样
+    see_bar_block_t     bar_block[30] ;                  // 1s 2s 3s ... 1f 2f 3f 5f ... 1h 5h ... 1y tick
+} see_fut_block_t ;                                         // 每个future 有一个 block !
+
+#define MOVE_BAR       p_bar0->o = p_bar1->o ; \
+                       p_bar0->c = p_bar1->c ; \
+                       p_bar0->h = p_bar1->h ; \
+                       p_bar0->l = p_bar1->l ; \
+                       p_bar0->v = p_bar1->v ;
+
+#define BAR1_TO_BAR0   memcpy(p_bar0->TradingDay,p_bar1->TradingDay,9) ; \
+                       memcpy(p_bar0->ca_btime,p_bar1->ca_btime,9) ; \
+                       memcpy(p_bar0->ActionDay,p_bar1->ActionDay,9) ; \
+                       p_bar0->o = p_bar1->o ; \
+                       p_bar0->c = p_bar1->c ; \
+                       p_bar0->h = p_bar1->h ; \
+                       p_bar0->l = p_bar1->l ; \
+                       p_bar0->v = p_bar1->v ;
+
+#define NEW_BAR1       memcpy(p_bar1->TradingDay,tick->TradingDay,9) ; \
+                       memcpy(p_bar1->ca_btime,tick->UpdateTime,9) ; \
+                       memcpy(p_bar1->ActionDay,tick->ActionDay,9) ; \
+                       p_bar1->o = tick->LastPrice ; \
+                       p_bar1->c = tick->LastPrice ; \
+                       p_bar1->h = tick->LastPrice ; \
+                       p_bar1->l = tick->LastPrice ; \
+                       p_bar1->vsum = tick->Volume ; \
+                       p_bar1->v = 0 ;
+
+#define UPDATE_BAR1    p_bar1->c = tick->LastPrice ; \
+                       if (  p_bar1->h < tick->LastPrice ) { p_bar1->h = tick->LastPrice ; } \
+                       if (  p_bar1->l > tick->LastPrice ) { p_bar1->l = tick->LastPrice ; } \
+                       p_bar1->v    = tick->Volume - p_bar0->vsum ; \
+                       p_bar1->vsum = tick->Volume ;
+
+#define FIRST_TICK     if (  p_bar0->h < 0 ) { \
+                           memcpy(p_bar0->TradingDay,tick->TradingDay,9) ; \
+                           memcpy(p_bar0->ca_btime,tick->UpdateTime,9) ; \
+                           memcpy(p_bar0->ActionDay,tick->ActionDay,9) ; \
+                           p_bar0->o = tick->LastPrice ; \
+                           p_bar0->c = tick->LastPrice ; \
+                           p_bar0->h = tick->LastPrice ; \
+                           p_bar0->l = tick->LastPrice ; \
+                           p_bar0->v = tick->Volume ; \
+                           memcpy(p_bar1->TradingDay,tick->TradingDay,9) ; \
+                           memcpy(p_bar1->ca_btime,tick->UpdateTime,9) ; \
+                           memcpy(p_bar1->ActionDay,tick->ActionDay,9) ; \
+                           p_bar1->o = tick->LastPrice ; \
+                           p_bar1->c = tick->LastPrice ; \
+                           p_bar1->h = tick->LastPrice ; \
+                           p_bar1->l = tick->LastPrice ; \
+                           p_bar1->v = tick->Volume ; \
+                           break ; \
+                       }
+
+typedef see_fut_block_t  *PT_BLOCKS     [FUTURE_NUMBER] ;
+
+int see_bars_index_next (int start_index) ;
+int see_bars_index_back (int start_index, int n) ;
+int see_bars_index_forword (int start_index, int n) ;
+
+int see_bars_load (see_bar_t bars[], int start_index, int n) ; //从start_index开始装n个bar,装完后，需要将g_bar_cur_index 改成 start_index + n - 1 ;
+int see_bars_add (see_bar_t bars[], int start_index ) ;  // 规定：g_bar_cur_index 所指的是最后一个K线bar，所以要add一个K线bar时，要将start_index的值设为g_bar_cur_index+1，并在add完成后， g_bar_cur_index 应该是 加1了。
+
+int see_date_comp( char * pca_first, char * pca_last ) ;
+int see_time_comp( char * pca_first, char * pca_last ) ;
+see_bar_t * see_create_bar( char * p_future_id, char c_period  ) ;
+int see_calc_bar( see_fut_block_t * p_block, char * buf, int period ) ; 
+//extern int see_calc_k_bar( see_fut_block_t * p_block, char * buf, int period ) ;
+int see_calc_k_bar( see_fut_block_t * p_block, char * buf, int period ) ;
+
+int split_string(char *s,char _cmd[SEE_SGM_NUM][20]) ;
+int see_time_to_int(char *f ) ;
+int see_handle_bars( see_fut_block_t *p_block, char *buf ) ;
+int see_save_bar ( see_fut_block_t * p_block, char *buf, int period ) ;
+int is_weekend( char * pc_day) ;
+int is_holiday( char * pc_day) ;
+int is_notrade( see_fut_block_t * p_blick,char * time0 ) ;
+int see_first_tick(see_fut_block_t *p_block, char *buf, see_bar_t *p_bar0, see_bar_t *p_bar1, int period ) ;
+int see_calc_bar_block( see_fut_block_t * p_block, char * buf, int period ) ;
+//int see_calc_bar_block( see_fut_block_t * p_block, see_bar_t * p_bar0, see_bar_t * p_bar1, char * buf, int period ) ;
+int is_mkt_open(see_fut_block_t * p_block,char * buf) ;
+
+int is_same_k_bar ( see_fut_block_t     * p_block,
+                    see_bar_t       * p_bar1,
+                    char            * buf,
+                    int             period );
+
+// int see_calc_k_value(see_future_block_t * p_block,char * buf) ;  // 计算所有周期的K柱
+// int see_save_k_value(see_future_block_t * p_block) ;             // 存储所有周期的K柱
+
+#endif

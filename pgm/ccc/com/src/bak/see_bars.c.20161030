@@ -1,0 +1,1371 @@
+#include <see_com_common.h>
+
+static char ca_errmsg[512] ;
+
+int
+see_bars_index_forword (int start_index, int n)   // bar指针前移n个.
+{
+    int rtn ;
+    if ( n >= MAX_BARS_LEN ) { return -1 ; }
+    rtn = start_index + n ;
+    if ( rtn >= MAX_BARS_LEN )
+    {
+        rtn = rtn - MAX_BARS_LEN  ;
+    }
+    return rtn ;
+}
+
+int
+see_bars_index_back (int start_index, int n)  //bar指针后移n个。
+{
+    int rtn ;
+    if ( n >= MAX_BARS_LEN ) { return -1 ; }
+    rtn = start_index -n ;
+    if ( rtn < 0 )
+    {
+        rtn = rtn + MAX_BARS_LEN ;
+    }
+    return rtn ;
+}
+
+int
+see_bars_load (see_bar_t bars[], int start_index, int n)  // 从start_index开始装 n 个 bar的数据，装完后，需要将 g_bar_cur_index 改成 start_index + n -1  ;
+{
+    int rtn = 0 ;
+    int i ;
+    for ( i = start_index ; i < start_index+n ; i++ )
+    {
+        bars[i].o = i ;
+        bars[i].c = i ;
+        bars[i].h = i ;
+        bars[i].l = i ;
+    }
+    return rtn ;
+}
+int
+see_bars_calc_bar_1s ( see_bar_t * bar )
+{
+    int rtn = 0 ;
+    bar->o = 100 ;
+    bar->c = 100 ;
+    bar->h = 100 ;
+    bar->l = 100 ;
+    return rtn ;
+}
+
+int 
+see_date_comp( char * pca_first, char * pca_last )
+{
+    
+    int i_rtn ;
+    char ca_first[9] ;
+    char ca_last[9] ;
+    if( strlen(pca_first) < 8 ){
+        see_errlog(1000,"see_date_comp: input error!",RPT_TO_LOG,0,0) ;
+    }
+    if( strlen(pca_last) < 8 ){
+        see_errlog(1000,"see_date_comp: input error!",RPT_TO_LOG,0,0) ;
+    }
+    memset(ca_first,'\0',9) ;
+    memset(ca_last,'\0',9) ;
+    memcpy(ca_first,pca_first,8) ;
+    memcpy(ca_last,pca_last,8) ;
+    i_rtn = strcmp ( ca_first,ca_last ) ;
+    return i_rtn ;
+}
+
+int 
+see_time_comp( char * f, char * l )  // 比较时间，输出秒 格式：06:33:26
+{
+    char f_h[3] = "\0\0\0" ;
+    char f_m[3] = "\0\0\0" ;
+    char f_s[3] = "\0\0\0" ;
+
+    char l_h[3] = "\0\0\0" ;
+    char l_m[3] = "\0\0\0" ;
+    char l_s[3] = "\0\0\0" ;
+
+    int fh,fm,fs,lh,lm,ls ;
+
+    time_t f_sec;
+    time_t l_sec;
+
+    struct tm f_time_fields;
+    struct tm l_time_fields;
+
+    memcpy(f_h,f,2);
+    memcpy(f_m,f+3,2);
+    memcpy(f_s,f+6,2);
+
+    memcpy(l_h,l,2);
+    memcpy(l_m,l+3,2);
+    memcpy(l_s,l+6,2);
+
+    fh = atoi(f_h);
+    fm = atoi(f_m);
+    fs = atoi(f_s);
+
+    lh = atoi(l_h);
+    lm = atoi(l_m);
+    ls = atoi(l_s);
+
+    if ( fh == lh && fm == lm ) {
+        sprintf(ca_errmsg,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk, %s,%s,%d",f,l,ls-fs) ;
+        see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+        return ls-fs ;
+    }
+ 
+    f_time_fields.tm_mday = 0;
+    f_time_fields.tm_mon  = 0;
+    f_time_fields.tm_year = 0; 
+    f_time_fields.tm_hour = fh;
+    f_time_fields.tm_min  = fm;
+    f_time_fields.tm_sec  = fs;
+
+    l_time_fields.tm_mday = 0;
+    l_time_fields.tm_mon  = 0;
+    l_time_fields.tm_year = 0; 
+    l_time_fields.tm_hour = lh;
+    l_time_fields.tm_min  = lm;
+    l_time_fields.tm_sec  = ls;
+
+    f_sec = mktime(&f_time_fields);
+    l_sec = mktime(&l_time_fields);
+
+    sprintf(ca_errmsg,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk, %s,%s,%d",f,l,(int)(l_sec-f_sec)) ;
+    see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+    return l_sec-f_sec ;
+}
+
+int 
+see_bar_calc_1s  (see_bar_t * p_bar,char * buf)
+{
+    return SEE_OK ;
+}
+
+int see_bar_calc_5s  (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_10s (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_15s (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_30s (see_bar_t * p_bar,char * buf)
+{
+    return SEE_OK ;
+
+}
+
+int see_bar_calc_1f  (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_3f  (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_5f  (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_10f (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_15f (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_30f (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_1h  (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_2h  (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_3h  (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_4h  (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_d   (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_w   (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_m   (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_s   (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+int see_bar_calc_y   (see_bar_t * p_bar,char * buf)
+{
+
+    return SEE_OK ;
+}
+
+see_bar_t *
+see_create_bar( char * p_future_id,char c_period )
+{
+    see_bar_t * kkk ;
+    kkk = malloc(sizeof(see_bar_t)) ;              // 为每个future 分配2个bars 的内存 0表示前一个bar,1表示当前bar
+    if (kkk == NULL ) { 
+        see_errlog( 1000,"see_create_bar error!\n",RPT_TO_LOG,0,0 ) ; 
+    }   
+    memset(kkk->TradingDay,'\0',9) ;
+    memset(kkk->UpdateTime,'\0',9) ;
+    memset(kkk->ActionDay,'\0',9) ;
+    kkk->o = -1 ;
+    kkk->c = -1 ;
+    kkk->h = -1 ;
+    kkk->l = -1 ;
+    kkk->v = -1 ;
+    
+    return kkk ;
+}
+
+int
+see_calc_bar( see_fut_block_t * p_block, char * buf, int period )
+{
+    int wr = 0 ;
+    int ss ;
+    int nn ;  // 用来记数，有多少个old K柱需要存储到文件里。
+                 // 正常情况应该是0或者1，但如果tick有5秒没有到，前4秒应该都有记录为 ----
+    see_bar_t * p_bar0 ;
+    see_bar_t * p_bar1 ;
+    struct CThostFtdcDepthMarketDataField * tick ;
+
+    tick = (struct CThostFtdcDepthMarketDataField *)buf ;
+
+    switch(period) {
+        case  BAR_TICK :
+            wr = 1 ;
+            break ;
+        case  BAR_1S :
+            p_bar0 = &p_block->bar_block_1s.bar0 ;
+            p_bar1 = &p_block->bar_block_1s.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+
+        case  BAR_2S : 
+            p_bar0 = &p_block->bar_block_2s.bar0 ;
+            p_bar1 = &p_block->bar_block_2s.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/2 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;  
+            break ;
+
+        case  BAR_3S :
+            p_bar0 = &p_block->bar_block_3s.bar0 ;
+            p_bar1 = &p_block->bar_block_3s.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/3 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            memset(ca_errmsg,'\0',512) ;
+            sprintf(ca_errmsg,"######  BAR_3S nn:%d -- bar0:%s,bar1:%s,tick:%s",nn,p_bar0->UpdateTime,p_bar1->UpdateTime,tick->UpdateTime) ;
+            see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+            memset(ca_errmsg,'\0',512) ;
+            sprintf(ca_errmsg,"bar0:----o: %10.2f,c: %10.2f,h: %10.2f,l: %10.2f, ",p_bar0->o,p_bar0->c,p_bar0->h,p_bar0->l) ;
+            see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+            memset(ca_errmsg,'\0',512) ;
+            sprintf(ca_errmsg,"bar1:----o: %10.2f,c: %10.2f,h: %10.2f,l: %10.2f, ",p_bar1->o,p_bar1->c,p_bar1->h,p_bar1->l) ;
+            see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+            break ;
+
+
+        case  BAR_5S :
+            p_bar0 = &p_block->bar_block_5s.bar0 ;
+            p_bar1 = &p_block->bar_block_5s.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/5 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+
+        case  BAR_10S :
+            p_bar0 = &p_block->bar_block_10s.bar0 ;
+            p_bar1 = &p_block->bar_block_10s.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/10 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; } 
+            wr = nn ;
+            see_errlog(1000,p_bar0->UpdateTime,RPT_TO_LOG,0,0) ;
+            see_errlog(1000,p_bar1->UpdateTime,RPT_TO_LOG,0,0) ;
+            see_errlog(1000,tick->UpdateTime,RPT_TO_LOG,0,0) ;
+            memset(ca_errmsg,'\0',512) ;
+            sprintf(ca_errmsg," see_calc_bar BAR_10S : nnnnnnnnnnnn: nn: %d",nn ) ;
+            see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+            break ;
+
+        case  BAR_15S :
+            p_bar0 = &p_block->bar_block_15s.bar0 ;
+            p_bar1 = &p_block->bar_block_15s.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/15 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { 
+                BAR1_TO_BAR0 ; NEW_BAR1 ;
+                memset(ca_errmsg,'\0',512) ;
+                sprintf(ca_errmsg," see_calc_bar BAR_1F : nnnnnnnnnnnn:%d \t %s \t %10.2f   \t %10.2f    \t %10.2f    \t %10.2f ",
+                                                       p_bar0->v,p_bar0->UpdateTime,p_bar0->o,p_bar0->h,p_bar0->l,p_bar0->c ) ;
+                see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+            }
+            wr = nn ;
+            break ;
+
+        case  BAR_30S :
+            p_bar0 = &p_block->bar_block_30s.bar0 ;
+            p_bar1 = &p_block->bar_block_30s.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/30 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            see_errlog(1000,p_bar0->UpdateTime,RPT_TO_LOG,0,0) ;
+            see_errlog(1000,p_bar1->UpdateTime,RPT_TO_LOG,0,0) ;
+            see_errlog(1000,tick->UpdateTime,RPT_TO_LOG,0,0) ;
+            memset(ca_errmsg,'\0',512) ;
+            sprintf(ca_errmsg," see_calc_bar BAR_30S : nnnnnnnnnnnn: nn: %d",nn ) ;
+            see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+            break ;
+
+        case  BAR_1F :
+            p_bar0 = &p_block->bar_block_1f.bar0 ;
+            p_bar1 = &p_block->bar_block_1f.bar1 ;
+            see_first_tick( buf,p_bar0,p_bar1,BAR_1F) ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/60 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ;
+            p_bar1->h = -1 ;
+            see_first_tick( buf,p_bar0,p_bar1,BAR_1F) ;  //每次开新的K柱时，tick->UpdateTime的值有可能不是 起始的时间，所以要重算
+            memset(ca_errmsg,'\0',512) ;
+            sprintf(ca_errmsg," see_calc_bar BAR_1F : nnnnnnnnnnnn:%d \t %s \t %10.2f   \t %10.2f    \t %10.2f    \t %10.2f ",
+                                                       p_bar0->v,p_bar0->UpdateTime,p_bar0->o,p_bar0->h,p_bar0->l,p_bar0->c ) ;
+            see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+            }
+            wr = nn ;
+            break ;
+
+        case  BAR_2F :
+            p_bar0 = &p_block->bar_block_2f.bar0 ;
+            p_bar1 = &p_block->bar_block_2f.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/120 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+        case  BAR_3F :   
+            p_bar0 = &p_block->bar_block_2s.bar0 ;
+            p_bar1 = &p_block->bar_block_2s.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/180 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+        case  BAR_5F : 
+            p_bar0 = &p_block->bar_block_5f.bar0 ;
+            p_bar1 = &p_block->bar_block_5f.bar1 ;
+            see_first_tick( buf,p_bar0,p_bar1,BAR_5F) ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/300 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ;
+                memset(ca_errmsg,'\0',512) ;
+                sprintf(ca_errmsg," see_calc_bar BAR_5F : nnnnnnnnnnnn:%d \t %s \t %10.2f   \t %10.2f    \t %10.2f    \t %10.2f ",
+                                                                 p_bar0->v,p_bar0->UpdateTime,p_bar0->o,p_bar0->h,p_bar0->l,p_bar0->c ) ;
+                see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+            }
+            wr = nn ;
+            break ;
+
+
+        case  BAR_10F :
+            p_bar0 = &p_block->bar_block_10f.bar0 ;
+            p_bar1 = &p_block->bar_block_10f.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/600 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+        case  BAR_15F :
+            p_bar0 = &p_block->bar_block_15f.bar0 ;
+            p_bar1 = &p_block->bar_block_15f.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/900 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+
+        case  BAR_30F :
+            p_bar0 = &p_block->bar_block_30f.bar0 ;
+            p_bar1 = &p_block->bar_block_30f.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/1800 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+
+        case  BAR_1H :
+            p_bar0 = &p_block->bar_block_1h.bar0 ;
+            p_bar1 = &p_block->bar_block_1h.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/3600 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+        case  BAR_2H :
+            p_bar0 = &p_block->bar_block_2h.bar0 ;
+            p_bar1 = &p_block->bar_block_2h.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/7200 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+        case  BAR_3H :
+            p_bar0 = &p_block->bar_block_3h.bar0 ;
+            p_bar1 = &p_block->bar_block_3h.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/10800 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+        case  BAR_4H :
+            p_bar0 = &p_block->bar_block_2s.bar0 ;
+            p_bar1 = &p_block->bar_block_2s.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/14400 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+
+        case  BAR_5H :
+            p_bar0 = &p_block->bar_block_5h.bar0 ;
+            p_bar1 = &p_block->bar_block_5h.bar1 ;
+            FIRST_TICK ;
+            ss = see_time_comp( p_bar1->UpdateTime,tick->UpdateTime ) ;         // ==0 表示还是同一K柱  
+            nn = ss/18000 ;
+            if ( nn == 0 ) { UPDATE_BAR1 ; }else { BAR1_TO_BAR0 ; NEW_BAR1 ; }
+            wr = nn ;
+            break ;
+
+
+        case  BAR_1D :
+            p_bar0 = &p_block->bar_block_1d.bar0 ;
+            p_bar1 = &p_block->bar_block_1d.bar1 ;
+            p_bar0->o = 100+BAR_1S ;
+            p_bar1->o = 101+BAR_1S ;
+            break ;
+        case  BAR_1W :
+            p_bar0 = &p_block->bar_block_1w.bar0 ;
+            p_bar1 = &p_block->bar_block_1w.bar1 ;
+            p_bar0->o = 100+BAR_1S ;
+            p_bar1->o = 101+BAR_1S ;
+            break ;
+        case  BAR_1M :
+            p_bar0 = &p_block->bar_block_1m.bar0 ;
+            p_bar1 = &p_block->bar_block_1m.bar1 ;
+            p_bar0->o = 100+BAR_1M ;
+            p_bar1->o = 101+BAR_1M ;
+            break ;
+        case  BAR_1J :
+            p_bar0 = &p_block->bar_block_1j.bar0 ;
+            p_bar1 = &p_block->bar_block_1j.bar1 ;
+            p_bar0->o = 100+BAR_1J ;
+            p_bar1->o = 101+BAR_1J ;
+            break ;
+        case  BAR_1Y :
+            p_bar0 = &p_block->bar_block_1y.bar0 ;
+            p_bar1 = &p_block->bar_block_1y.bar1 ;
+            p_bar0->o = 100+BAR_1Y ;
+            p_bar1->o = 101+BAR_1Y ;
+            break ;
+        default :
+            break ;
+    }
+    return wr ;
+}
+
+int 
+see_calc_k_bar( see_fut_block_t * p_block, char * buf, int period )
+{
+    int    num = 0 ;
+    char * pc_save ;
+    see_bar_t * p_bar0 ;
+    see_bar_t * p_bar1 ;
+    // see_bar_block_t bar_block ;
+    struct CThostFtdcDepthMarketDataField * tick;
+    tick = (struct CThostFtdcDepthMarketDataField *)buf ;
+    is_weekend( tick->ActionDay ) ;   // 判断是不是周末？
+    is_holiday( tick->ActionDay ) ;   // 判断是不是放假？
+//    if( is_notrade( p_block,tick->UpdateTime ) == 1 ) { 
+        // 不在交易时间段内发出的tick 应该需要更新 日K
+//        return 1 ;
+//    }  //判断是不是在交易时间段内？
+    // is_duplicate( ) ;              // 2 判断 buf是不是已经计算过？ 
+
+
+    switch(period) {
+        case  BAR_TICK :
+            break ;
+        case  BAR_1S :
+            p_bar0 = &p_block->bar_block_1s.bar0 ;
+            p_bar1 = &p_block->bar_block_1s.bar1 ;
+            pc_save = &p_block->bar_block_1s.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_2S :
+            p_bar0 = &p_block->bar_block_2s.bar0 ;
+            p_bar1 = &p_block->bar_block_2s.bar1 ;
+            pc_save = &p_block->bar_block_2s.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_3S :
+            p_bar0 = &p_block->bar_block_3s.bar0 ;
+            p_bar1 = &p_block->bar_block_3s.bar1 ;
+            pc_save = &p_block->bar_block_3s.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_5S :
+            p_bar0 = &p_block->bar_block_5s.bar0 ;
+            p_bar1 = &p_block->bar_block_5s.bar1 ;
+            pc_save = &p_block->bar_block_5s.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_10S :
+            p_bar0 = &p_block->bar_block_10s.bar0 ;
+            p_bar1 = &p_block->bar_block_10s.bar1 ;
+            pc_save = &p_block->bar_block_10s.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_15S :
+            p_bar0 = &p_block->bar_block_15s.bar0 ;
+            p_bar1 = &p_block->bar_block_15s.bar1 ;
+            pc_save = &p_block->bar_block_15s.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_30S :
+            p_bar0 = &p_block->bar_block_30s.bar0 ;
+            p_bar1 = &p_block->bar_block_30s.bar1 ;
+            pc_save = &p_block->bar_block_30s.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_1F :
+            p_bar0 = &p_block->bar_block_1f.bar0 ;
+            p_bar1 = &p_block->bar_block_1f.bar1 ;
+            pc_save = &p_block->bar_block_1f.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_2F :
+            p_bar0  = &p_block->bar_block_2f.bar0 ;
+            p_bar1  = &p_block->bar_block_2f.bar1 ;
+            pc_save = &p_block->bar_block_2f.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_3F :
+            p_bar0  = &p_block->bar_block_3f.bar0 ;
+            p_bar1  = &p_block->bar_block_3f.bar1 ;
+            pc_save = &p_block->bar_block_3f.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_5F :
+            p_bar0  = &p_block->bar_block_5f.bar0 ;
+            p_bar1  = &p_block->bar_block_5f.bar1 ;
+            pc_save = &p_block->bar_block_5f.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_10F :
+            p_bar0 =  &p_block->bar_block_10f.bar0 ;
+            p_bar1 =  &p_block->bar_block_10f.bar1 ;
+            pc_save = &p_block->bar_block_10f.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_15F :
+            p_bar0 =  &p_block->bar_block_15f.bar0 ;
+            p_bar1 =  &p_block->bar_block_15f.bar1 ;
+            pc_save = &p_block->bar_block_15f.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_30F :
+            p_bar0 =  &p_block->bar_block_30f.bar0 ;
+            p_bar1 =  &p_block->bar_block_30f.bar1 ;
+            pc_save = &p_block->bar_block_30f.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_1H :
+            p_bar0 =  &p_block->bar_block_1h.bar0 ;
+            p_bar1 =  &p_block->bar_block_1h.bar1 ;
+            pc_save = &p_block->bar_block_1h.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_2H :
+            p_bar0 =  &p_block->bar_block_2h.bar0 ;
+            p_bar1 =  &p_block->bar_block_2h.bar1 ;
+            pc_save = &p_block->bar_block_2h.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_3H :
+            p_bar0 =  &p_block->bar_block_3h.bar0 ;
+            p_bar1 =  &p_block->bar_block_3h.bar1 ;
+            pc_save = &p_block->bar_block_3h.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_4H :
+            p_bar0 =  &p_block->bar_block_4h.bar0 ;
+            p_bar1 =  &p_block->bar_block_4h.bar1 ;
+            pc_save = &p_block->bar_block_4h.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_5H :
+            p_bar0 =  &p_block->bar_block_5h.bar0 ;
+            p_bar1 =  &p_block->bar_block_5h.bar1 ;
+            pc_save = &p_block->bar_block_5h.c_save;
+            see_calc_bar_block( p_block, p_bar0, p_bar1, buf, pc_save, period ) ;
+            see_handle_bar(num,p_block,buf,period ) ;
+            break ;
+        case  BAR_1D :
+        case  BAR_1W :
+        case  BAR_1M :
+        case  BAR_1J :
+        case  BAR_1Y :
+            break ;
+        default :
+            break ;
+    }
+    return num ;
+}
+int is_same_segment( see_fut_block_t * p_block,char * mmm,char * nnn )
+{
+    int i = 0 ;
+    int j = 0 ;
+    int sss ;
+    int b,e ;
+    sss = see_time_to_int( mmm ) ;
+    while ( i < 10 ) {
+        b = p_block->trade_time.time_segment[i].b ;
+        e = p_block->trade_time.time_segment[i].e ;
+        if ( b>e ) { e = e+86400 ; }
+        if( sss >= b && sss<= e ){ break; }
+        i++ ;
+    }   
+    sss = see_time_to_int( nnn ) ;
+    while ( j < 10 ) {
+        b = p_block->trade_time.time_segment[j].b ;
+        e = p_block->trade_time.time_segment[j].e ;
+        if ( b>e ) { e = e+86400 ; }
+        if( sss >= b && sss<= e ){ break; }
+        j++ ;
+    }
+    if ( i == j ){ return 1 ; } else { return j ; }
+}
+
+int is_weekend( char * pc_day) 
+{
+    struct tm * p_time ;
+    struct tm cur_time;
+    time_t   rawtime ;
+    char ca_y[5] = "\0\0\0\0\0" ;
+    char ca_m[3] = "\0\0\0" ;
+    char ca_d[3] = "\0\0\0" ; 
+
+    memcpy(ca_y,pc_day,4);
+    memcpy(ca_m,pc_day+4,2);
+    memcpy(ca_d,pc_day+6,2);
+
+    cur_time.tm_mday = atoi(ca_d);
+    cur_time.tm_mon  = atoi(ca_m)-1;
+    cur_time.tm_year = atoi(ca_y)-1900; 
+    cur_time.tm_hour = 0;  
+    cur_time.tm_min  = 0;  
+    cur_time.tm_sec  = 0;
+    rawtime = mktime(&cur_time);
+
+    p_time =localtime(&rawtime);
+    if(  p_time->tm_wday == 6 || p_time->tm_wday == 0 ) { return 1 ; } else { return 0 ; } 
+}
+int is_holiday( char * pc_day )
+{
+    return 0 ;
+} 
+
+int is_notrade( see_fut_block_t * p_block,char * time0 )  //交易时间段判断
+{
+    int i = 0 ;
+    int sss ;
+    int b,e ;
+    sss = see_time_to_int( time0 ) ;
+    while ( i < 10 ) {
+        b = p_block->trade_time.time_segment[i].b ;
+        e = p_block->trade_time.time_segment[i].e ;
+        if ( b>e ) { e = e+86400 ; }
+        if( sss >= b && sss< e ){ return 0; }
+        i++ ;
+    }  
+    if ( sss >= 2085916953 && sss < 2085938553 ) {   // between 15:00:00 ----- 21:00:00
+        return 2;
+    } 
+    return 1;  //不在交易时间段内
+}
+
+int 
+see_save_bar( see_bar_t * p_bar,int x,int period)
+{
+    // int tt;
+    // tt = x * period ;
+//    see_errlog(1000,(char *)"save bar !",RPT_TO_LOG,(char *)p_bar,sizeof(see_bar_t)) ;    
+    return 0 ;
+}
+
+int
+see_handle_bar(int num, see_fut_block_t * p_block,char * buf,int period )
+{
+/*    int x;
+    int m;
+    int n;
+    struct CThostFtdcDepthMarketDataField * tick ;
+    tick = (struct CThostFtdcDepthMarketDataField *)buf ;
+
+    if ( num == 0 ) { return 0 ; }
+    if ( num == 1 ) { see_save_bar( &p_block->bars_1s[0],0,period) ; return 0; }
+    if ( num > 1  ) {
+        if ( see_date_comp( p_block->bars_1s[0].TradingDay,p_block->bars_1s[1].TradingDay )==0 ) {
+            if ( is_same_segment(p_block,p_block->bars_1s[0].UpdateTime,tick->UpdateTime) ) { // r=1:同一交易时间段内
+                x=0 ;
+                while ( x < num ) {
+                    see_save_bar( &p_block->bars_1s[0],x,period)  ;  //要保存 num 个 bar0 ;
+                    x++ ;
+                }
+            } else {    // 不在同一个时间段内
+               // 要计算 |-----*--m--      ----------    ---n----*-----| 两个*之间的差，要减去 非交易时间段 ！！
+                x=0 ;
+                m=1 ; // 先取1，以后再来算应该取几
+                while ( x < m ) {
+                    see_save_bar( &p_block->bars_1s[0],x,period) ;
+                    x++ ;
+                }
+                x=0 ;
+                n=0 ; // 以后再来算应该取几
+                while ( x < n ) {
+                    see_save_bar( &p_block->bars_1s[0],x,period) ;
+                    x++ ;
+                }
+            }
+        } else {  // 不是同一个交易日
+            x=0 ;
+            m=1 ; // 先取1，以后再来算应该取几
+            while ( x < m ) {
+                see_save_bar( &p_block->bars_1s[0],x,period) ;
+                x++ ;
+            }
+            x=0 ;
+            n=0 ; // 以后再来算应该取几
+            while ( x < n ) {
+                see_save_bar( &p_block->bars_1s[0],x,period) ;
+                x++ ;
+            }
+        }
+    }
+*/
+    return 0 ;
+}
+
+int 
+see_first_tick( char * buf, see_bar_t * p_bar0, see_bar_t *p_bar1, int period )
+{
+    int  rtn = 0 ;
+    char f_h[3] = "\0\0\0" ;
+    char f_m[3] = "\0\0\0" ;
+    char f_s[3] = "\0\0\0" ;
+
+    int fh;
+    int fm;
+    int fs;
+    char * f ;
+    struct CThostFtdcDepthMarketDataField * tick ;
+
+    tick = (struct CThostFtdcDepthMarketDataField *)buf ;
+    f = tick->UpdateTime ;
+    memcpy(f_h,f,2);
+    memcpy(f_m,f+3,2);
+    memcpy(f_s,f+6,2);
+
+    fh = atoi(f_h);
+    fm = atoi(f_m);
+    fs = atoi(f_s);
+
+    switch(period) {
+        case  BAR_TICK :
+            break ;
+        case  BAR_1S :
+            NEW_BAR1;
+            if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            break ;
+        case  BAR_2S :
+            NEW_BAR1 ;
+            fs = fs - fs%2 ;
+            if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+            break ;
+        case  BAR_3S :
+            NEW_BAR1 ;
+            fs = fs - fs%3 ;
+            if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+            break ;
+        case  BAR_5S :
+            NEW_BAR1 ;
+            fs = fs - fs%5 ;
+            if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+            break ;
+        case  BAR_10S :
+            NEW_BAR1 ;
+            fs = fs - fs%10 ;
+            if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+            break ;
+        case  BAR_15S :
+            NEW_BAR1 ;
+            fs = fs - fs%15 ;
+            if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+            break ;
+        case  BAR_30S :
+            NEW_BAR1 ;
+            fs = fs - fs%30 ;
+            if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+            break ;
+        case  BAR_1F :
+            NEW_BAR1;
+            if ( memcmp( tick->UpdateTime+6,"00",2 ) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            } else {
+                memset(f_s,'0',3);
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1;
+            } 
+            break ;
+
+        case  BAR_2F :
+            NEW_BAR1 ;
+            fm = fm - fm%2 ;
+            if ( memcmp( tick->UpdateTime+6,"00",2 ) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            } else {
+                memset(f_m,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_m,"%02d",fm) ;
+                memcpy(p_bar1->UpdateTime+3,f_m,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }
+            break ;
+        case  BAR_3F :
+            NEW_BAR1 ;
+            fm = fm - fm%3 ;
+            if ( memcmp( tick->UpdateTime+6,"00",2 ) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            } else {
+                memset(f_m,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_m,"%02d",fm) ;
+                memcpy(p_bar1->UpdateTime+3,f_m,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }
+            break ;
+        case  BAR_5F :
+            NEW_BAR1 ;
+            fm = fm - fm%5 ;
+            if ( memcmp( tick->UpdateTime+6,"00",2 ) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            } else {
+                memset(f_m,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_m,"%02d",fm) ;
+                memcpy(p_bar1->UpdateTime+3,f_m,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }
+            break ;
+
+        case  BAR_10F :
+            NEW_BAR1 ;
+            fm = fm - fm%10 ;
+            if ( memcmp( tick->UpdateTime+6,"00",2 ) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; } 
+            } else {
+                memset(f_m,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_m,"%02d",fm) ;
+                memcpy(p_bar1->UpdateTime+3,f_m,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }    
+            break ;
+
+        case  BAR_15F :
+            NEW_BAR1 ;
+            fm = fm - fm%15 ;
+            if ( memcmp( tick->UpdateTime+6,"00",2 ) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; } 
+            } else {
+                memset(f_m,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_m,"%02d",fm) ;
+                memcpy(p_bar1->UpdateTime+3,f_m,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }    
+            break ;
+
+        case  BAR_30F :
+            NEW_BAR1 ;
+            fm = fm - fm%30 ;
+            if ( memcmp( tick->UpdateTime+6,"00",2 ) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; } 
+            } else {
+                memset(f_m,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_m,"%02d",fm) ;
+                memcpy(p_bar1->UpdateTime+3,f_m,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }    
+            break ;
+
+        case  BAR_1H :
+            if ( memcmp(tick->UpdateTime+3,"00",2) == 0 && memcmp(tick->UpdateTime+6,"00",2) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            } else {
+                memset(f_s,'0',3);
+                memcpy(p_bar1->UpdateTime+3,f_s,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1;
+            }
+            break ;
+        case  BAR_2H :
+            NEW_BAR1 ;
+            fh = fh - fh%2 ;
+            if ( memcmp(tick->UpdateTime+3,"00",2) == 0 && memcmp(tick->UpdateTime+6,"00",2) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            } else {
+                memset(f_h,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_h,"%02d",fh) ;
+                memcpy(p_bar1->UpdateTime+3,f_h,2) ;
+                memcpy(p_bar1->UpdateTime+3,f_s,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }
+            break ;
+
+        case  BAR_3H :
+            NEW_BAR1 ;
+            fh = fh - fh%3 ;
+            if ( memcmp(tick->UpdateTime+3,"00",2) == 0 && memcmp(tick->UpdateTime+6,"00",2) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            } else {
+                memset(f_h,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_h,"%02d",fh) ;
+                memcpy(p_bar1->UpdateTime+3,f_h,2) ;
+                memcpy(p_bar1->UpdateTime+3,f_s,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }
+            break ;
+
+        case  BAR_4H :
+            NEW_BAR1 ;
+            fh = fh - fh%4 ;
+            if ( memcmp(tick->UpdateTime+3,"00",2) == 0 && memcmp(tick->UpdateTime+6,"00",2) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            } else {
+                memset(f_h,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_h,"%02d",fh) ;
+                memcpy(p_bar1->UpdateTime+3,f_h,2) ;
+                memcpy(p_bar1->UpdateTime+3,f_s,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }
+            break ;
+
+        case  BAR_5H :
+            NEW_BAR1 ;
+            fh = fh - fh%5 ;
+            if ( memcmp(tick->UpdateTime+3,"00",2) == 0 && memcmp(tick->UpdateTime+6,"00",2) == 0 ) {
+                if( tick->UpdateMillisec == 0 ) { rtn = 0; }else{ rtn = 1; }
+            } else {
+                memset(f_h,'\0',3);
+                memset(f_s,'0',3);
+                sprintf(f_h,"%02d",fh) ;
+                memcpy(p_bar1->UpdateTime+3,f_h,2) ;
+                memcpy(p_bar1->UpdateTime+3,f_s,2) ;
+                memcpy(p_bar1->UpdateTime+6,f_s,2) ;
+                rtn = 1 ;
+            }
+            break ;
+        case  BAR_1D :
+        case  BAR_1W :
+        case  BAR_1M :
+        case  BAR_1J :
+        case  BAR_1Y :
+            break ;
+        default :
+            break ;
+    }
+    return rtn ;
+}
+
+int 
+see_calc_bar_block( see_fut_block_t * p_block, see_bar_t * p_bar0, see_bar_t * p_bar1, char * buf, char * pc_save, int period )
+{
+    struct CThostFtdcDepthMarketDataField * tick ;
+    tick = (struct CThostFtdcDepthMarketDataField *)buf ;
+
+    int i_rtn = is_notrade( p_block,tick->UpdateTime )  ;
+    //-------------------------------------------------------------------------------------
+    if( i_rtn == 0 ) {  // 在交易时间段内
+        if ( p_bar1->o == -1 ) {   // 表示刚开机
+            see_first_tick( buf,p_bar0,p_bar1,period) ;
+            memcpy((char *)p_bar0,p_bar1,sizeof(see_bar_t)) ;
+            return 0 ;
+        }
+        if( is_same_k_bar(p_bar1,buf,period) ){  //同一个K
+            UPDATE_BAR1 ;
+        }else{ // 下一个K
+            if( 1 ) {  //  in the seme segment  !  在同一时间段内  要处理 间隔多个
+                memcpy((char *)p_bar0,p_bar1,sizeof(see_bar_t)) ;
+                *pc_save = 1 ;
+                if( see_first_tick( buf,p_bar0,p_bar1,period) == 0 ) {  // 新K柱，tick->UpdateTime的值可能不是 起始的时间
+                    p_bar0->v    = tick->Volume - p_bar0->vsum ;
+                    p_bar0->vsum = tick->Volume ;
+                }else{
+                    p_bar1->v    = tick->Volume - p_bar0->vsum ;
+                }
+                memset(ca_errmsg,'\0',512) ;
+                sprintf(ca_errmsg,
+                    "uuuuuuuuuuu%d:%d \t %s \t %10.2f \t %10.2f \t %10.2f \t %10.2f ",
+                    period,p_bar0->v,p_bar0->UpdateTime,p_bar0->o,p_bar0->h,p_bar0->l,p_bar0->c ) ;
+                see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+            } else {      // 不在同一时间段内
+                return 0 ;
+            }
+        }
+        return 0 ;
+    }
+    //-------------------------------------------------------------------------------------
+    if( i_rtn == 2 ) {  // between 15:00:00 ----------- 21:00:00 
+        return 0 ;
+    }
+    //-------------------------------------------------------------------------------------
+    if( i_rtn ==1 ){   // 不在交易时间段 
+        return 0 ;
+    }
+    //-------------------------------------------------------------------------------------
+    return 0 ;
+}
+
+int is_same_k_bar ( see_bar_t * p_bar1, char * buf, int period )
+{
+    int  rtn = 0 ;
+    char f_h[3] = "\0\0\0" ;
+    char f_m[3] = "\0\0\0" ;
+    char f_s[3] = "\0\0\0" ;
+
+    int fh;
+    int fm;
+    int fs;
+    char * f ;
+    struct CThostFtdcDepthMarketDataField * tick ;
+    tick = (struct CThostFtdcDepthMarketDataField *)buf ;
+
+    f = tick->UpdateTime ;
+    memcpy(f_h,f,2);
+    memcpy(f_m,f+3,2);
+    memcpy(f_s,f+6,2);
+
+    fh = atoi(f_h);
+    fm = atoi(f_m);
+    fs = atoi(f_s);
+
+    switch(period) {
+        case  BAR_TICK :
+            break ;
+        case  BAR_1S :
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,8) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_2S :
+            fs = fs - fs%2 ;
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,5) == 0 && memcmp(p_bar1->UpdateTime+6,f_s,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_3S :
+            fs = fs - fs%3 ;
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,5) == 0 && memcmp(p_bar1->UpdateTime+6,f_s,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_5S :
+            fs = fs - fs%5 ;
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,5) == 0 && memcmp(p_bar1->UpdateTime+6,f_s,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_10S :
+            fs = fs - fs%10 ;
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,5) == 0 && memcmp(p_bar1->UpdateTime+6,f_s,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_15S :
+            fs = fs - fs%15 ;
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,5) == 0 && memcmp(p_bar1->UpdateTime+6,f_s,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_30S :
+            fs = fs - fs%30 ;
+            memset(f_s,'\0',3);
+            sprintf(f_s,"%02d",fs) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,5) == 0 && memcmp(p_bar1->UpdateTime+6,f_s,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_1F :
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,5) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_2F :
+            fm = fm - fm%2 ;
+            memset(f_m,'\0',3);
+            sprintf(f_m,"%02d",fm) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,2) == 0 && memcmp(p_bar1->UpdateTime+3,f_m,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_3F :
+            fm = fm - fm%3 ;
+            memset(f_m,'\0',3);
+            sprintf(f_m,"%02d",fm) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,2) == 0 && memcmp(p_bar1->UpdateTime+3,f_m,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_5F :
+            fm = fm - fm%5 ;
+            memset(f_m,'\0',3);
+            sprintf(f_m,"%02d",fm) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,2) == 0 && memcmp(p_bar1->UpdateTime+3,f_m,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_10F :
+            fm = fm - fm%10 ;
+            memset(f_m,'\0',3);
+            sprintf(f_m,"%02d",fm) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,2) == 0 && memcmp(p_bar1->UpdateTime+3,f_m,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_15F :
+            fm = fm - fm%15 ;
+            memset(f_m,'\0',3);
+            sprintf(f_m,"%02d",fm) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,2) == 0 && memcmp(p_bar1->UpdateTime+3,f_m,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_30F :
+            fm = fm - fm%30 ;
+            memset(f_m,'\0',3);
+            sprintf(f_m,"%02d",fm) ;
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,2) == 0 && memcmp(p_bar1->UpdateTime+3,f_m,2) == 0 ) {
+            //    see_errlog( 1000,(char *)"same!!!!!!!!!!!!!!!!!!!!",RPT_TO_LOG,0,0 ) ;
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+          //  memset( ca_errmsg,'\0',512 );
+          //  sprintf ( ca_errmsg,"30FFFFFFFFFFFFFFFFF  %s  %s",p_bar1->UpdateTime,tick->UpdateTime ) ;
+          //  see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+
+            break ;
+        case  BAR_1H :
+            if ( memcmp(tick->UpdateTime,p_bar1->UpdateTime,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_2H :
+            fh = fh - fh%2 ;
+            memset(f_h,'\0',3);
+            sprintf(f_h,"%02d",fh) ;
+            if ( memcmp(tick->TradingDay,p_bar1->TradingDay,8) == 0 && memcmp(p_bar1->UpdateTime,f_h,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_3H :
+            fh = fh - fh%3 ;
+            memset(f_h,'\0',3);
+            sprintf(f_h,"%02d",fh) ;
+            if ( memcmp(tick->TradingDay,p_bar1->TradingDay,8) == 0 && memcmp(p_bar1->UpdateTime,f_h,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_4H :
+            fh = fh - fh%4 ;
+            memset(f_h,'\0',3);
+            sprintf(f_h,"%02d",fh) ;
+            if ( memcmp(tick->TradingDay,p_bar1->TradingDay,8) == 0 && memcmp(p_bar1->UpdateTime,f_h,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_5H :
+            fh = fh - fh%5 ;
+            memset(f_h,'\0',3);
+            sprintf(f_h,"%02d",fh) ;
+            if ( memcmp(tick->TradingDay,p_bar1->TradingDay,8) == 0 && memcmp(p_bar1->UpdateTime,f_h,2) == 0 ) {
+                rtn = 1 ;
+            } else { rtn = 0 ; }
+            break ;
+        case  BAR_1D :
+            break ;
+        case  BAR_1W :
+            break ;
+        case  BAR_1M :
+            break ;
+        case  BAR_1J :
+            break ;
+        case  BAR_1Y :
+            break ;
+        default :
+            break ;
+    }
+    return rtn ;
+}

@@ -1,0 +1,217 @@
+#include <see_com_common.h>
+
+const char ca_pubsub_url[] = "ipc:///tmp/pubsub.ipc" ;
+const char ca_mysql_url[]  = "mysql://127.0.0.1/test?user=root&password=root" ;
+static char ca_tick_file[512] ;
+
+
+
+int
+main(int iArgCnt, char *pcaArgVec[])
+{
+ //   int iRc = 0 ;
+ //   int i = 0 ;
+    char ca_errmsg[100] ;
+    int sock ;
+//    struct CThostFtdcDepthMarketDataField  market_data ;
+    struct CThostFtdcDepthMarketDataField * market_data1 ;
+
+    see_signal_init() ;
+
+    see_daemon(1,0) ;
+
+    sock = see_pubsub_client( ca_pubsub_url, "iostest" ) ;
+
+
+    URL_T url = URL_new("mysql://127.0.0.1/test?user=root&password=root");
+    if(url==NULL) {   
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"mysql://127.0.0.1/test?user=root&password=root: connection error !\n") ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        return -1 ;
+    }
+    ConnectionPool_T pool = ConnectionPool_new(url);            // create pool
+    ConnectionPool_setInitialConnections(pool,20);              // 设置初始化连接数目
+    ConnectionPool_start(pool);                                 //开启线程池
+    Connection_T con = ConnectionPool_getConnection(pool);      //从线程池中取出连接（活动连接数＋1）
+
+/*
+    PreparedStatement_T p1 = Connection_prepareStatement(con, "INSERT INTO tick_data( \
+                             TradingDay, \
+                             UpdateTime, \
+                             UpdateMillisec, \
+                             TickData) \
+                             VALUES(?,?,?,?)") ;
+    PreparedStatement_T p = Connection_prepareStatement(con, "INSERT INTO market_data( \
+        TradingDay, \
+        InstrumentID, \
+        ExchangeID,    \
+        ExchangeInstID,  \
+        LastPrice,         \
+        PreSettlementPrice, \
+        PreClosePrice,     \
+        PreOpenInterest,   \
+        OpenPrice,         \
+        HighestPrice,      \
+        LowestPrice,       \
+        Volume,            \
+        Turnover,          \
+        OpenInterest,      \
+        ClosePrice   ,     \
+        SettlementPrice,   \
+        UpperLimitPrice,   \
+        LowerLimitPrice,   \
+        PreDelta       ,   \
+        CurrDelta      ,   \
+        UpdateTime     ,   \
+        UpdateMillisec ,   \
+        BidPrice1       ,  \
+        BidVolume1     ,   \
+        AskPrice1      ,   \
+        AskVolume1     ,   \
+        BidPrice2      ,   \
+        BidVolume2     ,   \
+        AskPrice2      ,   \
+        AskVolume2     ,   \
+        BidPrice3      ,   \
+        BidVolume3     ,   \
+        AskPrice3      ,   \
+        AskVolume3     ,   \
+        BidPrice4      ,   \
+        BidVolume4     ,   \
+        AskPrice4      ,   \
+        AskVolume4     ,   \
+        BidPrice5      ,   \
+        BidVolume5     ,   \
+        AskPrice5      ,   \
+        AskVolume5     ,   \
+        AveragePrice   ,   \
+        ActionDay) \
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+*/
+
+
+    while (1)                                  //  接收数据 并进行处理 
+    {
+        char *buf = NULL;
+        struct timeval start, end;
+
+
+
+        gettimeofday( &start, NULL );
+        int bytes = nn_recv (sock, &buf, NN_MSG, 0);
+        gettimeofday( &end,NULL );
+
+
+        market_data1 = (struct CThostFtdcDepthMarketDataField *)buf ; 
+
+       /* 
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"============== market_data1->TradingDay: %s \n", market_data1->TradingDay ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        */
+
+        char ca_tmp[3] ;
+        memset( ca_tmp,'\0',3 ) ;
+        memcpy( ca_tmp,market_data1->UpdateTime,2 );
+        memset( ca_tick_file,'\0',512 ) ;
+        sprintf( ca_tick_file, "tick-%s-%s-%s.bin",market_data1->InstrumentID, \
+                                                   market_data1->TradingDay, \
+                                                   ca_tmp ) ;
+
+
+        see_save_file(ca_tick_file,buf,bytes) ;
+
+
+        /* -----------------------------------------
+        PreparedStatement_setString(p,1,(char *)market_data1->TradingDay) ;
+        PreparedStatement_setString(p,2,(char *)market_data1->InstrumentID) ;      
+        PreparedStatement_setString(p,3,(char *)market_data1->ExchangeID) ;               
+        PreparedStatement_setString(p,4,(char *)market_data1->ExchangeInstID) ;          
+        PreparedStatement_setDouble(p,5,market_data1->LastPrice) ;               
+        PreparedStatement_setDouble(p,6,market_data1->PreSettlementPrice   ) ;     
+        PreparedStatement_setDouble(p,7,market_data1->PreClosePrice  ) ;           
+        PreparedStatement_setDouble(p,8,market_data1->PreOpenInterest   ) ;        
+        PreparedStatement_setDouble(p,9,market_data1->OpenPrice     ) ;            
+        PreparedStatement_setDouble(p,10,market_data1->HighestPrice    ) ;          
+        PreparedStatement_setDouble(p,11,market_data1->LowestPrice     ) ;          
+        PreparedStatement_setInt(p,12,market_data1->Volume             ) ;       
+        PreparedStatement_setDouble(p,13,market_data1->Turnover          ) ;        
+        PreparedStatement_setDouble(p,14,market_data1->OpenInterest       ) ;       
+        PreparedStatement_setDouble(p,15,market_data1->ClosePrice         ) ;       
+        PreparedStatement_setDouble(p,16,market_data1->SettlementPrice   ) ;        
+        PreparedStatement_setDouble(p,17,market_data1->UpperLimitPrice  ) ;     
+        PreparedStatement_setDouble(p,18,market_data1->LowerLimitPrice    ) ;       
+        PreparedStatement_setDouble(p,19,market_data1->PreDelta    ) ;              
+        PreparedStatement_setDouble(p,20,market_data1->CurrDelta     ) ;            
+        PreparedStatement_setString(p,21,(char *)market_data1->UpdateTime ) ;       
+        PreparedStatement_setInt(p,22,market_data1->UpdateMillisec    ) ;        
+        PreparedStatement_setDouble(p,23,market_data1->BidPrice1     ) ;            
+        PreparedStatement_setInt(p,24,market_data1->BidVolume1      ) ;          
+        PreparedStatement_setDouble(p,25,market_data1->AskPrice1    ) ;             
+        PreparedStatement_setInt(p,26,market_data1->AskVolume1      ) ;          
+        PreparedStatement_setDouble(p,27,market_data1->BidPrice2    ) ;             
+        PreparedStatement_setInt(p,28,market_data1->BidVolume2      ) ;          
+        PreparedStatement_setDouble(p,29,market_data1->AskPrice2    ) ;             
+        PreparedStatement_setInt(p,30,market_data1->AskVolume2      ) ;          
+        PreparedStatement_setDouble(p,31,market_data1->BidPrice3    ) ;             
+        PreparedStatement_setInt(p,32,market_data1->BidVolume3    ) ;            
+        PreparedStatement_setDouble(p,33,market_data1->AskPrice3   ) ;              
+        PreparedStatement_setInt(p,34,market_data1->AskVolume3     ) ;           
+        PreparedStatement_setDouble(p,35,market_data1->BidPrice4   ) ;              
+        PreparedStatement_setInt(p,36,market_data1->BidVolume4    ) ;            
+        PreparedStatement_setDouble(p,37,market_data1->AskPrice4  ) ;               
+        PreparedStatement_setInt(p,38,market_data1->AskVolume4     ) ;           
+        PreparedStatement_setDouble(p,39,market_data1->BidPrice5    ) ;             
+        PreparedStatement_setInt(p,40,market_data1->BidVolume5      ) ;          
+        PreparedStatement_setDouble(p,41,market_data1->AskPrice5      ) ;           
+        PreparedStatement_setInt(p,42,market_data1->AskVolume5        ) ;        
+        PreparedStatement_setDouble(p,43,market_data1->AveragePrice    ) ;          
+        PreparedStatement_setString(p,44,(char *)market_data1->ActionDay ) ;            
+        PreparedStatement_execute(p);
+        ------------------------------------------------------------------------------ */
+        /*
+        TRY {
+            PreparedStatement_setString(p1,1,(char *)market_data1->TradingDay) ;
+            PreparedStatement_setString(p1,2,(char *)market_data1->UpdateTime ) ;       
+            PreparedStatement_setInt(p1,3,market_data1->UpdateMillisec    ) ;        
+            PreparedStatement_setBlob(p1,4,buf,408) ;        
+            PreparedStatement_execute(p1);
+        }
+        CATCH(SQLException) {
+            sprintf(ca_errmsg,"SQL error: %s\n", Connection_getLastError(con)); 
+            see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+        }
+        END_TRY;
+        */
+
+        nn_freemsg (buf);
+
+
+        memset( ca_errmsg,'\0',100 );
+        sprintf( ca_errmsg,"==== time =========: sec:%lu usec:%lu \n",end.tv_sec-start.tv_sec,end.tv_usec-start.tv_usec ) ;
+        see_errlog( 1000,ca_errmsg,RPT_TO_LOG,0,0 ) ;
+
+    }
+
+
+
+
+    /* 
+    ResultSet_T result = Connection_executeQuery(con, "select * from t_test");  //输出全部连接数目
+    printf("ALL NUMBE:%d\n",ConnectionPool_size(pool));                         //输出活动连接数目
+    printf("ACTIVE NUMBER:%d\n",ConnectionPool_active(pool));
+    while(ResultSet_next(result))                                               //游标滑到下一行
+    {       //获取列名 ResultSet_getColumnName                                  //获取列值 ResultSet_getString
+        printf("column: %s\n",ResultSet_getColumnName(result,2));       //根据列名获取值ResultSet_getStringByName
+        printf("%s\n",ResultSet_getStringByName(result,"userId"));      //根据列索引获取列值 ［注意索引是从1开始不是0］
+        printf("%s\n",ResultSet_getString(result,3));
+    }   //关闭连接（活动连接－1）
+    */
+
+    Connection_close(con);                                              //将连接池与数据库分离
+    ConnectionPool_stop(pool);
+    ConnectionPool_free(&pool);
+    URL_free(&url);
+    return 0;
+}
