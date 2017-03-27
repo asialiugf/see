@@ -1191,7 +1191,9 @@
 
     // Connection opened
     sock.addEventListener('open', function(e) {
-      sock.send('{"action":"subs","stamp":"x","data":["TA703","TA705"]}');
+      //sock.send('{"action":"unsubs","stamp":"x","data":["TA703","TA705"]}');
+      //sock.send('{"action":"subs","data":["TA703","TA705:5F"]}');
+      sock.send('{"action":"subs","data":["TA703","TA705:1s","TA705:5s"]}');
     });
 
     // Listen for messages
@@ -1199,11 +1201,14 @@
       console.log('Message from server', e.data);
     });
 
+    sock.addEventListener('error', function(e) {
+      console.log('Message from server errrrrrrrrrrrrrrrrrrrrrrrr', e.data);
+    });
 
     // ping/pong heartbeat
     //job = setInterval('s.send(\'{"action":"ping"}\')', 5000);
 
-    /* -------------------------------------------------------------------------------------------------------------------------- */
+    /* ----------------------------------------------------------------------------------------------- */
 
     function keyPress(e) {
       let keyID = e.keyCode ? e.keyCode : e.which;

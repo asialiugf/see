@@ -21,10 +21,10 @@ int mysend(int sock, int i)
     sprintf(ca_tmp, "topic:sub,future:TA703");
     int sz_n = strlen(ca_tmp);
     nn_send(sock, ca_tmp, sz_n, NN_DONTWAIT);
-    usleep(100000);
+    usleep(1000000);
     sprintf(ca_tmp, "topic:sub,future:TA705");
     nn_send(sock, ca_tmp, sz_n, NN_DONTWAIT);
-    usleep(100000);
+    usleep(1000000);
     return 1;
 }
 

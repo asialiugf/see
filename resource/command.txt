@@ -10,3 +10,10 @@ echo 2 >/proc/sys/vm/drop_caches
 echo 1 >/proc/sys/vm/drop_caches
 echo 0 >/proc/sys/vm/drop_caches
 
+
+#==================== git 
+git add pyy
+git add pgm
+git commit -m "modified"
+git push
+#==================== git 

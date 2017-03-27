@@ -27,6 +27,7 @@ int see_zmq_pub_send(void * sock, char * pc_msg)
     int len = 0;
     len = strlen(pc_msg);
     printf("%s  --  %d\n",pc_msg,len);
+    rc = zmq_send(sock, "TA705", 5, ZMQ_SNDMORE);
     rc = zmq_send(sock, pc_msg, len, ZMQ_DONTWAIT);
     if(rc!=len) {
         see_errlog(1000," zmq_send error !!",RPT_TO_LOG,0,0);

@@ -1361,13 +1361,21 @@ int see_save_bar(see_fut_block_t *p_block, char *buf, int period)
                     p_block->bar_block[period].i_bar_type,
                     p_block->bar_block[period].c_bar_type);
         }
-        sprintf(ca_msg,"%s %s %s %s %10.2f %10.2f %10.2f %10.2f %d\n",
+        sprintf(ca_msg,"%s %s %s %s %10.2f %10.2f %10.2f %10.2f %d",
                 p_block->InstrumentID,
                 p_block->bar_block[period].bar0.TradingDay,
                 p_block->bar_block[period].bar0.ActionDay,
                 p_bar0->ca_btime,p_bar0->o,p_bar0->h,p_bar0->l,p_bar0->c,p_bar0->v);
-        //see_save_line(ca_filename,ca_msg);
-        see_send_bar(p_block,ca_msg);
+
+       //see_save_line(ca_filename,ca_msg);
+
+        char ca_sss[1024];
+        memset(ca_sss,'\0',1024);
+        //sprintf(ca_sss,"{\"topic\":\"1s\",\"data\":\"%s\"}",
+        sprintf(ca_sss,"{\"topic\":\"%s:%d%c\",\"data\":\"%s\"}",p_block->InstrumentID,
+                p_block->bar_block[period].i_bar_type,
+                p_block->bar_block[period].c_bar_type,ca_msg);
+        see_send_bar(p_block,ca_sss);
     }
     return 0;
 }
@@ -1382,13 +1390,12 @@ int see_send_bar(see_fut_block_t *p_block,char *pc_msg)
     if(i_size <=0) {
         return -1;
     }
-    //i_rtn = nn_send (p_block->i_sock, pc_msg, i_size, NN_DONTWAIT);
     i_rtn = see_zmq_pub_send(p_block->v_sock,pc_msg);
     if(i_rtn != i_size) {
         see_errlog(1000,"see_send_bar: send error !!",RPT_TO_LOG,0,0);
     }
     //usleep(50000);
-    usleep(500000);
+    usleep(50000);
     return 0;
 }
 
