@@ -1,0 +1,3 @@
+python ./rose/ihq.py&
+python ./dewdrop/serv.py&
+python ./rndsdk/wand.py&
