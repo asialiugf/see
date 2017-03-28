@@ -41,10 +41,10 @@
     必须设定type值。具体参看 this.update() 的说明。
 
   */
-  let oo;
-  let cc;
-  let hh;
-  let ll;
+  let opt_oo = [];
+  let opt_cc = [];
+  let opt_hh = [];
+  let opt_ll = [];
 
   let option = {
     type: 0,
@@ -64,20 +64,20 @@
         x: 2,
         y: [{
           type: 'o',
-          data: oo
+          data: opt_oo
         }, {
           type: 'h',
-          data: hh
+          data: opt_hh
         }, {
           type: 'l',
-          data: ll
+          data: opt_ll
         }, {
           type: 'c',
-          data: cc
+          data: opt_cc
         }, {
           title: 'MA5',
           type: 'line',
-          data: cc
+          data: []
         }]
       }, {
         title: 'Vol',
@@ -97,16 +97,16 @@
         y: [{
           title: 'diff',
           type: 'line',
-          data: oo
+          data: opt_oo
         }, {
           title: 'dea',
           type: 'line',
-          data: cc
+          data: opt_cc
         }, {}]
       }]
     }
   };
-  /* sample option begin*/
+  /* sample option end*/
 
   let O = {
     oo: [],
@@ -760,7 +760,8 @@
       //G.curLevel = G.curLevel ;  //这个赋值，用来更新 G.barB B.barE !!
     }
 
-    this.update = function(opt) {
+    //this.update = function(opt) {
+    function update1(opt) {
       if (opt.type == 1) { //更新，但最后一个只是修改
         for (let i = 0; i < opt.Y.data.length; i++) {
           if (opt.Y.data[i].position == 'main') {
@@ -872,6 +873,7 @@
       //drawAll();
 
     } /* end of this.update() */
+    //let updateOO = this.update() ;
 
     /* 
       下面this.update(opt);的参数opt是从 function stockcharts(opt, theme) 中来的。
@@ -879,7 +881,8 @@
       在index.html中的opt.type = 0, 
       然后 this.update(opt) 根据 opt.tpye=0 对 cD[] 进行初始化。cD[]，即canvas Display array !!
     */
-    this.update(opt);
+    //this.update(opt);
+    update1(opt);
     let mainF = cD[0][0];
     let mainB = cD[0][1];
     let sub1F = cD[1][0];
@@ -938,7 +941,6 @@
         if (x >= cc.length) {
           x = cc.length - 1;
         }
-        //console.log("this.idx:" + this.idx + " x: " + x);
         if (x < this.idx) {
           return;
         } else if (x >= this.idx) {
@@ -951,6 +953,7 @@
             this.MA.push(R(this.sum / N * 1000) / 1000);
           }
           this.idx = x;
+          let kkkkk = this.sum - cc[x];
           this.sum = this.sum - cc[x];
         }
       }
@@ -1193,12 +1196,28 @@
     sock.addEventListener('open', function(e) {
       //sock.send('{"action":"unsubs","stamp":"x","data":["TA703","TA705"]}');
       //sock.send('{"action":"subs","data":["TA703","TA705:5F"]}');
-      sock.send('{"action":"subs","data":["TA703","TA705:1s","TA705:5s"]}');
+      sock.send('{"action":"subs","data":["TA703","TA705:5s"]}');
+      //sock.send('{"action":"subs","data":["TA703","TA705:1s","TA705:2s"]}');
     });
 
     // Listen for messages
     sock.addEventListener('message', function(e) {
       console.log('Message from server', e.data);
+      let obj = JSON.parse(e.data)
+      let ary = [];
+      ary = obj['data'].split(' ');
+      opt_oo.length = 0;
+      opt_hh.length = 0;
+      opt_ll.length = 0;
+      opt_cc.length = 0;
+      opt_oo.push( parseFloat(ary[7]) );
+      opt_hh.push( parseFloat(ary[11]) );
+      opt_ll.push( parseFloat(ary[15]) );
+      opt_cc.push( parseFloat(ary[19]) );
+      option.type = 2;
+      update1(option);
+      //console.log( ary ) ;
+
     });
 
     sock.addEventListener('error', function(e) {
@@ -1206,7 +1225,7 @@
     });
 
     // ping/pong heartbeat
-    //job = setInterval('s.send(\'{"action":"ping"}\')', 5000);
+    //setInterval('sock.send(\'{"action":"ping"}\')', 5000);
 
     /* ----------------------------------------------------------------------------------------------- */
 
@@ -1289,7 +1308,6 @@
     //cvs.addEventListener("mousemove", yyyy, false);
     //cvs.addEventListener("click", kkkkk, false);
     drawAll();
-
 
 
   }

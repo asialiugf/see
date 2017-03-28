@@ -1331,8 +1331,8 @@ int see_save_bar(see_fut_block_t *p_block, char *buf, int period)
                 ca_HighestPrice,ca_LowestPrice,ca_LastPrice,
                 ca_BidPrice1,ca_BidVolume1,ca_AskPrice1,ca_AskVolume1,
                 ca_Volume);
-        //see_save_line(ca_filename,ca_msg);
-        //see_save_bin(ca_tickname,(char *)buf,sizeof(struct CThostFtdcDepthMarketDataField));
+        see_save_line(ca_filename,ca_msg);
+        see_save_bin(ca_tickname,(char *)buf,sizeof(struct CThostFtdcDepthMarketDataField));
         return 0;
     } /* tick data saving */
 
@@ -1367,11 +1367,14 @@ int see_save_bar(see_fut_block_t *p_block, char *buf, int period)
                 p_block->bar_block[period].bar0.ActionDay,
                 p_bar0->ca_btime,p_bar0->o,p_bar0->h,p_bar0->l,p_bar0->c,p_bar0->v);
 
-       //see_save_line(ca_filename,ca_msg);
+        see_save_line(ca_filename,ca_msg);
 
         char ca_sss[1024];
         memset(ca_sss,'\0',1024);
-        //sprintf(ca_sss,"{\"topic\":\"1s\",\"data\":\"%s\"}",
+        /*
+        sprintf(ca_sss,"{\"topic\":\"%s\",\"data\":\"%s\"}",p_block->InstrumentID,
+                ca_msg);
+        */
         sprintf(ca_sss,"{\"topic\":\"%s:%d%c\",\"data\":\"%s\"}",p_block->InstrumentID,
                 p_block->bar_block[period].i_bar_type,
                 p_block->bar_block[period].c_bar_type,ca_msg);
@@ -1395,7 +1398,7 @@ int see_send_bar(see_fut_block_t *p_block,char *pc_msg)
         see_errlog(1000,"see_send_bar: send error !!",RPT_TO_LOG,0,0);
     }
     //usleep(50000);
-    usleep(50000);
+    //usleep(1000);
     return 0;
 }
 

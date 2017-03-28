@@ -4,7 +4,7 @@
 #include <MdSpi.h>
 #include <AAextern.h>
 
-int i_sock;
+//int i_sock;
 int i_tick_len = sizeof(CThostFtdcDepthMarketDataField) ;
 //const char ca_nano_url[] = "ipc:///tmp/heaven.ipc";
 
@@ -33,7 +33,7 @@ void CMdSpi::OnFrontConnected()
 {
 
     cerr << "OnFrontConnected() "  << endl;
-    i_sock = see_pipeline_server(t_conf.ca_nn_pubsub_url);             // become a nanomsg pub server !!
+    //i_sock = see_pipeline_server(t_conf.ca_nn_pubsub_url);             // become a nanomsg pub server !!
     ReqUserLogin1();                                             // user login !!!  用户登录请求
 }
 
@@ -98,10 +98,11 @@ void CMdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificIn
 
 void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *buf)
 {
-    int bytes;
+    //int bytes;
     int i_idx;
     // see_save_tick( (char *)buf, i_tick_len );
 
+    /*
     bytes = nn_send(i_sock, (char *)buf, i_tick_len,NN_DONTWAIT);          // 收到数据，发送到存储进程 进行存储！
     if(bytes != i_tick_len) {
         memset(ca_errmsg,'\0',100);
@@ -112,6 +113,7 @@ void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *buf)
                 buf->UpdateTime,bytes);
         see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0);
     }
+    */
 
     i_idx = see_get_future_index(t_conf.pc_futures,buf->InstrumentID);   //i_idx 合约所在的数组下标
     if(i_idx == SEE_ERROR) {

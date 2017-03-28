@@ -45,12 +45,12 @@ int see_config_init( see_config_t *p_conf )
     }
     j_temp = cJSON_GetObjectItem( j_item, "pair_url" );
     memcpy( p_conf->ca_nn_pair_url, j_temp->valuestring, strlen(j_temp->valuestring) );
-    p_conf->i_pair_sock = see_pair_server(p_conf->ca_nn_pair_url) ;
+    //p_conf->i_pair_sock = see_pair_server(p_conf->ca_nn_pair_url) ;
 
     /* topy : to python rose */
     j_temp = cJSON_GetObjectItem( j_item, "topy_url" );
     memcpy( p_conf->ca_nn_topy_url, j_temp->valuestring, strlen(j_temp->valuestring) );
-    p_conf->i_topy_sock = see_pair_server(p_conf->ca_nn_topy_url) ;
+    //p_conf->i_topy_sock = see_pair_server(p_conf->ca_nn_topy_url) ;
 
     /* zmq_pub : to python rose */
     j_temp = cJSON_GetObjectItem( j_item, "zmq_pubsub_url" );
@@ -119,7 +119,6 @@ int see_config_init( see_config_t *p_conf )
 
              在 see_bars.c 的 see_send_bar() 会 使用到 i_sock !
             */
-            p_conf->pt_fut_blks[u]->i_sock = p_conf->i_topy_sock ;
             p_conf->pt_fut_blks[u]->v_sock = p_conf->v_sock ; // for zmq pub
 
             p_conf->pt_stt_blks[u] = (see_stt_block_t *)malloc(sizeof(see_stt_block_t)) ;

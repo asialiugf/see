@@ -52,13 +52,14 @@ main(int argc,char *argv[])
 {
 
     int i_rtn;
-    see_config_init( &t_conf );
     //see_stt_blocks_init( &t_conf );
 
     see_signal_init() ;                 // ÐèÒªÏêÏ¸¿¼ÂÇ 
     signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
     see_daemon(1,0) ;
+
+    see_config_init( &t_conf );
 
     i_rtn = pthread_create(&t_conf.p_dat, NULL, see_pthread_dat, &t_conf);
     if  (i_rtn == -1) {
