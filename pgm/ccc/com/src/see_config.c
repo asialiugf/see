@@ -57,6 +57,7 @@ int see_config_init( see_config_t *p_conf )
     memcpy( p_conf->ca_zmq_pubsub_url, j_temp->valuestring, strlen(j_temp->valuestring) );
     p_conf->v_sock = see_zmq_pub_init(p_conf->ca_zmq_pubsub_url);
     
+    /* for test begin */
     int rc = 0;
     for( i = 0;i<=1 ; i++) {
         printf("ddddddddddddd: %d\n",i );
@@ -64,6 +65,7 @@ int see_config_init( see_config_t *p_conf )
         if (rc !=4 ) { printf( " zmq_send kkkk 4 err!!!!!!!!!\n" ); }
         sleep(1);
     }
+    /* for test end */
 
     /* 这里其实是 pipeline sock !! */
     j_temp = cJSON_GetObjectItem( j_item, "pubsub_url" );
@@ -112,12 +114,10 @@ int see_config_init( see_config_t *p_conf )
             }
             see_block_init( p_conf->pt_fut_blks[u], p_conf->pc_futures[u], &p_conf->t_hours[0] ) ;
             /*
-             下面这句，是为每个 future block 的 i_sock赋值。i_sock是指 nanomsg  
-             由前面的 p_conf->i_topy_sock = see_pair_server(p_conf->ca_nn_topy_url) ; 这一句生成。
-             目前，所有的future block  的 i_sock 的值是一样的。
-             将来，如果要将不同的future，send 到不同的 地方去，可以修改它的i_sock。
-
-             在 see_bars.c 的 see_send_bar() 会 使用到 i_sock !
+                下面这句，是为每个 future block 的 v_sock赋值。v_sock是指 zmq  
+                前面 see_zmq_pub_init() 会产生 v_sock值。
+                目前，所有的future block  的 v_sock 的值是一样的。
+                在 see_bars.c 的 see_send_bar() 会 使用到 v_sock !
             */
             p_conf->pt_fut_blks[u]->v_sock = p_conf->v_sock ; // for zmq pub
 

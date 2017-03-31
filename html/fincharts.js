@@ -12,7 +12,7 @@
     'line'
   ];
 
-  /* sample option begin*/
+  /* ------------------------------------------- data defined here ---------------------------------- */
   /* 
     下面的 let option = {}
     是一个option的例子，在 index.html 中 let op =  new barCharts();之后,会用到
@@ -40,80 +40,100 @@
     this.update()参数 option.type有三种类型：0，1，2。在后端从服务器送过来的的option数据
     必须设定type值。具体参看 this.update() 的说明。
 
+    关于数据的说明：
+
+    1、下面的option 中的数据，将会一直保存。
+    2、由于javascript 数组赋值时，其数据只是一份，也就是公用原型数据，因此 需要特别注意数据的修改。
+       比如：
+       let aa = [];
+       let bb = aa;
+       如果修改了 aa，则 bb 也变了。
   */
   let opt_oo = [];
-  let opt_cc = [];
   let opt_hh = [];
-  let opt_ll = [];
+  let opt_ll = []; // 
+  let opt_cc = [];
+  let opt_tt = []; // X轴的时间，是字串类型
+
+  let MAIN = {
+    title: '中国联通',
+    type: 'candle',
+    position: 'main',
+    kedu: [],
+    x: 2,
+    y: [{
+      type: 'o',
+      data: opt_oo
+    }, {
+      type: 'h',
+      data: opt_hh
+    }, {
+      type: 'l',
+      data: opt_ll
+    }, {
+      type: 'c',
+      data: opt_cc
+    }, {
+      title: 'MA5',
+      type: 'line',
+      data: []
+    }]
+  };
+
+  let MACD = {
+    title: 'MACD',
+    position: 'sub',
+    y: [{
+      title: 'diff',
+      type: 'line',
+      data: opt_oo
+    }, {
+      title: 'dea',
+      type: 'line',
+      data: opt_cc
+    }]
+  };
+
+  let VOL = {
+    title: 'Vol',
+    position: 'sub',
+    kedu: [],
+    x: 3,
+    y: [{
+      type: 'bar',
+      data: []
+    }, {
+      type: 'line',
+      data: [] // ma5
+    }]
+  };
+
+  let KDJ = {
+
+  };
+
+  let RSI = {
+
+  };
 
   let option = {
     type: 0,
     X: {
       data: [{
-        x: []
+        x: opt_tt
       }, {
-        x: []
+        x: opt_tt
       }]
     },
     Y: {
-      data: [{
-        title: '中国联通',
-        type: 'candle',
-        position: 'main',
-        kedu: [],
-        x: 2,
-        y: [{
-          type: 'o',
-          data: opt_oo
-        }, {
-          type: 'h',
-          data: opt_hh
-        }, {
-          type: 'l',
-          data: opt_ll
-        }, {
-          type: 'c',
-          data: opt_cc
-        }, {
-          title: 'MA5',
-          type: 'line',
-          data: []
-        }]
-      }, {
-        title: 'Vol',
-        position: 'sub',
-        kedu: [],
-        x: 3,
-        y: [{
-          type: 'bar',
-          data: []
-        }, {
-          type: 'line',
-          data: [] // ma5
-        }]
-      }, {
-        title: 'MACD',
-        position: 'sub',
-        y: [{
-          title: 'diff',
-          type: 'line',
-          data: opt_oo
-        }, {
-          title: 'dea',
-          type: 'line',
-          data: opt_cc
-        }, {}]
-      }]
+      data: [MAIN, VOL, MACD, KDJ]
     }
   };
-  /* sample option end*/
 
-  let O = {
-    oo: [],
-    hh: [],
-    ll: [],
-    cc: []
-  };
+  /* ------------------------------------------- data defined here ---------------------------------- */
+
+  option.Y.data.push(MACD);
+  console.log(option);
 
   function stockcharts(opt, theme) {
 
@@ -130,6 +150,7 @@
     tW = tW / tWid;
     H1 = H1 / tWid;
     H2 = H2 / tWid;
+    let H3 = R(H2 * 0.2);
     let topW = tW,
       botW = tW,
       topH = 0 / tWid,
@@ -176,13 +197,14 @@
       _disLast: 1, //  display the most right bar !
       _barW: 0,
       _barB: 0,
-      _barE: 1000,
+      _barE: 0,
       _minLevel: 0, // min display Level
       _curLevel: 0, // current display Level
       _maxLevel: 0 // max display Level
     };
 
     let cD = []; // canvas Display !!
+    let frame = []; // canvas Display !!
     let cvsConf = {
       topNav: {
         backgroundColor: "#111111",
@@ -207,7 +229,8 @@
         top: topH,
         left: tW - rightW,
         width: rightW,
-        height: rightH
+        height: 100
+        //height: rightH
       },
       botNav: {
         backgroundColor: "#111111",
@@ -268,6 +291,7 @@
         width: subFW,
         height: subFH
       },
+      /*
       sub1B: {
         backgroundColor: "transparent",
         zIndex: 94,
@@ -316,6 +340,7 @@
         width: subFW,
         height: subFH
       },
+      */
       sttB: {
         backgroundColor: "#222222",
         zIndex: 16,
@@ -470,6 +495,13 @@
       }
       console.log(" G._curLevel " + G._curLevel);
       let dataLen = Math.min(G.AB[G._curLevel][2], G._disLen, G._datLen);
+      if (dataLen == 0) {
+        G._barB = 0;
+        G._barE = 0;
+        G._disLast = 1;
+        G._barW = G.AB[G._curLevel][0] > 0 ? G.AB[G._curLevel][0] : 1;
+        return;
+      }
       G._barW = G.AB[G._curLevel][0] > 0 ? G.AB[G._curLevel][0] : 1;
       G._barE = R((dataLen + G._barB + G._barE) / 2);
       G._barB = G._barE - dataLen;
@@ -559,12 +591,12 @@
     }
 
     function _topNav() {
-      let cvs = new createCvs("topNav", cvsConf.topNav);
-      this.cvs = cvs;
+      let c = new createCvs("topNav", cvsConf.topNav);
+      this.cvs = c[0];
+      this.ctx = c[1];
       //cvs[0].style.position = "fixed";
-      let ctx = cvs[1];
-      ctx.fillStyle = "#AA0000";
-      ctx.fillRect(0, topH - 1, topW, 1);
+      this.ctx.fillStyle = "#AA0000";
+      this.ctx.fillRect(0, topH - 1, topW, 1);
     }
 
     function _leftNav() {
@@ -578,14 +610,16 @@
     //let leftNav = new _leftNav();
 
     function _rightNav() {
-      let cvs = new createCvs("rightNav", cvsConf.rightNav);
-      this.cvs = cvs;
+      let c = new createCvs("rightNav", cvsConf.rightNav);
+      this.cvs = c[0];
+      this.ctx = c[1];
       //cvs[0].style.position = "fixed";
     }
 
     function _botNav() {
-      let cvs = new createCvs("botNav", cvsConf.botNav);
-      this.cvs = cvs;
+      let c = new createCvs("botNav", cvsConf.botNav);
+      this.cvs = c[0];
+      this.ctx = c[1];
     }
 
     function _mainF() {
@@ -659,22 +693,27 @@
       //cvs[0].style.position = "fixed";
       c[0].addEventListener("mousemove", mouseMove, false);
       c[0].addEventListener('wheel', xxxx, false);
+      this.clear = function() {
+        alert( "enter into clear !!" ) ;
+        this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
+      }
 
       this.init = function() {
+        this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
         this.ctx.fillStyle = "#AA0000";
-        this.ctx.fillRect(0, subBH - 1, subBW, 1);
+        this.ctx.fillRect(0, this.cvs.height - 1, subBW, 1);
         c[1].fillStyle = "#773388";
-        this.kedu.push([30, "100%"]);
-        this.kedu.push([R(30 + (subBH - 60) * 0.191), "19.1%"]);
-        this.kedu.push([R(30 + (subBH - 60) * 0.382), "38.2%"]);
-        this.kedu.push([R(30 + (subBH - 60) * 0.500), "50.0%"]);
-        this.kedu.push([R(30 + (subBH - 60) * 0.618), "61.8%"]);
-        this.kedu.push([R(30 + (subBH - 60) * 0.809), "80.9%"]);
-        this.kedu.push([subBH - 30, "00.0%"]);
+        this.kedu.push([10, "100%"]);
+        this.kedu.push([R(10 + (this.cvs.height - 20) * 0.191), "19.1%"]);
+        this.kedu.push([R(10 + (this.cvs.height - 20) * 0.382), "38.2%"]);
+        this.kedu.push([R(10 + (this.cvs.height - 20) * 0.500), "50.0%"]);
+        this.kedu.push([R(10 + (this.cvs.height - 20) * 0.618), "61.8%"]);
+        this.kedu.push([R(10 + (this.cvs.height - 20) * 0.809), "80.9%"]);
+        this.kedu.push([this.cvs.height - 10, "00.0%"]);
 
         c[1].fillStyle = "#773388";
         c[1].font = "14px";
-        c[1].fillRect(leftW - 2, 0, 1, subBH);
+        c[1].fillRect(leftW - 2, 0, 1, this.cvs.height);
         for (let i = 0; i < this.kedu.length; i++) {
           c[1].fillStyle = "#773388";
           c[1].fillRect(leftW - 6, this.kedu[i][0], 4, 1);
@@ -711,10 +750,11 @@
       this.ctx = c[1];
       //cvs[0].style.position = "fixed";
       this.mouseMove = function(x, y) {
-        c[1].clearRect(0, 0, backFW, backFH);
+        console.log( "this.cvs.width: " + this.cvs.width );
+        c[1].clearRect(0, 0, this.cvs.width, this.cvs.height);
         c[1].fillStyle = "#773388";
-        c[1].fillRect(x, 0, 1, backFH);
-        c[1].fillRect(0, y, backFW, 1);
+        c[1].fillRect(x, 0, 1, this.cvs.height);
+        c[1].fillRect(0, y, this.cvs.width, 1);
       }
     }
 
@@ -729,23 +769,128 @@
         c[1].fillRect(x, 0, 1, 600);
         c[1].fillRect(0, y, 1200, 1);
       }
+      this.init = function () {
+      }
     }
 
     let topNav = new _topNav();
     let rightNav = new _rightNav();
     let botNav = new _botNav();
-    //let mainF = new _mainF();
-    //let mainB = new _mainB();
+
+    let mainF11 = new _mainF();
+    let mainB11 = new _mainB();
+
     let scrollB = new _scrollB();
     let scrollF = new _scrollF();
-    //let sub1B = new _subB();
-    //let sub1F = new _subF();
+
+    let sub1B11 = new _subB();
+    let sub1F11 = new _subF();
+
     let backF = new _backF();
     let backB = new _backB();
     /* canvas function end !! ----------------------------------------------- */
+    frame.push([mainF11, mainB11]);
+    frame.push([sub1F11, sub1B11]);
+    frame.push([backF, backB]);
+    frame.push([rightNav, botNav]);
+
+    function frameInit() {
+      let topNav = new _topNav();
+      let rightNav = new _rightNav();
+      let botNav = new _botNav();
+      let mainF = new _mainF();
+      let mainB = new _mainB();
+      let scrollB = new _scrollB();
+      let scrollF = new _scrollF();
+      //let sub1B = new _subB();
+      //let sub1F = new _subF();
+      let backF = new _backF();
+      let backB = new _backB();
+      frame.push([mainF, mainB]);
+    }
+
+    /*
+        frameChange(x) 参数：
+        n：表示处理的 第几个sub。 n = 1 第一个sub , n=2 第2个sub
+        x: 表示删除，还是增加，还是改动。
+           其中，改动分为 放大和缩小。
+           x == 1,2  增加 (在第n个位置增加)
+           x == -1   删除
+           x == 10   放大
+           x == 0    缩小
+            n :              0             1           2           3
+        frame 的格式：[ [mainF,mainB],[subF,subB],[subF,subB],[subF,subB] ]
+        操作上:
+        frameChange(2,1) : 在第2个sub前插入一个sub
+        frameChange(2,2) : 在第2个sub后插入一个sub
+        frameChange(1,-1) : 删除第1个sub
+        frameChange(3,10)  : 第3个sub放大
+        frameChange(1,0)  : 第1个sub缩小
+            
+    */
+    function frameChange(n, x) {
+      let i = 0;
+        //alert( "frame.length "  + frame.length ) ;
+      if (n < 1 || n >= (frame.length - 1)) {
+        alert( "111111") ;
+        return -1;
+      }
+      if (x == 1 || x == 2) {
+        alert( "22222222") ;
+        let subF = new _subF();
+        let subB = new _subB();
+        if (x == 1) {
+          frame.splice(n, 0, [subF, subB]);
+        } else if (x == 2) {
+          frame.splice(n + 1, 0, [subF, subB]);
+        }
+      }
+      if (x == -1) {
+        alert( "3333333333") ;
+        frame.splice(n, 1);
+      }
+      if (x == 10) {
+        alert( "44444444") ;
+        frame[n][0].cvs.height = H2;
+        frame[n][1].cvs.height = H2;
+      }
+      if (x == 0) {
+        alert( "5555555") ;
+        frame[n][1].clear() ;
+        frame[n][0].cvs.height = H3;
+        frame[n][1].cvs.height = H3;
+        alert( "H3:  " + H3 ) ;
+        alert( "H2:  " + H2 ) ;
+      }
+      let t = topH + H1 + scrollFH;
+      for (i = 1; i < frame.length-2; i++) {
+        frame[i][0].cvs.style.top = t;
+        frame[i][1].cvs.style.top = t;
+        console.log( " i: " + i + " top: " + t ) ;
+        frame[i][1].init();
+        t = t + frame[i][0].cvs.height;
+      }
+      frame[i][0].cvs.height = t;
+      frame[i][1].cvs.height = t;
+      frame[i+1][0].cvs.height = t;
+      frame[i+1][1].cvs.style.top = t;
+    }
+
+    alert(frame);
+    frameChange(1, 1);
+    //frameChange(1, 2);
+    //frameChange(1, 2);
+    //frameChange(1, -1);
+    frameChange(3, 10);
+    frameChange(1, 0);
+    frameChange(1, 2);
+    frameChange(1, 2);
+    frameChange(1, 2);
+    frameChange(3, 0);
 
     function OInit(opt = {}, O = {}) {
       //O = opt;
+      /*
       if (opt.X) {
         O.X = opt.X;
       }
@@ -756,7 +901,8 @@
         O.ll = O.Y.data[0].ll;
         O.cc = O.Y.data[0].cc;
       }
-      G.curLevel = 0;
+      */
+      //G.curLevel = 0;
       //G.curLevel = G.curLevel ;  //这个赋值，用来更新 G.barB B.barE !!
     }
 
@@ -835,17 +981,17 @@
             for (let j = 0; j < mF.y.length; j++) {
               if (mF.y[j].type == 'o') {
                 mF.oo = mF.y[j].data;
-                O.oo = mF.oo;
+                //O.oo = mF.oo;
                 G.datLen = mF.oo.length;
               } else if (mF.y[j].type == 'h') {
                 mF.hh = mF.y[j].data;
-                O.hh = mF.hh;
+                //O.hh = mF.hh;
               } else if (mF.y[j].type == 'l') {
                 mF.ll = mF.y[j].data;
-                O.ll = mF.ll;
+                //O.ll = mF.ll;
               } else if (mF.y[j].type == 'c') {
                 mF.cc = mF.y[j].data;
-                O.cc = mF.cc;
+                //O.cc = mF.cc;
               } else {
                 mF.other[n] = opt.Y.data[i].y[j];
                 n++;
@@ -860,10 +1006,6 @@
             cD.push([subF, subB]);
           }
         }
-        //O.oo = opt.Y.data[0].y[0].data; // 是同一个，不是新创建O.oo
-        //O.hh = opt.Y.data[0].y[1].data;
-        //O.ll = opt.Y.data[0].y[2].data;
-        //O.cc = opt.Y.data[0].y[3].data;
         G.curLevel = 0;
       }
       let subbB = Object.create(cvsConf.subB);
@@ -881,12 +1023,11 @@
       在index.html中的opt.type = 0, 
       然后 this.update(opt) 根据 opt.tpye=0 对 cD[] 进行初始化。cD[]，即canvas Display array !!
     */
-    //this.update(opt);
     update1(opt);
-    let mainF = cD[0][0];
-    let mainB = cD[0][1];
-    let sub1F = cD[1][0];
-    let sub1B = cD[1][1];
+    let mF = cD[0][0]; //mainF  main front 
+    let mB = cD[0][1]; //mainB  main back
+    let s1F = cD[1][0]; // s1F sub1F  sub1 front
+    let s1B = cD[1][1]; // s1B sub1B  sub1 back
 
     console.log(cvsConf.subS);
     console.log(cD);
@@ -905,8 +1046,26 @@
       let sum = 0;
       let aver;
       let rr = [];
+      if (cc.length == 0) {
+        return {
+          MA: rr,
+          sum: 0,
+          idx: 0
+        }
+      }
       if (N <= 0) {
         return -1;
+      }
+      if (N > cc.length) {
+        for (i = 0; i < cc.length - 1; i++) {
+          sum = cc[i] + sum;
+          rr.push(0);
+        }
+        return {
+          MA: rr,
+          sum: (sum - cc[cc.length - 1]), // 前N-1的合值
+          idx: cc.length - 1 // cc.length-1
+        }
       }
       for (i = 0; i < N - 1; i++) {
         sum = cc[i] + sum;
@@ -938,6 +1097,9 @@
       this.sum = r.sum;
       this.idx = r.idx; // length-1 
       this.calcMA = function(x) { // x should be length-1
+        if (x <= 0 || cc.length == 0) {
+          return;
+        }
         if (x >= cc.length) {
           x = cc.length - 1;
         }
@@ -945,21 +1107,24 @@
           return;
         } else if (x >= this.idx) {
           //console.log("N:i  " + N );
-          this.sum = this.sum + cc[this.idx];
+          this.sum = this.sum + cc[this.idx]; // 重新计算 this.idx的MA。
           this.MA.pop();
-          this.MA.push(R(this.sum / N * 1000) / 1000);
-          for (let i = this.idx + 1; i <= x; i++) {
+          this.MA.push(R(this.sum / N * 1000) / 1000); //保留三位小数。
+
+          for (let i = this.idx + 1; i <= x; i++) { //再计算 后面的 MA。
             this.sum = this.sum - cc[i - N] + cc[i];
             this.MA.push(R(this.sum / N * 1000) / 1000);
           }
           this.idx = x;
-          let kkkkk = this.sum - cc[x];
-          this.sum = this.sum - cc[x];
+          this.sum = this.sum - cc[x]; // this.sum 的值会少加最后一个，即cc[x]，因为cc[x]会一直变化。
+          /*
+             比如，当前是显示的1f的图表，最后一个1钟的K柱没有定型，收到的数据，是要每次更新最后
+             一个1分钟的K柱，直到第60秒结束，这个K柱才定型。新一个K柱会开始。
+             所以在现实的图上，会看到最后一个K柱一直在变化，等时间到，本K柱结束，新一个K柱开始。
+          */
         }
       }
     }
-
-
 
     function calcYkedu(height, b, e, hh, ll) {
       //let top = 0.05;
@@ -987,6 +1152,9 @@
     }
 
     function calcYkedu0(height, hh, ll) {
+      if (hh.length == 0) {
+        return [0, 0];
+      }
       let top = 30;
       let down = 30;
       if (ll == undefined) {
@@ -1000,23 +1168,20 @@
     }
 
     /*---------------------------------------------------------------------------------------------- */
-    //OInit(opt, O);
-    //this.initHL();
-    //calcYkedu1(100, 5, 100, O.hh, O.ll, G.hFst, G.lFst, G.hSnd, G.lSnd);
-    //console.log(G.hFst);
-    //console.log(G.lFst);
 
-    let MA5 = new _MA(5, O.cc);
-    let MA10 = new _MA(10, O.cc);
-    let MA20 = new _MA(20, O.cc);
-    let MA30 = new _MA(30, O.cc);
-    let MA40 = new _MA(40, O.cc);
-    let MA60 = new _MA(60, O.cc);
-    let MA89 = new _MA(89, O.cc);
-    let MA144 = new _MA(144, O.cc);
-    let MA233 = new _MA(233, O.cc);
-    let MA377 = new _MA(377, O.cc);
-    let MA610 = new _MA(610, O.cc);
+    /*
+    let MA5 = new _MA(5, mF.cc);
+    let MA10 = new _MA(10, mF.cc);
+    let MA20 = new _MA(20, mF.cc);
+    let MA30 = new _MA(30, mF.cc);
+    let MA40 = new _MA(40, mF.cc);
+    let MA60 = new _MA(60, mF.cc);
+    let MA89 = new _MA(89, mF.cc);
+    let MA144 = new _MA(144, mF.cc);
+    let MA233 = new _MA(233, mF.cc);
+    let MA377 = new _MA(377, mF.cc);
+    let MA610 = new _MA(610, mF.cc);
+    */
 
     /* ----------------------------------------------------------------------------------------------------*/
 
@@ -1025,6 +1190,9 @@
 
 
     function drawLine(obj, dd, color) {
+      if (dd.length == 0 || G.barB == G.barE) {
+        return;
+      }
       let ctx = obj.ctx;
       let j = 0;
       let x1, y1;
@@ -1064,6 +1232,9 @@
 
 
     function drawCandle(obj) {
+      if (G.barB == G.barE) {
+        return;
+      }
       let oo = [],
         hh = [],
         ll = [],
@@ -1091,15 +1262,15 @@
         if (position == posB && i != (G.barE - 1)) {
           continue;
         } else {
-          let h1 = O.hh.slice(idxB, i + 1)
-          let l1 = O.ll.slice(idxB, i + 1)
+          let h1 = mF.hh.slice(idxB, i + 1)
+          let l1 = mF.ll.slice(idxB, i + 1)
           let hhh = Math.max.apply(null, h1);
           let lll = Math.min.apply(null, l1);
 
           hh.push(hhh);
           ll.push(lll);
-          oo.push(O.oo[idxB]);
-          cc.push(O.cc[i]);
+          oo.push(mF.oo[idxB]);
+          cc.push(mF.cc[i]);
 
           PP.push(position + halfBarW);
 
@@ -1142,6 +1313,8 @@
           }
         }
       }
+
+      /*
       drawLine(obj, MA5.MA, "#E7E7E7");
       drawLine(obj, MA10.MA, "#DCDC0A");
       drawLine(obj, MA20.MA, "#FF00FF");
@@ -1153,6 +1326,8 @@
       drawLine(obj, MA233.MA, "#808000");
       drawLine(obj, MA377.MA, "#800080");
       drawLine(obj, MA610.MA, "#008080");
+      */
+
     }
 
 
@@ -1167,6 +1342,8 @@
     }
 
     function drawAll() {
+
+      /*
       MA5.calcMA(G.datLen);
       MA10.calcMA(G.datLen);
       MA20.calcMA(G.datLen);
@@ -1178,14 +1355,21 @@
       MA233.calcMA(G.datLen);
       MA377.calcMA(G.datLen);
       MA610.calcMA(G.datLen);
-      drawCandle(cD[0][0]);
+      //drawCandle(cD[0][0]);
+      */
 
+      drawCandle(mF);
+
+      /*
       let uu = MA5.MA.slice(G.barB, G.barE);
-      sub1F.mn = calcYkedu0(sub1F.cvs.height, uu, uu);
-      sub1F.ctx.clearRect(0, 0, subFW, subFH);
+      s1F.mn = calcYkedu0(s1F.cvs.height, uu, uu);
+      s1F.ctx.clearRect(0, 0, subFW, subFH);
       //drawLine(sub1F, MA60.MA, "#787878");
       //drawLine(sub1F, MA30.MA, "#787878");
-      drawLine(cD[1][0], MA10.MA, "#787878");
+      //drawLine(cD[1][0], MA10.MA, "#787878");
+      drawLine(s1F, MA10.MA, "#787878");
+      */
+
     }
 
     /* ------------ websocket ------------------------------------------------------------------------- */
@@ -1210,10 +1394,10 @@
       opt_hh.length = 0;
       opt_ll.length = 0;
       opt_cc.length = 0;
-      opt_oo.push( parseFloat(ary[7]) );
-      opt_hh.push( parseFloat(ary[11]) );
-      opt_ll.push( parseFloat(ary[15]) );
-      opt_cc.push( parseFloat(ary[19]) );
+      opt_oo.push(parseFloat(ary[7]));
+      opt_hh.push(parseFloat(ary[11]));
+      opt_ll.push(parseFloat(ary[15]));
+      opt_cc.push(parseFloat(ary[19]));
       option.type = 2;
       update1(option);
       //console.log( ary ) ;
@@ -1232,6 +1416,8 @@
     function keyPress(e) {
       let keyID = e.keyCode ? e.keyCode : e.which;
       if (keyID === 38 || keyID === 87) { // up arrow and W
+        console.log( "up" );
+        e.preventDefault();
         if (G.curLevel > 0) {
           G.curLevel = G.curLevel - 1;
           drawAll();
@@ -1239,6 +1425,8 @@
         e.preventDefault();
       }
       if (keyID === 40 || keyID === 83) { // down arrow and S
+        console.log( "down" );
+        e.preventDefault();
         if (G.curLevel < G.maxLevel) {
           G.curLevel = G.curLevel + 1;
           drawAll();
@@ -1266,6 +1454,7 @@
     }
 
     function xxxx(e) {
+      e.preventDefault();
       console.log(e.deltaX);
       console.log(e.deltaY);
       if (e.deltaY > 0) { // 向下

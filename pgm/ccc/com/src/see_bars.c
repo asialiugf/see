@@ -908,10 +908,26 @@ see_calc_bar_block(see_fut_block_t  * p_block,
             return 0;
         }
 
+        /*
+            在 is_same_k_bar() 中， 会对 c_save 进行赋值，'s'表示tick已经不是同一个K柱了，要save。
+            'n'表示 当前收到的tick仍然是同一个K柱。
+            i_kbar_num 是is_same_k_bar()的返回值 ，==0 表示 是同一个K柱。
+            i_kbar_num == 2,表是前面要存在两个K柱要 save，一般情况 i_kbar_num应该是1，如果比1大，
+            表示，中间隔了比较久没有收到tick了。
+        */
         i_kbar_num = is_same_k_bar(p_block,p_bar1,buf,period);
         if(i_kbar_num == 0) {   //同一个K
             UPDATE_BAR1;
         } else { // 下一个K
+            /*
+                例如：
+                假设现在正在计算的是5F的K柱
+                假如第N个K柱，收到 tick的时间是 09:29:59 000,这个tick要计算到第N个K柱中。这时不能确定
+                第N个K柱是否结束。
+                当新一个tick来到，时间恰好是09:31:02 500, 也就是说中间有好几秒没有tick，这种情况下，
+                可以确定第N个K柱结束。于是，将p_bar1的内容copy到 p_bar0，即p_bar0是第N个K柱的结束状态。
+                
+            */
             memcpy((char *)p_bar0,p_bar1,sizeof(see_bar_t));
             if(see_first_tick(p_block,buf,p_bar0,p_bar1,period) == 0) {    // 新K柱，tick->UpdateTime的值可能不是 起始的时间
                 p_bar0->v    = tick->Volume - p_bar0->vsum;
@@ -920,21 +936,6 @@ see_calc_bar_block(see_fut_block_t  * p_block,
                 p_bar1->v    = tick->Volume - p_bar0->vsum;
             }   // 根据 see_first_tick 返回 tick的 UpdateMillisec 是 0 还是 500，来处理 Volume
 
-            //see_save_bin("../../dat/hloc.bin",(char *)p_bar0,sizeof(see_bar_t));
-            //memset(ca_ohlc_file,'\0',512);
-            //memset(ca_errmsg,'\0',512);
-            //sprintf(ca_ohlc_file,"%s-%s-%d%c",p_block->InstrumentID,p_bar0->TradingDay,p_block->bar_block[period].i_bar_type,
-            //        p_block->bar_block[period].c_bar_type);
-            //sprintf(ca_ohlc_file,"%s-%s-%d",p_block->InstrumentID,p_bar0->TradingDay,period);
-            //sprintf(ca_errmsg,"%s:%10.2f:%10.2f:%10.2f:%10.2f\n",p_bar0->ca_btime,p_bar0->o,p_bar0->h,p_bar0->l,p_bar0->c);
-            //see_save_line(ca_ohlc_file,ca_errmsg);
-            // see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0);
-            /*
-            hh[i_index] = p_bar0->h;
-            ll[i_index] = p_bar0->l;
-            oo[i_index] = p_bar0->o;
-            cc[i_index] = p_bar0->c;
-            */
         }
     }
     return 0;
@@ -1385,6 +1386,50 @@ int see_save_bar(see_fut_block_t *p_block, char *buf, int period)
 /*
  see_send_bar() 向web python 传送bar的信息。
 */
+
+/*
+    参数：see_fut_block_t *p_block
+    输入特定的 future block。
+
+    功能：
+    把 p_block中的不同的period的 K柱的信息，传递到前端。
+*/
+/*
+int see_send_bar1(see_fut_block_t *p_block)
+{
+    int i ;
+    // 创建JSON Object
+    cJSON *root = cJSON_CreateObject();
+    // 加入节点（键值对），节点名称为value，节点值为123.4
+    cJSON_AddNumberToObject(root,"value",123.4);
+    // 打印JSON数据包
+    char *out = cJSON_Print(root);
+    printf("%s\n",out);
+    // 释放内存
+    cJSON_Delete(root);
+    free(out);
+    return 0;
+
+    cJSON * root =  cJSON_CreateObject();
+    cJSON * item =  cJSON_CreateObject();
+    cJSON * next =  cJSON_CreateObject();
+
+    cJSON_AddItemToObject(root, "topic", cJSON_CreateNumber(0));//根节点下添加
+    cJSON_AddItemToObject(root, "operation", cJSON_CreateString("CALL"));
+    cJSON_AddItemToObject(root, "service", cJSON_CreateString("telephone"));
+    cJSON_AddItemToObject(root, "text", cJSON_CreateString("打电话给张三"));
+    cJSON_AddItemToObject(root, "semantic", item);//root节点下添加semantic节点
+    cJSON_AddItemToObject(item, "slots", next);//semantic节点下添加item节点
+    cJSON_AddItemToObject(next, "name", cJSON_CreateString("张三"));//添加name节点
+
+    printf("%s\n", cJSON_Print(root));
+
+    for(i=0; i<=BAR_TICK; i++) {
+
+    }
+}
+*/
+
 int see_send_bar(see_fut_block_t *p_block,char *pc_msg)
 {
     int i_size;
@@ -1397,7 +1442,7 @@ int see_send_bar(see_fut_block_t *p_block,char *pc_msg)
     if(i_rtn != i_size) {
         see_errlog(1000,"see_send_bar: send error !!",RPT_TO_LOG,0,0);
     }
-    //usleep(50000);
+    usleep(50000);
     //usleep(1000);
     return 0;
 }
