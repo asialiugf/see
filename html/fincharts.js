@@ -634,7 +634,7 @@
       this.hh = [];
       this.ll = [];
       this.cc = [];
-      this.line = [];
+      this.line = []; // 用于保存有多少条line需要画。
       this.bar = [];
       this.cvs.addEventListener("mousemove", mouseMove, false);
       //this.cvs.addEventListener("mouseleave", mouseMove, false);
@@ -651,6 +651,10 @@
         this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
       }
 
+      /* 
+        drawCandle() 必须先调用之后，才会修改 this.mn 和 this.PP 
+        其它的显示会依赖 this.mn 和 this.PP
+      */
       this.drawCandle = function () {
         console.log( G.barB + " " +  G.barE );
         if (G.barB == G.barE) {
@@ -673,6 +677,12 @@
         this.PP.length = 0; // 清空
         //P.length = 0;
 
+        /*
+           是否要把下面的这一部分独立出去？
+           因为VOL显示,也需要这里的计算方法。
+           如下面， 从idxB 到i的 VOL 也需要找出最大的一个，用于显示。
+           即： 需要加上 let v1 = this.vv.slice(idxB, i + 1)
+        */
         posB = -1;
         idxB = G.barB;
         for (let i = G.barB; i < G.barE; i++) {
@@ -681,8 +691,8 @@
           if (position == posB && i != (G.barE - 1)) {
             continue;
           } else {
-            let h1 = this.hh.slice(idxB, i + 1)
-            let l1 = this.ll.slice(idxB, i + 1)
+            let h1 = this.hh.slice(idxB, i + 1) ;
+            let l1 = this.ll.slice(idxB, i + 1) ;
             let hhh = Math.max.apply(null, h1);
             let lll = Math.min.apply(null, l1);
 
@@ -691,7 +701,11 @@
             oo.push(this.oo[idxB]);
             cc.push(this.cc[i]);
 
-            pp.push(position + halfBarW);
+            pp.push(position + halfBarW); // 这里的pp是否要改为 mainF的属性？
+            /*
+               除了要记录 显示的位置 position，还需要记录显示 第几个K bar？就是这里有i 
+               另外在显示 VOL时，需要用到这个position 
+            */
             for (let j = (position - halfBarW); j <= (position + halfBarW); j++) {
               this.PP[j] = i;
             }
@@ -908,12 +922,17 @@
     mainF11.cc = opt.Y.data[0].y[3].data;
 
     G.datLen = mainF11.oo.length;
-    alert ( G._datLen );
     G.curLevel = 0;
+    mainF11.line[0] = mainF11.oo;
+    mainF11.line[1] = mainF11.hh;
+
+    alert ( "this.line.length:  " + mainF11.line.length + " " +  mainF11.line[0].length );
+    alert ( mainF11.oo[100] );
+    alert ( mainF11.line[0][100] ) ;
+    mainF11.hh[100] = 100000 ;
+    alert ( mainF11.line[1][100] ) ;
     mainF11.drawCandle();
     console.log( mainF11.PP ) ;
-
-    alert(mainF11.oo.length);
 
     let scrollB = new _scrollB();
     let scrollF = new _scrollF();
@@ -1506,6 +1525,7 @@
       //drawCandle(mF);
       frame[0][0].clear();
       frame[0][0].drawCandle();
+      console.log( frame[0][0].PP );
 
       /*
       let uu = MA5.MA.slice(G.barB, G.barE);
