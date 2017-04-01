@@ -217,7 +217,7 @@
       },
       leftNav: {
         backgroundColor: "#222222",
-        zIndex: 101,
+        zIndex: 105,
         top: topH,
         left: 0,
         width: leftW,
@@ -225,12 +225,12 @@
       },
       rightNav: {
         backgroundColor: "#222222",
-        zIndex: 101,
+        zIndex: 105,
         top: topH,
         left: tW - rightW,
         width: rightW,
         height: 100
-        //height: rightH
+          //height: rightH
       },
       botNav: {
         backgroundColor: "#111111",
@@ -243,7 +243,7 @@
       mainB: {
         backgroundColor: "#000000",
         //backgroundColor: "#776633",
-        zIndex: 96,
+        zIndex: 99,
         top: topH,
         left: 0,
         width: mainBW,
@@ -252,7 +252,7 @@
       mainF: {
         backgroundColor: "transparent",
         //backgroundColor: "#776633",
-        zIndex: 98,
+        zIndex: 101,
         top: topH,
         left: leftW,
         width: mainFW,
@@ -260,7 +260,7 @@
       },
       scrollB: {
         backgroundColor: "#229999",
-        zIndex: 99,
+        zIndex: 104,
         top: topH + mainFH,
         left: 0,
         width: scrollBW,
@@ -268,7 +268,7 @@
       },
       scrollF: {
         backgroundColor: "#229999",
-        zIndex: 100,
+        zIndex: 105,
         top: topH + mainFH,
         left: leftW,
         width: scrollFW,
@@ -277,7 +277,7 @@
       subS: [],
       subB: {
         backgroundColor: "transparent",
-        zIndex: 94,
+        zIndex: 99,
         top: topH + H1 + scrollFH,
         left: 0,
         width: subBW,
@@ -285,7 +285,7 @@
       },
       subF: {
         backgroundColor: "transparent",
-        zIndex: 95,
+        zIndex: 101,
         top: topH + H1 + scrollFH,
         left: leftW,
         width: subFW,
@@ -343,7 +343,7 @@
       */
       sttB: {
         backgroundColor: "#222222",
-        zIndex: 16,
+        zIndex: 99,
         top: topH,
         left: 0,
         width: sttBW,
@@ -351,7 +351,7 @@
       },
       sttF: {
         backgroundColor: "#222222",
-        zIndex: 16,
+        zIndex: 101,
         top: topH,
         left: leftW,
         width: sttFW,
@@ -359,7 +359,7 @@
       },
       backB: {
         backgroundColor: "#000000",
-        zIndex: -101,
+        zIndex: 49,
         top: 0,
         left: 0,
         width: backBW,
@@ -367,7 +367,7 @@
       },
       backF: {
         backgroundColor: "transparent",
-        zIndex: 97,
+        zIndex: 100,
         top: 0,
         left: leftW,
         width: backFW,
@@ -630,7 +630,7 @@
       this.mn = [];
       //cvs[0].style.position = "fixed";
       this.cvs.addEventListener("mousemove", mouseMove, false);
-      this.cvs.addEventListener("mouseleave", mouseMove, false);
+      //this.cvs.addEventListener("mouseleave", mouseMove, false);
       //cvs.addEventListener("mouseout", mouseMove, false);
       this.cvs.addEventListener('wheel', xxxx, false);
       //this.ctx.fillStyle = "#773388";
@@ -644,11 +644,12 @@
       this.kedu = [];
       this.mn = [];
       //cvs[0].style.position = "fixed";
-      c[0].addEventListener("mousemove", mouseMove, false);
-      c[0].addEventListener('wheel', xxxx, false);
+      //c[0].addEventListener("mousemove", mouseMove, false);
+      //c[0].addEventListener('wheel', xxxx, false);
 
       this.init = function() {
         c[1].fillStyle = "#773388";
+        this.kedu = [];
         this.kedu.push([30, "100%"]);
         this.kedu.push([R(30 + (mainBH - 60) * 0.191), "19.1%"]);
         this.kedu.push([R(30 + (mainBH - 60) * 0.382), "38.2%"]);
@@ -689,12 +690,14 @@
       let c = new createCvs("subB", cvsConf.subB);
       this.cvs = c[0];
       this.ctx = c[1];
+      this.idx = 0;
       this.kedu = [];
       //cvs[0].style.position = "fixed";
       c[0].addEventListener("mousemove", mouseMove, false);
-      c[0].addEventListener('wheel', xxxx, false);
+      //c[0].addEventListener('wheel', xxxx, false);
+      //this.cvs.addEventListener('dblclick', frameChange(this.idx, 0), false);
       this.clear = function() {
-        alert( "enter into clear !!" ) ;
+        //alert("enter into clear !!");
         this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
       }
 
@@ -703,6 +706,7 @@
         this.ctx.fillStyle = "#AA0000";
         this.ctx.fillRect(0, this.cvs.height - 1, subBW, 1);
         c[1].fillStyle = "#773388";
+        this.kedu = [];
         this.kedu.push([10, "100%"]);
         this.kedu.push([R(10 + (this.cvs.height - 20) * 0.191), "19.1%"]);
         this.kedu.push([R(10 + (this.cvs.height - 20) * 0.382), "38.2%"]);
@@ -730,10 +734,28 @@
       let c = new createCvs("subF", cvsConf.subF);
       this.cvs = c[0];
       this.ctx = c[1];
-      this.ctx.fillStyle = "#AA0000";
-      this.ctx.fillRect(0, subFH - 1, subFW, 1);
+      this.idx = 0;
+      this.big = 10;
+      //this.ctx.fillStyle = "#AA0000";
+      //this.ctx.fillRect(0, subFH - 1, subFW, 1);
       this.cvs.addEventListener("mousemove", mouseMove, false);
       this.cvs.addEventListener('wheel', xxxx, false);
+      this.cvs.addEventListener('dblclick', xx.bind(this), false);
+      function xx(e) {
+        //alert( " this.idx  " + this.idx ) ;
+        if (this.big == 0) {
+          frameChange(this.idx, 10);
+        } else if (this.big == 10) {
+          frameChange(this.idx, 0);
+        }
+      }
+      this.clear = function() {
+        this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
+      }
+    }
+
+    function ddff(n, x) {
+      alert(" dblclick " + n + " " + x);
     }
 
 
@@ -749,8 +771,9 @@
       this.cvs = c[0];
       this.ctx = c[1];
       //cvs[0].style.position = "fixed";
+      this.cvs.addEventListener("mousemove", mouseMove, false);
       this.mouseMove = function(x, y) {
-        console.log( "this.cvs.width: " + this.cvs.width );
+        console.log("this.cvs.width: " + this.cvs.width);
         c[1].clearRect(0, 0, this.cvs.width, this.cvs.height);
         c[1].fillStyle = "#773388";
         c[1].fillRect(x, 0, 1, this.cvs.height);
@@ -769,8 +792,7 @@
         c[1].fillRect(x, 0, 1, 600);
         c[1].fillRect(0, y, 1200, 1);
       }
-      this.init = function () {
-      }
+      this.init = function() {}
     }
 
     let topNav = new _topNav();
@@ -830,13 +852,17 @@
     */
     function frameChange(n, x) {
       let i = 0;
-        //alert( "frame.length "  + frame.length ) ;
+      //alert( "frame.length "  + frame.length ) ;
       if (n < 1 || n >= (frame.length - 1)) {
-        alert( "111111") ;
         return -1;
       }
+      for (i = 1; i < frame.length - 2; i++) {
+        frame[i][0].clear();
+        frame[i][1].clear();
+        //return 0;
+      }
       if (x == 1 || x == 2) {
-        alert( "22222222") ;
+        alert("22222222");
         let subF = new _subF();
         let subB = new _subB();
         if (x == 1) {
@@ -846,34 +872,40 @@
         }
       }
       if (x == -1) {
-        alert( "3333333333") ;
+        alert("3333333333");
+        document.body.removeChild(frame[n][0].cvs);
+        document.body.removeChild(frame[n][1].cvs);
+        frame[n][0] = null;
+        frame[n][1] = null;
         frame.splice(n, 1);
       }
       if (x == 10) {
-        alert( "44444444") ;
+        frame[n][0].big = 10;
+        frame[n][1].big = 10;
         frame[n][0].cvs.height = H2;
         frame[n][1].cvs.height = H2;
       }
       if (x == 0) {
-        alert( "5555555") ;
-        frame[n][1].clear() ;
+        frame[n][0].big = 0;
+        frame[n][1].big = 0;
         frame[n][0].cvs.height = H3;
         frame[n][1].cvs.height = H3;
-        alert( "H3:  " + H3 ) ;
-        alert( "H2:  " + H2 ) ;
       }
       let t = topH + H1 + scrollFH;
-      for (i = 1; i < frame.length-2; i++) {
+      for (i = 1; i < frame.length - 2; i++) {
+        frame[i][0].idx = i;
+        frame[i][1].idx = i;
         frame[i][0].cvs.style.top = t;
         frame[i][1].cvs.style.top = t;
-        console.log( " i: " + i + " top: " + t ) ;
+        console.log(" i: " + i + " top: " + t);
+        //frame[i][1].clear();
         frame[i][1].init();
         t = t + frame[i][0].cvs.height;
       }
       frame[i][0].cvs.height = t;
       frame[i][1].cvs.height = t;
-      frame[i+1][0].cvs.height = t;
-      frame[i+1][1].cvs.style.top = t;
+      frame[i + 1][0].cvs.height = t;
+      frame[i + 1][1].cvs.style.top = t;
     }
 
     alert(frame);
@@ -885,6 +917,9 @@
     frameChange(1, 0);
     frameChange(1, 2);
     frameChange(1, 2);
+    frameChange(1, 2);
+    frameChange(1, 2);
+    frameChange(2, -1);
     frameChange(1, 2);
     frameChange(3, 0);
 
@@ -1000,10 +1035,12 @@
             cD.push([mF, mB]);
           }
           if (opt.Y.data[i].position == 'sub') {
+            /*
             let subF = new _subF();
             let subB = new _subB();
             subF.Y = opt.Y.data[i].y;
             cD.push([subF, subB]);
+            */
           }
         }
         G.curLevel = 0;
@@ -1026,12 +1063,12 @@
     update1(opt);
     let mF = cD[0][0]; //mainF  main front 
     let mB = cD[0][1]; //mainB  main back
-    let s1F = cD[1][0]; // s1F sub1F  sub1 front
-    let s1B = cD[1][1]; // s1B sub1B  sub1 back
+    //let s1F = cD[1][0]; // s1F sub1F  sub1 front
+    //let s1B = cD[1][1]; // s1B sub1B  sub1 back
 
     console.log(cvsConf.subS);
     console.log(cD);
-    console.log(cD[1][0].Y);
+    //console.log(cD[1][0].Y);
     console.log(cD[0] instanceof _mainF);
     console.log(cD[1] instanceof _mainF);
     console.log(cD[1] instanceof _mainB);
@@ -1416,7 +1453,7 @@
     function keyPress(e) {
       let keyID = e.keyCode ? e.keyCode : e.which;
       if (keyID === 38 || keyID === 87) { // up arrow and W
-        console.log( "up" );
+        console.log("up");
         e.preventDefault();
         if (G.curLevel > 0) {
           G.curLevel = G.curLevel - 1;
@@ -1425,7 +1462,7 @@
         e.preventDefault();
       }
       if (keyID === 40 || keyID === 83) { // down arrow and S
-        console.log( "down" );
+        console.log("down");
         e.preventDefault();
         if (G.curLevel < G.maxLevel) {
           G.curLevel = G.curLevel + 1;
@@ -1474,7 +1511,7 @@
     }
 
 
-    backF.cvs.addEventListener("mousemove", mouseMove, false);
+    //backF.cvs.addEventListener("mousemove", mouseMove, false);
 
     function getMousePos(cvs, e) {
       let r = cvs.getBoundingClientRect();
