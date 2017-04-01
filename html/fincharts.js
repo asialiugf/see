@@ -129,7 +129,7 @@
       data: [MAIN, VOL, MACD, KDJ]
     }
   };
-
+  //option.Y.data[0].y[0].data
   /* ------------------------------------------- data defined here ---------------------------------- */
 
   option.Y.data.push(MACD);
@@ -157,8 +157,8 @@
       botH = 30 / tWid,
       leftW = 60 / tWid,
       rightW = 200 / tWid,
-      scrollFH = 15 / tWid,
-      scrollBH = 15 / tWid,
+      scrollFH = 5 / tWid,
+      scrollBH = 5 / tWid,
 
       mainFW = tW - rightW - leftW,
       mainFH = H1,
@@ -622,21 +622,123 @@
       this.ctx = c[1];
     }
 
+    // 主窗口，前端显示 candle，均线等
     function _mainF() {
       let c = new createCvs("mainF", cvsConf.mainF);
       this.cvs = c[0];
       this.ctx = c[1];
       this.id = c[2];
-      this.mn = [];
-      //cvs[0].style.position = "fixed";
+      this.PP = []; // 存储屏幕位置所对应的 bar的index值。
+      this.mn = []; // 计算 Y轴刻度
+      this.oo = [];
+      this.hh = [];
+      this.ll = [];
+      this.cc = [];
+      this.line = [];
+      this.bar = [];
       this.cvs.addEventListener("mousemove", mouseMove, false);
       //this.cvs.addEventListener("mouseleave", mouseMove, false);
       //cvs.addEventListener("mouseout", mouseMove, false);
       this.cvs.addEventListener('wheel', xxxx, false);
-      //this.ctx.fillStyle = "#773388";
-      //this.ctx.fillRect(0, 100, 500, 20);
-    }
 
+      this.cvs.addEventListener('dblclick', xx.bind(this), false);
+      function xx(e) {
+        this.drawCandle();
+      }
+
+      this.calcMN = function() {}
+      this.clear = function() {
+        this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
+      }
+
+      this.drawCandle = function () {
+        console.log( G.barB + " " +  G.barE );
+        if (G.barB == G.barE) {
+          return;
+        }
+        let oo = [],
+          hh = [],
+          ll = [],
+          cc = [];
+        let idxB;
+        let idxE;
+        let posB;
+        let position,
+          halfBarW = (G.barW - 1) / 2;
+        let cvs = this.cvs;
+        let ctx = this.ctx;
+        //ctx.clearRect(0, 0, cvs.width, cvs.height);
+        let o, h, l, c, dif1, dif2;
+        let pp = [];
+        this.PP.length = 0; // 清空
+        //P.length = 0;
+
+        posB = -1;
+        idxB = G.barB;
+        for (let i = G.barB; i < G.barE; i++) {
+          position = F(((i - G.barB) / G.AB[G.curLevel][2]) * this.cvs.width);
+          //P[i - G.barB] = position + halfBarW;  //记录每个bar在屏幕上的位置
+          if (position == posB && i != (G.barE - 1)) {
+            continue;
+          } else {
+            let h1 = this.hh.slice(idxB, i + 1)
+            let l1 = this.ll.slice(idxB, i + 1)
+            let hhh = Math.max.apply(null, h1);
+            let lll = Math.min.apply(null, l1);
+
+            hh.push(hhh);
+            ll.push(lll);
+            oo.push(this.oo[idxB]);
+            cc.push(this.cc[i]);
+
+            pp.push(position + halfBarW);
+            for (let j = (position - halfBarW); j <= (position + halfBarW); j++) {
+              this.PP[j] = i;
+            }
+
+            posB = position;
+            idxB = i + 1;
+          }
+        }
+        this.mn = calcYkedu0(this.cvs.height, hh, ll);
+        for (let i = 0; i < hh.length; i++) {
+          if (halfBarW != 0) {
+            o = R(this.mn[0] * oo[i] + this.mn[1]);
+            c = R(this.mn[0] * cc[i] + this.mn[1]);
+            dif1 = c - o;
+            if (dif1 == 0) {
+              dif1 = 1;
+            }
+          }
+          h = R(this.mn[0] * hh[i] + this.mn[1]);
+          l = R(this.mn[0] * ll[i] + this.mn[1]);
+          dif2 = l - h;
+          if (dif2 == 0) {
+            dif2 = 1;
+          }
+
+          if (cc[i] < oo[i]) {
+            ctx.fillStyle = "#008888";
+            if (halfBarW != 0) {
+              ctx.fillRect(pp[i] - halfBarW, o, G.barW, dif1);
+              ctx.fillRect(pp[i], h, 1, dif2);
+            } else {
+              ctx.fillRect(pp[i], h, 1, dif2);
+            }
+          } else {
+            ctx.fillStyle = "#880000";
+            if (halfBarW != 0) {
+              ctx.fillRect(pp[i] - halfBarW, c, G.barW, 0 - dif1);
+              ctx.fillRect(pp[i], h, 1, dif2);
+            } else {
+              ctx.fillRect(pp[i], h, 1, dif2);
+            }
+          }
+        }
+      } /* end drawCandle()  */
+    } /* end _mainF */
+
+    // 主窗口，后端，根据鼠标的移动，显示当前 K柱 的相关信息，包括 ohlc,均线值，增长百分比等
     function _mainB() {
       let c = new createCvs("mainB", cvsConf.mainB);
       this.cvs = c[0];
@@ -671,6 +773,9 @@
         }
       }
       this.init();
+      this.clear = function() {
+        this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
+      }
     }
 
 
@@ -697,7 +802,6 @@
       //c[0].addEventListener('wheel', xxxx, false);
       //this.cvs.addEventListener('dblclick', frameChange(this.idx, 0), false);
       this.clear = function() {
-        //alert("enter into clear !!");
         this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
       }
 
@@ -741,6 +845,7 @@
       this.cvs.addEventListener("mousemove", mouseMove, false);
       this.cvs.addEventListener('wheel', xxxx, false);
       this.cvs.addEventListener('dblclick', xx.bind(this), false);
+
       function xx(e) {
         //alert( " this.idx  " + this.idx ) ;
         if (this.big == 0) {
@@ -752,10 +857,6 @@
       this.clear = function() {
         this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
       }
-    }
-
-    function ddff(n, x) {
-      alert(" dblclick " + n + " " + x);
     }
 
 
@@ -801,6 +902,18 @@
 
     let mainF11 = new _mainF();
     let mainB11 = new _mainB();
+    mainF11.oo = opt.Y.data[0].y[0].data;
+    mainF11.hh = opt.Y.data[0].y[1].data;
+    mainF11.ll = opt.Y.data[0].y[2].data;
+    mainF11.cc = opt.Y.data[0].y[3].data;
+
+    G.datLen = mainF11.oo.length;
+    alert ( G._datLen );
+    G.curLevel = 0;
+    mainF11.drawCandle();
+    console.log( mainF11.PP ) ;
+
+    alert(mainF11.oo.length);
 
     let scrollB = new _scrollB();
     let scrollF = new _scrollF();
@@ -856,13 +969,11 @@
       if (n < 1 || n >= (frame.length - 1)) {
         return -1;
       }
-      for (i = 1; i < frame.length - 2; i++) {
+      for (i = 1; i < frame.length - 2; i++) { //清除canvas内容
         frame[i][0].clear();
         frame[i][1].clear();
-        //return 0;
       }
-      if (x == 1 || x == 2) {
-        alert("22222222");
+      if (x == 1 || x == 2) { // 增加一个副图,1在前面增加,2在后面增加
         let subF = new _subF();
         let subB = new _subB();
         if (x == 1) {
@@ -871,48 +982,45 @@
           frame.splice(n + 1, 0, [subF, subB]);
         }
       }
-      if (x == -1) {
-        alert("3333333333");
+      if (x == -1) { // 删除一个副图指标
         document.body.removeChild(frame[n][0].cvs);
         document.body.removeChild(frame[n][1].cvs);
         frame[n][0] = null;
         frame[n][1] = null;
         frame.splice(n, 1);
       }
-      if (x == 10) {
+      if (x == 10) { // 副图放大
         frame[n][0].big = 10;
         frame[n][1].big = 10;
         frame[n][0].cvs.height = H2;
         frame[n][1].cvs.height = H2;
       }
-      if (x == 0) {
+      if (x == 0) { //副图缩小
         frame[n][0].big = 0;
         frame[n][1].big = 0;
         frame[n][0].cvs.height = H3;
         frame[n][1].cvs.height = H3;
       }
       let t = topH + H1 + scrollFH;
-      for (i = 1; i < frame.length - 2; i++) {
+      for (i = 1; i < frame.length - 2; i++) { //重绘所有副图指标
         frame[i][0].idx = i;
         frame[i][1].idx = i;
         frame[i][0].cvs.style.top = t;
         frame[i][1].cvs.style.top = t;
         console.log(" i: " + i + " top: " + t);
-        //frame[i][1].clear();
         frame[i][1].init();
         t = t + frame[i][0].cvs.height;
       }
+      //  backF,backB 的高度调整
       frame[i][0].cvs.height = t;
       frame[i][1].cvs.height = t;
+      //  rightNav 高度调整
       frame[i + 1][0].cvs.height = t;
+      //  botNav 最下面菜单位置调整
       frame[i + 1][1].cvs.style.top = t;
     }
 
-    alert(frame);
     frameChange(1, 1);
-    //frameChange(1, 2);
-    //frameChange(1, 2);
-    //frameChange(1, -1);
     frameChange(3, 10);
     frameChange(1, 0);
     frameChange(1, 2);
@@ -1060,18 +1168,18 @@
       在index.html中的opt.type = 0, 
       然后 this.update(opt) 根据 opt.tpye=0 对 cD[] 进行初始化。cD[]，即canvas Display array !!
     */
-    update1(opt);
-    let mF = cD[0][0]; //mainF  main front 
-    let mB = cD[0][1]; //mainB  main back
+    //update1(opt);
+    //let mF = cD[0][0]; //mainF  main front 
+    //let mB = cD[0][1]; //mainB  main back
     //let s1F = cD[1][0]; // s1F sub1F  sub1 front
     //let s1B = cD[1][1]; // s1B sub1B  sub1 back
 
-    console.log(cvsConf.subS);
-    console.log(cD);
+    //console.log(cvsConf.subS);
+    //console.log(cD);
     //console.log(cD[1][0].Y);
-    console.log(cD[0] instanceof _mainF);
-    console.log(cD[1] instanceof _mainF);
-    console.log(cD[1] instanceof _mainB);
+    //console.log(cD[0] instanceof _mainF);
+    //console.log(cD[1] instanceof _mainF);
+    //console.log(cD[1] instanceof _mainB);
 
 
 
@@ -1395,7 +1503,9 @@
       //drawCandle(cD[0][0]);
       */
 
-      drawCandle(mF);
+      //drawCandle(mF);
+      frame[0][0].clear();
+      frame[0][0].drawCandle();
 
       /*
       let uu = MA5.MA.slice(G.barB, G.barE);
@@ -1436,7 +1546,7 @@
       opt_ll.push(parseFloat(ary[15]));
       opt_cc.push(parseFloat(ary[19]));
       option.type = 2;
-      update1(option);
+      //update1(option);
       //console.log( ary ) ;
 
     });
