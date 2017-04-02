@@ -155,7 +155,7 @@
       botW = tW,
       topH = 0 / tWid,
       botH = 30 / tWid,
-      leftW = 60 / tWid,
+      leftW = 100 / tWid,
       rightW = 200 / tWid,
       scrollFH = 5 / tWid,
       scrollBH = 5 / tWid,
@@ -189,6 +189,8 @@
 
     let G = {
       AB: [], // levelInit()
+      PP: [], // 记录用于显示的每个K'柱的起始K，结束K，以及显示于屏幕的起始位置X
+      XX: [], // 记录屏幕X位置上显示的K柱index。
       _winX: 0,
       _winY: 0,
       _maxLen: 20000, //  max data len
@@ -196,6 +198,7 @@
       _disLen: 8000, //  max display len
       _disLast: 1, //  display the most right bar !
       _barW: 0,
+      _halfBarW: 0,
       _barB: 0,
       _barE: 0,
       _minLevel: 0, // min display Level
@@ -427,6 +430,16 @@
         enumerable: true,
         configurable: true
       },
+      "halfBarW": {
+        set: function(x) {
+          this._halfBarW = x;
+        },
+        get: function() {
+          return this._halfBarW;
+        },
+        enumerable: true,
+        configurable: true
+      },
       "barB": {
         set: function(x) {
           //this._barB = x;
@@ -500,9 +513,11 @@
         G._barE = 0;
         G._disLast = 1;
         G._barW = G.AB[G._curLevel][0] > 0 ? G.AB[G._curLevel][0] : 1;
+        G._halfBarW = (G._barW - 1) / 2;
         return;
       }
       G._barW = G.AB[G._curLevel][0] > 0 ? G.AB[G._curLevel][0] : 1;
+      G._halfBarW = (G._barW - 1) / 2;
       G._barE = R((dataLen + G._barB + G._barE) / 2);
       G._barB = G._barE - dataLen;
       if (G._barB < 0) {
@@ -564,7 +579,6 @@
         G.AB.push([1, 0, F(baseLen)]);
         baseLen = baseLen * rate;
       }
-
       G.curLevel = 0;
       G._maxLevel = G.AB.length - 1;
     }
@@ -628,7 +642,6 @@
       this.cvs = c[0];
       this.ctx = c[1];
       this.id = c[2];
-      this.PP = []; // 存储屏幕位置所对应的 bar的index值。
       this.mn = []; // 计算 Y轴刻度
       this.oo = [];
       this.hh = [];
@@ -642,6 +655,7 @@
       this.cvs.addEventListener('wheel', xxxx, false);
 
       this.cvs.addEventListener('dblclick', xx.bind(this), false);
+
       function xx(e) {
         this.drawCandle();
       }
@@ -651,12 +665,35 @@
         this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
       }
 
+      function calcPosition() { // 使用不了 this.xx 这种变量
+        let position = 0;
+        let posB = -1;
+        let idxB = G.barB;
+        G.PP = [];
+        G.XX = [];
+        for (let i = G.barB; i < G.barE; i++) {
+          position = F(((i - G.barB) / G.AB[G.curLevel][2]) * c[0].width);
+          if (position == posB && i != (G.barE - 1)) {
+            continue;
+          } else {
+            G.PP.push([idxB, (i + 1), position]) // position 是K'柱的起始位置, position + G.halfBarW，是K'的中心位置
+            for (let j = position; j < (position + G.barW); j++) {
+              G.XX[j] = i;
+            }
+            posB = position;
+            idxB = i + 1;
+          }
+        }
+      }
+
+
       /* 
         drawCandle() 必须先调用之后，才会修改 this.mn 和 this.PP 
         其它的显示会依赖 this.mn 和 this.PP
       */
-      this.drawCandle = function () {
-        console.log( G.barB + " " +  G.barE );
+      this.drawCandle = function() { //采用this.aaa = function() 这种方式，内部可以使用this.xx变量。
+        calcPosition();
+        console.log(G.barB + " " + G.barE);
         if (G.barB == G.barE) {
           return;
         }
@@ -664,59 +701,23 @@
           hh = [],
           ll = [],
           cc = [];
-        let idxB;
-        let idxE;
-        let posB;
-        let position,
-          halfBarW = (G.barW - 1) / 2;
         let cvs = this.cvs;
         let ctx = this.ctx;
-        //ctx.clearRect(0, 0, cvs.width, cvs.height);
-        let o, h, l, c, dif1, dif2;
-        let pp = [];
-        this.PP.length = 0; // 清空
-        //P.length = 0;
 
-        /*
-           是否要把下面的这一部分独立出去？
-           因为VOL显示,也需要这里的计算方法。
-           如下面， 从idxB 到i的 VOL 也需要找出最大的一个，用于显示。
-           即： 需要加上 let v1 = this.vv.slice(idxB, i + 1)
-        */
-        posB = -1;
-        idxB = G.barB;
-        for (let i = G.barB; i < G.barE; i++) {
-          position = F(((i - G.barB) / G.AB[G.curLevel][2]) * this.cvs.width);
-          //P[i - G.barB] = position + halfBarW;  //记录每个bar在屏幕上的位置
-          if (position == posB && i != (G.barE - 1)) {
-            continue;
-          } else {
-            let h1 = this.hh.slice(idxB, i + 1) ;
-            let l1 = this.ll.slice(idxB, i + 1) ;
-            let hhh = Math.max.apply(null, h1);
-            let lll = Math.min.apply(null, l1);
-
-            hh.push(hhh);
-            ll.push(lll);
-            oo.push(this.oo[idxB]);
-            cc.push(this.cc[i]);
-
-            pp.push(position + halfBarW); // 这里的pp是否要改为 mainF的属性？
-            /*
-               除了要记录 显示的位置 position，还需要记录显示 第几个K bar？就是这里有i 
-               另外在显示 VOL时，需要用到这个position 
-            */
-            for (let j = (position - halfBarW); j <= (position + halfBarW); j++) {
-              this.PP[j] = i;
-            }
-
-            posB = position;
-            idxB = i + 1;
-          }
+        for (let i = 0; i < G.PP.length; i++) {
+          let h1 = this.hh.slice(G.PP[i][0], G.PP[i][1]);
+          let l1 = this.ll.slice(G.PP[i][0], G.PP[i][1]);
+          let hhh = Math.max.apply(null, h1);
+          let lll = Math.min.apply(null, l1);
+          hh.push(hhh);
+          ll.push(lll);
+          oo.push(this.oo[G.PP[i][0]]);
+          cc.push(this.cc[G.PP[i][0] - 1]);
         }
+        let o, h, l, c, dif1, dif2;
         this.mn = calcYkedu0(this.cvs.height, hh, ll);
-        for (let i = 0; i < hh.length; i++) {
-          if (halfBarW != 0) {
+        for (let i = 0; i < G.PP.length; i++) {
+          if (G.halfBarW != 0) {
             o = R(this.mn[0] * oo[i] + this.mn[1]);
             c = R(this.mn[0] * cc[i] + this.mn[1]);
             dif1 = c - o;
@@ -730,26 +731,26 @@
           if (dif2 == 0) {
             dif2 = 1;
           }
-
           if (cc[i] < oo[i]) {
             ctx.fillStyle = "#008888";
-            if (halfBarW != 0) {
-              ctx.fillRect(pp[i] - halfBarW, o, G.barW, dif1);
-              ctx.fillRect(pp[i], h, 1, dif2);
+            if (G.halfBarW != 0) {
+              ctx.fillRect(G.PP[i][2], o, G.barW, dif1);
+              ctx.fillRect(G.PP[i][2] + G.halfBarW, h, 1, dif2);
             } else {
-              ctx.fillRect(pp[i], h, 1, dif2);
+              ctx.fillRect(G.PP[i][2] + G.halfBarW, h, 1, dif2);
             }
           } else {
             ctx.fillStyle = "#880000";
-            if (halfBarW != 0) {
-              ctx.fillRect(pp[i] - halfBarW, c, G.barW, 0 - dif1);
-              ctx.fillRect(pp[i], h, 1, dif2);
+            if (G.halfBarW != 0) {
+              ctx.fillRect(G.PP[i][2], c, G.barW, 0 - dif1);
+              ctx.fillRect(G.PP[i][2] + G.halfBarW, h, 1, dif2);
             } else {
-              ctx.fillRect(pp[i], h, 1, dif2);
+              ctx.fillRect(G.PP[i][2] + G.halfBarW, h, 1, dif2);
             }
           }
         }
       } /* end drawCandle()  */
+
     } /* end _mainF */
 
     // 主窗口，后端，根据鼠标的移动，显示当前 K柱 的相关信息，包括 ohlc,均线值，增长百分比等
@@ -889,10 +890,24 @@
       this.cvs.addEventListener("mousemove", mouseMove, false);
       this.mouseMove = function(x, y) {
         console.log("this.cvs.width: " + this.cvs.width);
+        /*
+            G.XX[x] (x是指屏幕的x坐标) 保存的是 K数组的下标，比如 G.XX[1] .... G.XX[5], 都是109,
+            表示屏幕 从1到5这几个像素 应该显示 第109个K柱，其显示的宽度为5个像素。
+            因此 frame[0][0].oo[G.XX[x]] 表示 mainF的 第109个K柱的open  值。
+            因此 frame[0][0].cc[G.XX[x]] 表示 mainF的 第109个K柱的close 值。
+       
+        */
+        let position = F(((G.XX[x] - G.barB) / G.AB[G.curLevel][2]) * c[0].width);
         c[1].clearRect(0, 0, this.cvs.width, this.cvs.height);
         c[1].fillStyle = "#773388";
-        c[1].fillRect(x, 0, 1, this.cvs.height);
+        c[1].fillRect(position + G.halfBarW, 0, 1, this.cvs.height);
         c[1].fillRect(0, y, this.cvs.width, 1);
+        c[1].fillStyle = "#AAAAAA";
+        //c[1].fillText("hellow miao!", position,10 );
+        c[1].fillText(frame[0][0].oo[G.XX[x]], position,10 );
+        c[1].fillText(frame[0][0].hh[G.XX[x]], position,20 );
+        c[1].fillText(frame[0][0].ll[G.XX[x]], position,30 );
+        c[1].fillText(frame[0][0].cc[G.XX[x]], position,40 );
       }
     }
 
@@ -916,6 +931,7 @@
 
     let mainF11 = new _mainF();
     let mainB11 = new _mainB();
+
     mainF11.oo = opt.Y.data[0].y[0].data;
     mainF11.hh = opt.Y.data[0].y[1].data;
     mainF11.ll = opt.Y.data[0].y[2].data;
@@ -923,16 +939,16 @@
 
     G.datLen = mainF11.oo.length;
     G.curLevel = 0;
-    mainF11.line[0] = mainF11.oo;
+    mainF11.line[0] = mainF11.oo; //对于line, bar等属性，请在外部赋值。
     mainF11.line[1] = mainF11.hh;
 
-    alert ( "this.line.length:  " + mainF11.line.length + " " +  mainF11.line[0].length );
-    alert ( mainF11.oo[100] );
-    alert ( mainF11.line[0][100] ) ;
-    mainF11.hh[100] = 100000 ;
-    alert ( mainF11.line[1][100] ) ;
-    mainF11.drawCandle();
-    console.log( mainF11.PP ) ;
+    alert("this.line.length:  " + mainF11.line.length + " " + mainF11.line[0].length);
+    alert(mainF11.oo[100]);
+    alert(mainF11.line[0][100]);
+    mainF11.hh[100] = 100000;
+    alert(mainF11.line[1][100]);
+    //mainF11.drawCandle();
+    //console.log(mainF11.PP);
 
     let scrollB = new _scrollB();
     let scrollF = new _scrollF();
@@ -1522,10 +1538,11 @@
       //drawCandle(cD[0][0]);
       */
 
-      //drawCandle(mF);
       frame[0][0].clear();
       frame[0][0].drawCandle();
-      console.log( frame[0][0].PP );
+      //console.log(frame[0][0].PP);
+      //console.log(G.PP);
+      //console.log(G.XX);
 
       /*
       let uu = MA5.MA.slice(G.barB, G.barE);
@@ -1608,11 +1625,11 @@
       }
       if (keyID === 39 || keyID === 68) { // right arrow and D
         /*
-          if (G.barE < O.hh.length) {
-         G.barE++;
-         G.barB++;
-        };
-       */
+            if (G.barE < O.hh.length) {
+           G.barE++;
+           G.barB++;
+          };
+         */
         //setBE(G.curLevel);
         G.barB = G.barB + G.curLevel;
         drawAll();
