@@ -1,0 +1,2 @@
+ps -ef |grep rrr |awk '{print $2}'|xargs kill -9
+ps -ef |grep sss |awk '{print $2}'|xargs kill -9

@@ -1542,11 +1542,11 @@ void *see_pthread_dat(void *data)
 
     int t =0;
     int t0 =0;
-    int t1 = 3600* 2 + 60*32;
-    int t2 = 3600*10 + 60*17;
-    int t3 = 3600*11 + 60*32;
-    int t4 = 3600*15 + 60* 2;
-    int t5 = 3600*24 + 60* 0;
+    int t1 = 3600* 2 + 60*32;  /* 2:32分 */
+    int t2 = 3600*10 + 60*17;  /* 10:17分 */
+    int t3 = 3600*11 + 60*32;  /* 11:32分 */
+    int t4 = 3600*15 + 60* 2;  /* 15:02分 */
+    int t5 = 3600*24 + 60* 0;  /* 24:00分 */
 
     while(1) {
         pthread_mutex_lock(&p_conf->mutex_bar);
@@ -1556,13 +1556,14 @@ void *see_pthread_dat(void *data)
 
         printf("--------------------------%d,%d\n",(int)outtime.tv_sec,(int)outtime.tv_nsec);
 
+        /* t 取得开启程序时的当前时间 */
         time(&now);
         timenow = localtime(&now);
-
         t = timenow->tm_hour*3600 + timenow->tm_min*60 + timenow->tm_sec;
 
         printf("-----------------%d,%d,%d,--------t:%d\n",timenow->tm_hour,timenow->tm_min,timenow->tm_sec,t);
 
+        /* 设定定时执行线程的时间点 */
         if(t<t1) {
             t0 = t1-t;
         }
@@ -1575,6 +1576,9 @@ void *see_pthread_dat(void *data)
         if(t3<=t && t<t4) {
             t0 = t4-t;
         }
+        /*
+            如果下午3点(t4)以后开机，则要在2:32 进行数据库存储 
+        */
         if(t4<=t && t<t5) {
             t0 = t5-t+t1;
         }
@@ -1583,8 +1587,12 @@ void *see_pthread_dat(void *data)
         outtime.tv_nsec=0;
         printf("--------------------------%d,%d\n",(int)outtime.tv_sec,(int)outtime.tv_nsec);
         see_errlog(1000,(char *)"enter into see_pthread_dat() sleeping !!!!!",RPT_TO_LOG,0,0);
+
+        /* pthread_cond_timedwait() 这个函数执行等待时，程序会打开锁
+           一旦时间到，被唤醒，进入它下面的程序段，就会锁住，直到最后，
+           调用  pthread_mutex_unlock() 解锁。
+        */
         pthread_cond_timedwait(&p_conf->cond_bar, &p_conf->mutex_bar, &outtime);
-        see_errlog(1000,(char *)"enter into see_pthread_dat() working !!!!!",RPT_TO_LOG,0,0);
         see_zdb_open(p_conf);
 
         /*
@@ -1646,10 +1654,11 @@ void *see_pthread_dat(void *data)
         see_zdb_close(p_conf);
         pthread_mutex_unlock(&p_conf->mutex_bar);
     }
-
-
     return NULL;
 }
+
+
+
 void *see_pthread_bar(void *data)
 {
     see_config_t           *p_conf;

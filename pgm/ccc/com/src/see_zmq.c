@@ -28,6 +28,12 @@ int see_zmq_pub_send(void * sock, char * pc_msg)
     int len = 0;
     len = strlen(pc_msg);
 
+    /*
+        这里需要调用两次zmq_send()，第一次采用 ZMQ_SNDMORE
+        这样是为了让rose-dewdrop 能够根据订阅的  "TA705" 来处理.
+        注：
+            这里的 "TA705" 需要修改，根据需要来输入。
+   */
     rc = zmq_send(sock, "TA705", 5, ZMQ_SNDMORE);
     rc = zmq_send(sock, pc_msg, len, ZMQ_DONTWAIT);
     if(rc!=len) {

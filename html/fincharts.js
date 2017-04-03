@@ -139,6 +139,7 @@
 
     let R = Math.round;
     let F = Math.floor;
+    let C = Math.ceil;
     let P = []; //记录屏幕px位置对应的K数组下标
     let X, Y;
 
@@ -647,6 +648,7 @@
       this.hh = [];
       this.ll = [];
       this.cc = [];
+      this.xx = []; //X轴的坐标 （时间）
       this.line = []; // 用于保存有多少条line需要画。
       this.bar = [];
       this.cvs.addEventListener("mousemove", mouseMove, false);
@@ -686,6 +688,18 @@
         }
       }
 
+      this.drawX = function() {
+        if (this.xx.length <= 0) {
+          return;
+        }
+        this.ctx.fillRect(0, this.cvs.height - 12, this.cvs.width, 1);
+        let space = C(G.AB[G.curLevel][2] / this.cvs.width * 80);
+        for (let i = G.barB; i < G.barE; i = i + space) {
+          let position = F(((i - G.barB) / G.AB[G.curLevel][2]) * this.cvs.width);
+          this.ctx.fillRect(position + G.halfBarW, this.cvs.height - 15, 1, 5);
+          this.ctx.fillText(this.xx[i], position, (this.cvs.height));
+        }
+      }
 
       /* 
         drawCandle() 必须先调用之后，才会修改 this.mn 和 this.PP 
@@ -693,7 +707,6 @@
       */
       this.drawCandle = function() { //采用this.aaa = function() 这种方式，内部可以使用this.xx变量。
         calcPosition();
-        console.log(G.barB + " " + G.barE);
         if (G.barB == G.barE) {
           return;
         }
@@ -712,7 +725,7 @@
           hh.push(hhh);
           ll.push(lll);
           oo.push(this.oo[G.PP[i][0]]);
-          cc.push(this.cc[G.PP[i][0] - 1]);
+          cc.push(this.cc[G.PP[i][1] - 1]);
         }
         let o, h, l, c, dif1, dif2;
         this.mn = calcYkedu0(this.cvs.height, hh, ll);
@@ -749,6 +762,7 @@
             }
           }
         }
+        this.drawX();
       } /* end drawCandle()  */
 
     } /* end _mainF */
@@ -792,7 +806,6 @@
         this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
       }
     }
-
 
     function _scrollB() {
       let cvs = new createCvs("scrollB", cvsConf.scrollB);
@@ -904,10 +917,10 @@
         c[1].fillRect(0, y, this.cvs.width, 1);
         c[1].fillStyle = "#AAAAAA";
         //c[1].fillText("hellow miao!", position,10 );
-        c[1].fillText(frame[0][0].oo[G.XX[x]], position,10 );
-        c[1].fillText(frame[0][0].hh[G.XX[x]], position,20 );
-        c[1].fillText(frame[0][0].ll[G.XX[x]], position,30 );
-        c[1].fillText(frame[0][0].cc[G.XX[x]], position,40 );
+        c[1].fillText(frame[0][0].oo[G.XX[x]], position, 10);
+        c[1].fillText(frame[0][0].hh[G.XX[x]], position, 20);
+        c[1].fillText(frame[0][0].ll[G.XX[x]], position, 30);
+        c[1].fillText(frame[0][0].cc[G.XX[x]], position, 40);
       }
     }
 
@@ -936,16 +949,18 @@
     mainF11.hh = opt.Y.data[0].y[1].data;
     mainF11.ll = opt.Y.data[0].y[2].data;
     mainF11.cc = opt.Y.data[0].y[3].data;
+    mainF11.xx = opt.Y.data[0].y[3].data;
 
     G.datLen = mainF11.oo.length;
     G.curLevel = 0;
     mainF11.line[0] = mainF11.oo; //对于line, bar等属性，请在外部赋值。
     mainF11.line[1] = mainF11.hh;
+    console.log( "length:::::::::::::::::::   " + mainF11.oo.length );
 
-    alert("this.line.length:  " + mainF11.line.length + " " + mainF11.line[0].length);
+    //alert("this.line.length:  " + mainF11.line.length + " " + mainF11.line[0].length);
     alert(mainF11.oo[100]);
     alert(mainF11.line[0][100]);
-    mainF11.hh[100] = 100000;
+    //mainF11.hh[100] = 100000;
     alert(mainF11.line[1][100]);
     //mainF11.drawCandle();
     //console.log(mainF11.PP);
