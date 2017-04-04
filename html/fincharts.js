@@ -156,7 +156,7 @@
       botW = tW,
       topH = 0 / tWid,
       botH = 30 / tWid,
-      leftW = 100 / tWid,
+      leftW = 60 / tWid,
       rightW = 200 / tWid,
       scrollFH = 5 / tWid,
       scrollBH = 5 / tWid,
@@ -643,7 +643,7 @@
       this.cvs = c[0];
       this.ctx = c[1];
       this.id = c[2];
-      this.mn = []; // 计算 Y轴刻度
+      this.mn = []; // 计算 Y轴刻度 [ m,n, hmax,lmin,top,down ]
       this.oo = [];
       this.hh = [];
       this.ll = [];
@@ -778,7 +778,7 @@
       //c[0].addEventListener("mousemove", mouseMove, false);
       //c[0].addEventListener('wheel', xxxx, false);
 
-      this.init = function() {
+      this.initScale = function() {
         c[1].fillStyle = "#773388";
         this.kedu = [];
         this.kedu.push([30, "100%"]);
@@ -788,7 +788,9 @@
         this.kedu.push([R(30 + (mainBH - 60) * 0.618), "61.8%"]);
         this.kedu.push([R(30 + (mainBH - 60) * 0.809), "80.9%"]);
         this.kedu.push([mainBH - 30, "00.0%"]);
+      }
 
+      this.dispScale = function() {
         c[1].fillStyle = "#773388";
         c[1].font = "14px";
         c[1].fillRect(leftW - 2, 0, 1, mainBH);
@@ -801,7 +803,25 @@
           c[1].fillText(this.kedu[i][1], leftW - 38, this.kedu[i][0]);
         }
       }
-      this.init();
+      this.initScale();
+      this.dispScale();
+
+      /* 
+        dispYdata() :
+        当鼠标移动时，Y轴显示鼠标Y所表示的股票的价格，显示在mainB的左边。
+        其中，需要使用到mainF中的mn数据。
+      */
+      this.dispYdata = function(y) {
+        if (y < frame[0][0].mn[4] || y > (this.cvs.height - frame[0][0].mn[5])) {
+          return;
+        }
+        let yy = R((y * (frame[0][0].mn[3] - frame[0][0].mn[2]) + frame[0][0].mn[2] *
+            (this.cvs.height - frame[0][0].mn[5]) - frame[0][0].mn[3] * frame[0][0].mn[4]) /
+          (this.cvs.height - frame[0][0].mn[5] - frame[0][0].mn[4]) * 100) / 100;
+        this.ctx.fillStyle = "#770088";
+        this.ctx.fillText(yy, 10, y);
+      }
+
       this.clear = function() {
         this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
       }
@@ -899,30 +919,45 @@
       let c = new createCvs("backF", cvsConf.backF);
       this.cvs = c[0];
       this.ctx = c[1];
-      //cvs[0].style.position = "fixed";
-      this.cvs.addEventListener("mousemove", mouseMove, false);
-      this.mouseMove = function(x, y) {
-        console.log("this.cvs.width: " + this.cvs.width);
-        /*
-            G.XX[x] (x是指屏幕的x坐标) 保存的是 K数组的下标，比如 G.XX[1] .... G.XX[5], 都是109,
-            表示屏幕 从1到5这几个像素 应该显示 第109个K柱，其显示的宽度为5个像素。
-            因此 frame[0][0].oo[G.XX[x]] 表示 mainF的 第109个K柱的open  值。
-            因此 frame[0][0].cc[G.XX[x]] 表示 mainF的 第109个K柱的close 值。
-       
-        */
+
+      /*
+        显示cross 以及 K柱相关数据
+      */
+      this.dispXdata = function(x, y) {
+        if (G.XX[x] == undefined) {
+          return;
+        }
         let position = F(((G.XX[x] - G.barB) / G.AB[G.curLevel][2]) * c[0].width);
-        c[1].clearRect(0, 0, this.cvs.width, this.cvs.height);
-        c[1].fillStyle = "#773388";
-        c[1].fillRect(position + G.halfBarW, 0, 1, this.cvs.height);
-        c[1].fillRect(0, y, this.cvs.width, 1);
-        c[1].fillStyle = "#AAAAAA";
-        //c[1].fillText("hellow miao!", position,10 );
-        c[1].fillText(frame[0][0].oo[G.XX[x]], position, 10);
-        c[1].fillText(frame[0][0].hh[G.XX[x]], position, 20);
-        c[1].fillText(frame[0][0].ll[G.XX[x]], position, 30);
-        c[1].fillText(frame[0][0].cc[G.XX[x]], position, 40);
+        this.ctx.fillStyle = "#773388";
+        this.ctx.fillRect(position + G.halfBarW, 0, 1, this.cvs.height);
+        this.ctx.fillRect(0, y, this.cvs.width, 1);
+        if (frame[0][0].oo[G.XX[x]] > frame[0][0].cc[G.XX[x]]) {
+          this.ctx.fillStyle = "#008888";
+        } else {
+          this.ctx.fillStyle = "#FF0000";
+        }
+        let yy = frame[0][0].cvs.height - 15;
+        let step = 100;
+        let o = '开盘:' + frame[0][0].oo[G.XX[x]];
+        let h = '最高:' + frame[0][0].hh[G.XX[x]];
+        let l = '最低:' + frame[0][0].ll[G.XX[x]];
+        let cc = '收盘:' + frame[0][0].cc[G.XX[x]];
+        this.ctx.fillText(o, 10, yy);
+        this.ctx.fillText(h, 10 + step, yy);
+        this.ctx.fillText(l, 10 + 2 * step, yy);
+        this.ctx.fillText(cc, 10 + 3 * step, yy);
+        if (G.XX[x] > 0) {
+          let rate = R(((frame[0][0].cc[G.XX[x]] - frame[0][0].cc[G.XX[x] - 1]) / frame[0][0].cc[G.XX[x] - 1]) * 100000) / 1000;
+          let r = '涨跌:' + rate + '%';
+          this.ctx.fillText(r, 10 + 4 * step, yy);
+        }
+      }
+
+      this.clear = function() {
+        this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
       }
     }
+
 
     function _backB() {
       let c = new createCvs("backB", cvsConf.backB);
@@ -937,11 +972,10 @@
       }
       this.init = function() {}
     }
-
+    /*
     let topNav = new _topNav();
     let rightNav = new _rightNav();
     let botNav = new _botNav();
-
     let mainF11 = new _mainF();
     let mainB11 = new _mainB();
 
@@ -955,44 +989,64 @@
     G.curLevel = 0;
     mainF11.line[0] = mainF11.oo; //对于line, bar等属性，请在外部赋值。
     mainF11.line[1] = mainF11.hh;
-    console.log( "length:::::::::::::::::::   " + mainF11.oo.length );
+    */
 
+    /*
+    console.log("length:::::::::::::::::::   " + mainF11.oo.length);
     //alert("this.line.length:  " + mainF11.line.length + " " + mainF11.line[0].length);
-    alert(mainF11.oo[100]);
-    alert(mainF11.line[0][100]);
+    //alert(mainF11.oo[100]);
+    //alert(mainF11.line[0][100]);
     //mainF11.hh[100] = 100000;
-    alert(mainF11.line[1][100]);
+    //alert(mainF11.line[1][100]);
     //mainF11.drawCandle();
     //console.log(mainF11.PP);
+    */
 
+    /*
     let scrollB = new _scrollB();
     let scrollF = new _scrollF();
-
     let sub1B11 = new _subB();
     let sub1F11 = new _subF();
-
     let backF = new _backF();
     let backB = new _backB();
-    /* canvas function end !! ----------------------------------------------- */
+
     frame.push([mainF11, mainB11]);
     frame.push([sub1F11, sub1B11]);
     frame.push([backF, backB]);
     frame.push([rightNav, botNav]);
+    */
 
     function frameInit() {
       let topNav = new _topNav();
       let rightNav = new _rightNav();
       let botNav = new _botNav();
-      let mainF = new _mainF();
-      let mainB = new _mainB();
+      let mainF11 = new _mainF();
+      let mainB11 = new _mainB();
+
+      mainF11.oo = opt.Y.data[0].y[0].data;
+      mainF11.hh = opt.Y.data[0].y[1].data;
+      mainF11.ll = opt.Y.data[0].y[2].data;
+      mainF11.cc = opt.Y.data[0].y[3].data;
+      mainF11.xx = opt.Y.data[0].y[3].data;
+
+      G.datLen = mainF11.oo.length;
+      G.curLevel = 0;
+      mainF11.line[0] = mainF11.oo; //对于line, bar等属性，请在外部赋值。
+      mainF11.line[1] = mainF11.hh;
+
       let scrollB = new _scrollB();
       let scrollF = new _scrollF();
-      //let sub1B = new _subB();
-      //let sub1F = new _subF();
+      let sub1B11 = new _subB();
+      let sub1F11 = new _subF();
       let backF = new _backF();
       let backB = new _backB();
-      frame.push([mainF, mainB]);
+
+      frame.push([mainF11, mainB11]);
+      frame.push([sub1F11, sub1B11]);
+      frame.push([backF, backB]);
+      frame.push([rightNav, botNav]);
     }
+    frameInit();
 
     /*
         frameChange(x) 参数：
@@ -1011,7 +1065,6 @@
         frameChange(1,-1) : 删除第1个sub
         frameChange(3,10)  : 第3个sub放大
         frameChange(1,0)  : 第1个sub缩小
-            
     */
     function frameChange(n, x) {
       let i = 0;
@@ -1081,23 +1134,6 @@
     frameChange(1, 2);
     frameChange(3, 0);
 
-    function OInit(opt = {}, O = {}) {
-      //O = opt;
-      /*
-      if (opt.X) {
-        O.X = opt.X;
-      }
-      if (opt.Y) {
-        O.Y = opt.Y;
-        O.oo = O.Y.data[0].oo; // 是同一个，不是新创建O.oo
-        O.hh = O.Y.data[0].hh;
-        O.ll = O.Y.data[0].ll;
-        O.cc = O.Y.data[0].cc;
-      }
-      */
-      //G.curLevel = 0;
-      //G.curLevel = G.curLevel ;  //这个赋值，用来更新 G.barB B.barE !!
-    }
 
     //this.update = function(opt) {
     function update1(opt) {
@@ -1359,7 +1395,7 @@
       let lmin = Math.min.apply(null, ll);
       let m = (top + down - height) / (hmax - lmin);
       let n = height - down - m * lmin;
-      return [m, n];
+      return [m, n, hmax, lmin, top, down];
     }
 
     /*---------------------------------------------------------------------------------------------- */
@@ -1666,14 +1702,18 @@
     }
 
     function mouseMove(e) {
+      let backF = frame[frame.length-2][0] ;
       let mousePos = getMousePos(backF.cvs, e);
-      // console.log(mousePos);
-      //show1(mousePos.x, mousePos.y);
-      backF.mouseMove(mousePos.x, mousePos.y);
+      //backF.mouseMove(mousePos.x, mousePos.y);
+      backF.clear();
+      backF.dispXdata(mousePos.x, mousePos.y);
+      /*
+        frame[0][1] 指mainB.
+      */
+      frame[0][1].clear();
+      frame[0][1].dispScale();
+      frame[0][1].dispYdata(mousePos.y);
     }
-
-
-    //backF.cvs.addEventListener("mousemove", mouseMove, false);
 
     function getMousePos(cvs, e) {
       let r = cvs.getBoundingClientRect();
