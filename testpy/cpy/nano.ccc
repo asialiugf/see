@@ -1,0 +1,14 @@
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+int main (const int argc, const char **argv)
+{
+    printf( "test 11\n") ;
+    printf( "test 22!\n") ;
+//    while(1)
+//    { 
+        sleep(1) ;
+	printf( "test ok!\n") ;
+//    }
+   return 0;
+}

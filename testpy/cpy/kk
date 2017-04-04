@@ -1,0 +1,7 @@
+gcc -o libpycall.so -shared -fPIC pycall.c
+#gcc nano.c -I/usr/local/include/nanomsg -lnanomsg -o nano
+#gcc nano.c -o nano
+cc -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -I /usr/local/include/nanomsg -o ns.o  ns.c
+cc -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -I /usr/local/include/nanomsg -o nc.o  nc.c
+cc -pipe -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -lnanomsg -o ns.x ns.o
+cc -pipe -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -lnanomsg -o nc.x nc.o
