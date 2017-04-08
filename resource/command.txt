@@ -21,10 +21,12 @@ $ git branch branch1
 $ git checkout branch1
 #==================== git 
 
+#以下两个命令无副作用
 $ git branch -a
 * master
   test01
   remotes/origin/master
   remotes/origin/test01
 $ 
-
+$ git config --local --list
+#====================
