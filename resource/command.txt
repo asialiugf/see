@@ -29,4 +29,6 @@ $ git branch -a
   remotes/origin/test01
 $ 
 $ git config --local --list
+# 删除远程分支
+ git push origin --delete test01
 #====================
