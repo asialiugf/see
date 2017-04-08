@@ -1,0 +1,11 @@
+git add etc
+git add pgm
+git add resource
+git add testc
+git add testpy
+git add html
+git add README.md
+git rm -r pgm/ccc/com/obj/
+git rm -r pgm/cpp/mds/obj/
+git commit -m "modified"
+git push
