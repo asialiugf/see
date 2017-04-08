@@ -36,3 +36,30 @@ $ git push origin --delete test01
 # 删除本地分支 
 $ git branch -d test01
 #====================
+# 修改 ssh 方式
+# git remote -v  可以查看是不是ssh方式，还是http方式
+$ git remote rm origin
+$ git remote add origin git@github.com:xxxxxxxx/see.git
+$ git push --set-upstream origin master
+
+首先，清除所有的key-pair
+$ ssh-add -D
+$ rm -r ~/.ssh
+
+删除你在github中的public-key重新生成ssh密钥对
+$ ssh-keygen -t rsa -C "xxxxxxx@xxxx.com"  #git用户
+$ chmod 0700 ~/.ssh
+$ chmod 0600 ~/.ssh/id_rsa*
+
+前往 GitHub 网站的"account settings"
+依次点击"Setting -> SSH Keys"->"New SSH key" 
+Title处填写“id_rsa.pub”或其他任意信息。 
+key处原样拷贝~/.ssh/id_rsa.pub` 文件的内容：
+$ cat ~/.ssh/id_rsa.pub
+
+测试一下：
+$ ssh -T git@github.com
+Warning: Permanently added the RSA host key for IP address '192.30.255.113' to the list of known hosts.
+Hi xxxxxxxx! You've successfully authenticated, but GitHub does not provide shell access.
+
+#====================
