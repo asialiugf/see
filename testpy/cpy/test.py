@@ -3,11 +3,11 @@ from ctypes import *
 ll = ctypes.cdll.LoadLibrary
 lib = ll("./libpycall.so")
 IntArray5 = c_int * 1000000
-ia = IntArray5(5, 1, 7, 33, 99)
-ib = IntArray5(5, 1, 7, 33, 99)
+ia = IntArray5(191, 1, 7, 33, 99)
+ib = IntArray5(227, 1, 7, 33, 99)
 c = lib.foo(ia, ib)
-print ia[0]
-print ib[2] 
+print "ia[0]: " , ia[0]
+print "ib[2]: " , ib[2] 
 
 import time  
 #import spam  

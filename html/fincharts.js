@@ -133,7 +133,6 @@
   /* ------------------------------------------- data defined here ---------------------------------- */
 
   option.Y.data.push(MACD);
-  console.log(option);
 
   function stockcharts(opt, theme) {
 
@@ -1634,7 +1633,8 @@
       opt_ll.push(parseFloat(ary[15]));
       opt_cc.push(parseFloat(ary[19]));
       option.type = 2;
-      //update1(option);
+
+      update1(option);
       //console.log( ary ) ;
 
     });
@@ -1702,7 +1702,7 @@
     }
 
     function mouseMove(e) {
-      let backF = frame[frame.length-2][0] ;
+      let backF = frame[frame.length - 2][0];
       let mousePos = getMousePos(backF.cvs, e);
       //backF.mouseMove(mousePos.x, mousePos.y);
       backF.clear();

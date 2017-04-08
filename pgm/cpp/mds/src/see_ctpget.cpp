@@ -8,7 +8,7 @@
 
 extern "C"
 {
-    #include <see_com_common.h>
+#include <see_com_common.h>
     double hh[10000] ;
     double ll[10000] ;
     double cc[10000] ;
@@ -27,7 +27,6 @@ int test = 0 ;
 using namespace std;
 /*   globle parameters !!!  */
 see_config_t        t_conf ;
-/*   globle parameters !!!  */
 
 char ca_errmsg[256] ;
 char ca_jsonfile[] = "../../etc/json/see_brokers.json" ;
@@ -54,40 +53,53 @@ main(int argc,char *argv[])
     int i_rtn;
     //see_stt_blocks_init( &t_conf );
 
-    see_signal_init() ;                 // 需要详细考虑 
+    see_signal_init();                 // 需要详细考虑
     signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
     see_daemon(1,0) ;
+    see_config_init(&t_conf);
 
-    see_config_init( &t_conf );
+    if(argc<=1) {
+        printf(" ctpget.x will enter into product mode! \n");
+        t_conf.c_test = 'p';
+    } else {
+        if(memcmp(argv[1],"-t",2)==0) {
+             printf(" ctpget.x will enter into test mode! \n");
+            t_conf.c_test = 't';
+        }
+        if(memcmp(argv[1],"-p",2)==0) {
+            t_conf.c_test = 'p';
+        }
+    }
+
 
     i_rtn = pthread_create(&t_conf.p_dat, NULL, see_pthread_dat, &t_conf);
-    if  (i_rtn == -1) {
-            printf("create thread (save data to database !) failed erron= %d/n", errno);
-            return -1;
+    if(i_rtn == -1) {
+        printf("create thread (save data to database !) failed erron= %d/n", errno);
+        return -1;
     }
     //pthread_create(&t_conf.p_bar, NULL, see_pthread_bar, &t_conf);
     //sleep(1) ;
 
 
     iInstrumentID = 100;
-	pUserApi1 = CThostFtdcMdApi::CreateFtdcMdApi("1.con");			// 创建UserApi 
-	CThostFtdcMdSpi* pUserSpi1 = new CMdSpi();                      // 创建UserSpi  可以创建多个
+    pUserApi1 = CThostFtdcMdApi::CreateFtdcMdApi("1.con");			// 创建UserApi
+    CThostFtdcMdSpi* pUserSpi1 = new CMdSpi();                      // 创建UserSpi  可以创建多个
 
 
-	pUserApi1->RegisterSpi(pUserSpi1);      						// 注册事件类
-	pUserApi1->RegisterFront(FRONT_ADDR4);	           				// connect
+    pUserApi1->RegisterSpi(pUserSpi1);      						// 注册事件类
+    pUserApi1->RegisterFront(FRONT_ADDR4);	           				// connect
 
-	pUserApi1->Init();
+    pUserApi1->Init();
     cout << "after Init() !" << endl;
 
-    //pUserApi1->SubscribeMarketData(pc_futures, iInstrumentID);  
+    //pUserApi1->SubscribeMarketData(pc_futures, iInstrumentID);
     //cout << "  pUserApi1->SubscribeMarketData !!!" << endl ;
 
     pthread_t pthID = pthread_self();
     cerr << "================main 02 =============================  pthId:" << pthID << endl;
 
-	pUserApi1->Join();
+    pUserApi1->Join();
     cout << "after Join() !" << endl;
 
     pthID = pthread_self();

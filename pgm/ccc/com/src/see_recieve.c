@@ -34,6 +34,9 @@ main(int iArgCnt, char *pcaArgVec[])
     see_daemon(1,0) ;
 
     p_conf = &t_conf ;
+    /*
+        see_config_init()必须在 see_daemon()之后。
+    */
     see_config_init(p_conf);
     see_stt_blocks_init(p_conf);
 
@@ -61,28 +64,6 @@ main(int iArgCnt, char *pcaArgVec[])
         }
     }
 
-    /*
-    see_node *node;
-    node = t_conf.pt_stt_blks[0]->list ;
-    while( node != NULL ){
-        printf( "test ok!!!!!!!!!!!!: period:%d\n", node->period );
-        node = node->next ;
-    }
-
-    printf( " i_future_num :%d\n",t_conf.i_future_num ) ;
-    printf( " home: %s \n",t_conf.ca_home ) ;
-    printf( " pair_url: %s \n",t_conf.ca_nn_pair_url ) ;
-    printf( " pair_url: %s \n",t_conf.ca_nn_pubsub_url ) ;
-    printf( " pair_url: %s \n",t_conf.ca_db_url ) ;
-
-    i = 0 ;
-    while ( t_conf.pc_futures[i] != NULL ) {
-        printf( " future: %s \n",t_conf.pc_futures[i] ) ;
-        i++ ;
-    }
-
-    */
-
     i_rtn = pthread_create(&t_conf.p_dat, NULL, see_pthread_dat, &t_conf);
     if(i_rtn == -1) {
         printf("create thread tcp recv_thread failed errno= %d/n", errno);
@@ -90,7 +71,6 @@ main(int iArgCnt, char *pcaArgVec[])
     }
     //pthread_create(&t_conf.p_bar, NULL, see_pthread_bar, &t_conf);
     //sleep(1) ;
-
 
     if(iArgCnt<=1) {
         printf("Arg error!\n");

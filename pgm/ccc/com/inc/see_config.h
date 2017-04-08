@@ -9,15 +9,16 @@
 #include <see_com_common.h>
 
 typedef struct {
+    char                c_test;                 /* 开机参数："t"：测试环境  "p"：生产环境  */
     char                ca_futures              [FUTURE_NUMBER][FUTRUE_ID_LEN] ;
     char               *pc_futures              [FUTURE_NUMBER] ;
     int                 i_future_num ;
-    int                 i_idx ;
+    int                 i_idx ;                 // future 数组下标
+
     char                ca_nn_pair_url          [512] ;
     int                 i_pair_sock;
     char                ca_nn_topy_url          [512] ;
     int                 i_topy_sock;
-
     char                ca_zmq_pubsub_url       [512] ;
     void       *        v_sock;
 

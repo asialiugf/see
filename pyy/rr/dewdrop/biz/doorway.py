@@ -115,6 +115,7 @@ class Messager(object):
                     #print (" topic------------------------ " )
                     #print ( topic )
                     #print ( top[:len(topic)] )
+                    #这里会调用下面的 PushWs.push，将信息送给websocket前端.
                     self.callback(json.dumps(dd))
         except:
             pass
@@ -143,6 +144,7 @@ class PushWs(tornado.websocket.WebSocketHandler):
             print( msg )
             pass
         else:
+            #发送消息给websocket，送到前端浏览器
             self.write_message(msg)
 
     def on_message(self, message):
@@ -179,5 +181,4 @@ class PushWs(tornado.websocket.WebSocketHandler):
         app_log.info('online connections %d', Statistics.CONNECTIONS)
 
     def on_error(self):
-        while(1):
-            print( "eeeeeeeeeeeerrrrrorr!!!!" )
+        print( " on_error: eeeeeeeeeeeerrrrrorr!!!!" )

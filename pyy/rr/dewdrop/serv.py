@@ -59,6 +59,7 @@ class Hubber(object):
 
 if __name__ == "__main__":
     # init
+    # websocket listen port !!!
     port = 8888
     includes = None
     opts, argvs = getopt.getopt(sys.argv[1:], "c:p:")

@@ -72,7 +72,6 @@ int see_config_init( see_config_t *p_conf )
     memcpy( p_conf->ca_nn_pubsub_url, j_temp->valuestring, strlen(j_temp->valuestring) );
     p_conf->i_pubsub_sock = see_pipeline_server(p_conf->ca_nn_pubsub_url) ;
 
-    
     j_item = cJSON_GetObjectItem( j_root, "database" );
     if( j_item == NULL ){
         printf ( " see_config_init() get database error !!  \n " );
