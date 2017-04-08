@@ -20,3 +20,11 @@ git push
 $ git branch branch1
 $ git checkout branch1
 #==================== git 
+
+$ git branch -a
+* master
+  test01
+  remotes/origin/master
+  remotes/origin/test01
+$ 
+
