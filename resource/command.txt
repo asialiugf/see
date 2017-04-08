@@ -16,4 +16,7 @@ git add pyy
 git add pgm
 git commit -m "modified"
 git push
+
+$ git branch branch1
+$ git checkout branch1
 #==================== git 
