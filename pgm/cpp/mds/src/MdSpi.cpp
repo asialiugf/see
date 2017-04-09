@@ -120,7 +120,7 @@ void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *buf)
         sprintf(ca_errmsg,"future %s is not in pc_futures : %s",buf->InstrumentID,buf->InstrumentID);
         see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0);
     }
-    see_handle_bars(t_conf.pt_fut_blks[i_idx], (char *)buf);
+    see_handle_bars(t_conf.pt_fut_blks[i_idx], buf);
 }
 
 void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *buf, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

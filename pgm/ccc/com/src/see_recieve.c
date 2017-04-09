@@ -122,7 +122,7 @@ main(int iArgCnt, char *pcaArgVec[])
             see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
             printf(" tick_data.BidVolume5 %d\n",tick->BidVolume5);
 
-            //see_handle_bars( t_conf.pt_fut_blks[i_idx], buf ) ;             // calc_bar_block & save_bar(save k value)
+            //see_handle_bars( t_conf.pt_fut_blks[i_idx], tick ) ;             // calc_bar_block & save_bar(save k value)
             //see_update_kk( pt_fut_blks[i_idx], pt_stt_blocks[i_idx] ) ;
             nn_freemsg(buf);
 
@@ -209,7 +209,7 @@ main(int iArgCnt, char *pcaArgVec[])
                     continue ;
                 }
 
-                see_handle_bars(t_conf.pt_fut_blks[i_idx], buf) ;               // calc_bar_block & save_bar(save k value)
+                see_handle_bars(t_conf.pt_fut_blks[i_idx], &tick_data) ;               // calc_bar_block & save_bar(save k value)
                 see_update_kkall(p_conf, i_idx) ;
 
             }

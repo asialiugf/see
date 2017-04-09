@@ -170,126 +170,6 @@ see_time_comp(char * f, char * l)    // 比较时间，输出秒 格式：06:33:
     return l_sec-f_sec;
 }
 
-int
-see_bar_calc_1s(see_bar_t * p_bar,char * buf)
-{
-    return SEE_OK;
-}
-
-int see_bar_calc_5s(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_10s(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_15s(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_30s(see_bar_t * p_bar,char * buf)
-{
-    return SEE_OK;
-
-}
-
-int see_bar_calc_1f(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_3f(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_5f(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_10f(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_15f(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_30f(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_1h(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_2h(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_3h(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_4h(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_d(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_w(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_m(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_s(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
-int see_bar_calc_y(see_bar_t * p_bar,char * buf)
-{
-
-    return SEE_OK;
-}
-
 see_bar_t *
 see_create_bar(char * p_future_id,char c_period)
 {
@@ -310,84 +190,16 @@ see_create_bar(char * p_future_id,char c_period)
     return kkk;
 }
 
-int
-see_calc_bar(see_fut_block_t * p_block, char * buf, int period)
-{
-    int wr = 0;
-
-    return wr;
-}
-
-int
-see_calc_k_bar(see_fut_block_t * p_block, char * buf, int period)
-{
-    int    num = 0;
-
-    switch(period) {
-    case  BAR_TICK :
-        break;
-    case  BAR_1S :
-    case  BAR_2S :
-        break;
-    case  BAR_3S :
-        break;
-    case  BAR_5S :
-        break;
-    case  BAR_10S :
-        break;
-    case  BAR_15S :
-        break;
-    case  BAR_30S :
-        break;
-    case  BAR_1F :
-        break;
-    case  BAR_2F :
-        break;
-    case  BAR_3F :
-        break;
-    case  BAR_5F :
-        break;
-    case  BAR_10F :
-        break;
-    case  BAR_15F :
-        break;
-    case  BAR_30F :
-        break;
-    case  BAR_1H :
-        break;
-    case  BAR_2H :
-        break;
-    case  BAR_3H :
-        break;
-    case  BAR_4H :
-        break;
-    case  BAR_5H :
-        break;
-    case  BAR_1D :
-    case  BAR_1W :
-    case  BAR_1M :
-    case  BAR_1J :
-    case  BAR_1Y :
-        break;
-    default :
-        break;
-    }
-    return num;
-}
-
 /*
 * i_sgm_idx：用于回传，返回当前的tick是在哪个交易时间段内
 * 收到一个tick，就需要调用一次is_mkt_open，更新 block里的 i_sgm_idx c_oc_flag
 */
-int is_mkt_open(see_fut_block_t *p_block, char *buf)
+int is_mkt_open(see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick)
 {
     int j = 0;
     int b;
     int e;
-    struct CThostFtdcDepthMarketDataField * tick;
-    tick = (struct CThostFtdcDepthMarketDataField *)buf;
 
-    j = 0;
     while(j < SEE_SGM_NUM) {
         if(p_block->pt_hour->pt_segments[j] != NULL) {
             b = memcmp(tick->UpdateTime, p_block->pt_hour->pt_segments[j]->ca_b,8);
@@ -465,7 +277,7 @@ int is_notrade(see_fut_block_t * p_block,char * time0)    //交易时间段判�
 
 */
 int
-see_handle_bars(see_fut_block_t *p_block, char *buf)
+see_handle_bars(see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick)
 {
     int     i_rtn;
     int     period;
@@ -476,7 +288,7 @@ see_handle_bars(see_fut_block_t *p_block, char *buf)
     //struct CThostFtdcDepthMarketDataField * tick;
     //tick = (struct CThostFtdcDepthMarketDataField *)buf;
 
-    i_rtn = is_mkt_open(p_block,buf);      // 修改 block->c_oc_flag 以及 block->i_sgm_i_idx
+    i_rtn = is_mkt_open(p_block,tick);      // 修改 block->c_oc_flag 以及 block->i_sgm_i_idx
     if(i_rtn == SEE_MKT_CLOSE) {
         return 0;
     }
@@ -494,8 +306,8 @@ see_handle_bars(see_fut_block_t *p_block, char *buf)
     / -----------------------  异常处理 ------------------------- */
 
     for(period=0; period<=30; period++) {
-        see_calc_bar_block(p_block, buf, period);                   // 计算K柱 .
-        see_save_bar(p_block, buf, period);                         // 保存文件.
+        see_calc_bar_block(p_block, tick, period);                   // 计算K柱 .
+        see_save_bar(p_block, tick, period);                         // 保存文件.
     }
 
     return 0;
@@ -506,8 +318,8 @@ rtn = 0; 表示为 第0秒的第0个tick,所以，这个tick的volume应该算�
 rtn = 1; 表示为 已经不是第0秒的第0个tick，所以这个tick的volume应该算到当前的K柱里
 */
 int
-see_first_tick(see_fut_block_t     *p_block,
-               char            *buf,
+see_first_tick(see_fut_block_t                                  *p_block,
+               struct CThostFtdcDepthMarketDataField            *tick,
                see_bar_t       *p_bar0,  //暂时没有用到
                see_bar_t       *p_bar1,
                int             period)
@@ -522,8 +334,6 @@ see_first_tick(see_fut_block_t     *p_block,
     int fm;
     int fs;
     char * f;
-    struct CThostFtdcDepthMarketDataField * tick;
-    tick = (struct CThostFtdcDepthMarketDataField *)buf;
 
     int  i_sgm_idx = p_block->i_sgm_idx;
 
@@ -882,28 +692,24 @@ see_first_tick(see_fut_block_t     *p_block,
 }
 
 int
-see_calc_bar_block(see_fut_block_t  * p_block,
-                   char         * buf,
-                   int          period)
+see_calc_bar_block(see_fut_block_t                                  *p_block,
+                   struct CThostFtdcDepthMarketDataField            *tick,
+                   int                                               period)
 {
     int             i_kbar_num;
     see_bar_t       *p_bar0;
     see_bar_t       *p_bar1;
 
-    struct CThostFtdcDepthMarketDataField * tick;
-
     if(period == BAR_TICK) {
         return 0;
     }
-
-    tick = (struct CThostFtdcDepthMarketDataField *)buf;
 
     p_bar0 =  &p_block->bar_block[period].bar0;
     p_bar1 =  &p_block->bar_block[period].bar1;
 
     if(p_block->c_oc_flag == 'o') {    // 在交易时间段内
         if(p_bar1->o == SEE_NULL) {    // 程序开启后的第一个tick
-            see_first_tick(p_block,buf,p_bar0,p_bar1,period);
+            see_first_tick(p_block,tick,p_bar0,p_bar1,period);
             memcpy((char *)p_bar0,p_bar1,sizeof(see_bar_t));
             return 0;
         }
@@ -915,7 +721,7 @@ see_calc_bar_block(see_fut_block_t  * p_block,
             i_kbar_num == 2,表是前面要存在两个K柱要 save，一般情况 i_kbar_num应该是1，如果比1大，
             表示，中间隔了比较久没有收到tick了。
         */
-        i_kbar_num = is_same_k_bar(p_block,p_bar1,buf,period);
+        i_kbar_num = is_same_k_bar(p_block,p_bar1,tick,period);
         if(i_kbar_num == 0) {   //同一个K
             UPDATE_BAR1;
         } else { // 下一个K
@@ -929,7 +735,7 @@ see_calc_bar_block(see_fut_block_t  * p_block,
                 
             */
             memcpy((char *)p_bar0,p_bar1,sizeof(see_bar_t));
-            if(see_first_tick(p_block,buf,p_bar0,p_bar1,period) == 0) {    // 新K柱，tick->UpdateTime的值可能不是 起始的时间
+            if(see_first_tick(p_block,tick,p_bar0,p_bar1,period) == 0) {    // 新K柱，tick->UpdateTime的值可能不是 起始的时间
                 p_bar0->v    = tick->Volume - p_bar0->vsum;
                 p_bar0->vsum = tick->Volume;
             } else {
@@ -943,7 +749,7 @@ see_calc_bar_block(see_fut_block_t  * p_block,
 
 int is_same_k_bar(see_fut_block_t     * p_block,
                   see_bar_t       * p_bar1,
-                  char            * buf,
+                  struct CThostFtdcDepthMarketDataField            *tick,
                   int             period)
 {
     int  i_rtn = 0;
@@ -965,8 +771,6 @@ int is_same_k_bar(see_fut_block_t     * p_block,
 
     char * f;
     char * b;
-    struct CThostFtdcDepthMarketDataField * tick;
-    tick = (struct CThostFtdcDepthMarketDataField *)buf;
 
     if(p_bar1->o == SEE_NULL) {
         return -1;
@@ -1172,7 +976,8 @@ int is_same_k_bar(see_fut_block_t     * p_block,
     return i_rtn;
 }
 
-int see_save_bar(see_fut_block_t *p_block, char *buf, int period)
+int see_save_bar(see_fut_block_t *p_block, 
+ struct CThostFtdcDepthMarketDataField *tick, int period)
 {
     see_bar_t       *p_bar0;
     char            ca_year[5] = "\0\0\0";
@@ -1180,14 +985,11 @@ int see_save_bar(see_fut_block_t *p_block, char *buf, int period)
     char            ca_filename[512];
     char            ca_tickname[512];
     char            ca_msg[1024];
-    struct CThostFtdcDepthMarketDataField * tick;
-
 
     memset(ca_msg,'\0',1024);
     memset(ca_filename,'\0',512);
 
     if(period == BAR_TICK) {
-        tick = (struct CThostFtdcDepthMarketDataField *)buf;
         memset(ca_filename,'\0',512);
         sprintf(ca_filename,"%s/tick/%s-%s-tick",   p_block->ca_home,
                 tick->InstrumentID,
@@ -1333,7 +1135,7 @@ int see_save_bar(see_fut_block_t *p_block, char *buf, int period)
                 ca_BidPrice1,ca_BidVolume1,ca_AskPrice1,ca_AskVolume1,
                 ca_Volume);
         see_save_line(ca_filename,ca_msg);
-        see_save_bin(ca_tickname,(char *)buf,sizeof(struct CThostFtdcDepthMarketDataField));
+        see_save_bin(ca_tickname,(char *)tick,sizeof(struct CThostFtdcDepthMarketDataField));
         return 0;
     } /* tick data saving */
 

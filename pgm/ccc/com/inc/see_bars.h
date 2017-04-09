@@ -1,14 +1,13 @@
-
 /*
- *  * Copyright (C) asialine
- *   * Copyright (C) seeme,Inc.
- *    */
-
+ *   Copyright (C) asialine
+ *   Copyright (C) seeme,Inc.
+ */
 
 #ifndef _SEE_BARS_H_INCLUDED_
 #define _SEE_BARS_H_INCLUDED_
 
 #include <see_com_common.h>
+#include <ThostFtdcUserApiStruct.h>
 
 #define  SEE_HOUR_TYPE_NUM 20
 #define  SEE_SGM_NUM       50
@@ -181,7 +180,6 @@ typedef struct  {
     int             i_hour_type ;
     see_segment_t  *pt_segments[SEE_SGM_NUM] ;
 } see_hours_t ;     // 交易时间，用于记录一天的所有的交易时间段  每个期货品种有一个 see_fut_block_t，这个结构中会包含 
-
 
 typedef struct {
 //    char    InstrumentID[31];
@@ -368,31 +366,29 @@ int see_bars_add (see_bar_t bars[], int start_index ) ;  // 规定：g_bar_cur_i
 int see_date_comp( char * pca_first, char * pca_last ) ;
 int see_time_comp( char * pca_first, char * pca_last ) ;
 see_bar_t * see_create_bar( char * p_future_id, char c_period  ) ;
-int see_calc_bar( see_fut_block_t * p_block, char * buf, int period ) ; 
-//extern int see_calc_k_bar( see_fut_block_t * p_block, char * buf, int period ) ;
-int see_calc_k_bar( see_fut_block_t * p_block, char * buf, int period ) ;
 
 int split_string(char *s,char _cmd[SEE_SGM_NUM][20]) ;
 int see_time_to_int(char *f ) ;
-int see_handle_bars( see_fut_block_t *p_block, char *buf ) ;
+int see_handle_bars( see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick ) ;
 int see_send_bar( see_fut_block_t *p_block,char *pc_msg) ; 
-int see_save_bar ( see_fut_block_t * p_block, char *buf, int period ) ;
+int see_save_bar ( see_fut_block_t * p_block, struct CThostFtdcDepthMarketDataField *tick, int period ) ;
 int see_save_bar_last ( see_fut_block_t *p_block, int period, int i_another_day ) ;
 int is_weekend( char * pc_day) ;
 int is_holiday( char * pc_day) ;
 int is_notrade( see_fut_block_t * p_blick,char * time0 ) ;
-int see_first_tick(see_fut_block_t *p_block, char *buf, see_bar_t *p_bar0, see_bar_t *p_bar1, int period ) ;
-int see_calc_bar_block( see_fut_block_t * p_block, char * buf, int period ) ;
-//int see_calc_bar_block( see_fut_block_t * p_block, see_bar_t * p_bar0, see_bar_t * p_bar1, char * buf, int period ) ;
-int is_mkt_open(see_fut_block_t * p_block,char * buf) ;
+int see_first_tick( see_fut_block_t                         *p_block, 
+                    struct CThostFtdcDepthMarketDataField   *tick, 
+                    see_bar_t                               *p_bar0,
+                    see_bar_t                               *p_bar1, 
+                    int                                      period ) ;
+int see_calc_bar_block( see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick, int period ) ;
+int is_mkt_open(see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick) ;
 
-int is_same_k_bar ( see_fut_block_t     * p_block,
-                    see_bar_t       * p_bar1,
-                    char            * buf,
-                    int             period );
+int is_same_k_bar ( see_fut_block_t                         *p_block,
+                    see_bar_t                               *p_bar1,
+                    struct CThostFtdcDepthMarketDataField   *tick,
+                    int                                      period );
 
-// int see_calc_k_value(see_future_block_t * p_block,char * buf) ;  // 计算所有周期的K柱
-// int see_save_k_value(see_future_block_t * p_block) ;             // 存储所有周期的K柱
 void *see_pthread_dat(void *) ;
 void *see_pthread_bar(void *) ;
 

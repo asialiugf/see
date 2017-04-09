@@ -5,6 +5,9 @@ rm -rf ctpget.x
 rm -rf kdj.x
 rm -rf maria.x
 
+mkdir ~/see/pgm/ccc/com/obj
+mkdir ~/see/pgm/cpp/mds/obj
+
 cd ~/see/pgm/ccc/com/obj
 rm -rf *.o
 
