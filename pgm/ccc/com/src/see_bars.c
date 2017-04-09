@@ -33,6 +33,10 @@ double    outSlowJ3[10000];
 double    J3[10000];
 double    JE3[10000];
 
+/* periods defined */
+/*                0  1 2 3 4  5  6  7  8  9   10  11  12  13  14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30   */
+/*                1S 2 3 5 10 15 20 30 1F 2F  3F  5F  10F 15F 20 30 1H 2H 3H 4H 5H 6H 8H 10 12 1D 1W 1M 1J 1Y TICK */
+static const int pp[31] =  {1, 2,3,5,10,15,20,30,60,120,180,300,600,900,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 int
 see_bars_index_forword(int start_index, int n)    // bar指针前移n个.
@@ -355,6 +359,7 @@ see_first_tick(see_fut_block_t                                  *p_block,
     switch(period) {
     case  BAR_TICK :
         break;
+/*
     case  BAR_1S :
         NEW_BAR1;
         if(tick->UpdateMillisec == 0) {
@@ -363,9 +368,17 @@ see_first_tick(see_fut_block_t                                  *p_block,
             rtn = 1;
         }
         break;
+*/
+    case  BAR_1S :
     case  BAR_2S :
+    case  BAR_3S :
+    case  BAR_5S :
+    case  BAR_10S :
+    case  BAR_15S :
+    case  BAR_20S :
+    case  BAR_30S :
         NEW_BAR1;
-        mo = fs%2;
+        mo = fs%(pp[period]);
         fs = fs - mo;
         if(mo == 0) {
             if(tick->UpdateMillisec == 0) {
@@ -380,6 +393,7 @@ see_first_tick(see_fut_block_t                                  *p_block,
             rtn = 1;
         }
         break;
+/*
     case  BAR_3S :
         NEW_BAR1;
         mo = fs%3;
@@ -465,6 +479,8 @@ see_first_tick(see_fut_block_t                                  *p_block,
             rtn = 1;
         }
         break;
+*/
+/*
     case  BAR_1F :
         NEW_BAR1;
         if(memcmp(tick->UpdateTime+6,"00",2) == 0) {
@@ -479,10 +495,15 @@ see_first_tick(see_fut_block_t                                  *p_block,
             rtn = 1;
         }
         break;
+*/
 
+    case  BAR_1F :
     case  BAR_2F :
+    case  BAR_3F :
+    case  BAR_5F :
+    case  BAR_10F :
         NEW_BAR1;
-        mo = fm%2;
+        mo = fm%(pp[period]/60);
         fm = fm - mo;
         if(mo==0 && memcmp(tick->UpdateTime+6,"00",2)==0) {
             if(tick->UpdateMillisec == 0) {
@@ -499,6 +520,7 @@ see_first_tick(see_fut_block_t                                  *p_block,
             rtn = 1;
         }
         break;
+/*
     case  BAR_3F :
         NEW_BAR1;
         mo = fm%3;
@@ -557,6 +579,7 @@ see_first_tick(see_fut_block_t                                  *p_block,
             rtn = 1;
         }
         break;
+*/
 
     case  BAR_15F :
         NEW_BAR1;
@@ -796,50 +819,34 @@ int is_same_k_bar(see_fut_block_t     * p_block,
     fm = atoi(f_m);
     fs = atoi(f_s);
 
-    /*
-    switch( c_bar_type ) {
-        case  BAR_SECOND :
-            fs = fs - ( fs%i_bar_type );
-            i_rtn = (fh-bh)*3600+(fm-bm)*60+fs-bs;
-            break;
-        case  BAR_MINUTE :
-            if ( i_bar_type == 15 ) {
-                if( memcmp(p_bar1->ca_btime,p_block->pt_hour->pt_segments[i_sgm_idx]->ca_15F_start,8) ==0 ||
-                    memcmp(p_bar1->ca_etime,p_block->pt_hour->pt_segments[i_sgm_idx]->ca_15F_end,8) ==0 ) {
-                    i_rtn = 0;
-                } else {
-                    i_rtn = 1;
-                }
-            } else if ( i_bar_type == 30 ) {
-                if( memcmp(p_bar1->ca_btime,p_block->pt_hour->pt_segments[i_sgm_idx]->ca_30F_start,8) ==0 ||
-                    memcmp(p_bar1->ca_etime,p_block->pt_hour->pt_segments[i_sgm_idx]->ca_30F_end,8) ==0 ) {
-                    i_rtn = 0;
-                } else {
-                    i_rtn = 1;
-                }
-            } else {
-                fm = fm - ( fm%i_bar_type );
-                i_rtn = (fh-bh)*60+fm-bm;
-            }
-            break;
-        case  BAR_HOUR :
-        case  BAR_DAY :
-        case  BAR_WEEK :
-        case  BAR_MONTH :
-        case  BAR_SEASON :
-        case  BAR_YEAR :
-            break;
-    }
-    */
-
     switch(period) {
     case  BAR_TICK :
         break;
     case  BAR_1S :
+    case  BAR_2S :
+    case  BAR_3S :
+    case  BAR_5S :
+    case  BAR_10S :
+    case  BAR_20S :
+    case  BAR_15S :
+    case  BAR_30S :
+        fs = fs - fs%(pp[period]);
+        i_rtn = (fh-bh)*3600+(fm-bm)*60+fs-bs;
+        break;
+    case  BAR_1F :
+    case  BAR_2F :
+    case  BAR_3F :
+    case  BAR_5F :
+    case  BAR_10F :
+        fm = fm - fm%(pp[period]/60);
+        i_rtn = (fh-bh)*60+fm-bm;
+        break;
+/*
+    case  BAR_1S :
         i_rtn = (fh-bh)*3600+(fm-bm)*60+fs-bs;
         break;
     case  BAR_2S :
-        fs = fs - fs%2;
+        fs = fs - fs%(pp[period]);
         i_rtn = (fh-bh)*3600+(fm-bm)*60+fs-bs;
         break;
     case  BAR_3S :
@@ -866,6 +873,8 @@ int is_same_k_bar(see_fut_block_t     * p_block,
         fs = fs - fs%30;
         i_rtn = (fh-bh)*3600+(fm-bm)*60+fs-bs;
         break;
+*/
+/*
     case  BAR_1F :
         i_rtn = (fh-bh)*60+fm-bm;
         break;
@@ -885,6 +894,7 @@ int is_same_k_bar(see_fut_block_t     * p_block,
         fm = fm - fm%10;
         i_rtn = (fh-bh)*60+fm-bm;
         break;
+*/
     case  BAR_15F :
         if(memcmp(p_bar1->ca_btime,p_block->pt_hour->pt_segments[i_sgm_idx]->ca_15F_start,8) ==0 ||
            memcmp(p_bar1->ca_etime,p_block->pt_hour->pt_segments[i_sgm_idx]->ca_15F_end,8) ==0) {

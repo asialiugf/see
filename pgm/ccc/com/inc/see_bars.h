@@ -82,6 +82,11 @@
 #define  BAR_1Y       29
 #define  BAR_TICK     30
 
+/* periods defined */
+/*                0  1 2 3 4  5  6  7  8  9   10  11  12  13  14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30   */
+/*                1S 2 3 5 10 15 20 30 1F 2F  3F  5F  10F 15F 20 30 1H 2H 3H 4H 5H 6H 8H 10 12 1D 1W 1M 1J 1Y TICK */
+//const static int pp[31] =  {1, 2,3,5,10,15,20,30,60,120,180,300,600,900,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 #define  BAR_SECOND        's'
 #define  BAR_MINUTE        'f'
 #define  BAR_HOUR          'h'
@@ -176,8 +181,20 @@ typedef struct  {
     char ca_1D_end[9] ;
 } see_segment_t ;   // 用于记录时间段，目前每个交易时间段为15分钟
 
+
+typedef struct {
+    char ca_begin[9];
+    char ca_end[9];
+} see_begin_end_t;
+
+typedef struct {
+    int             i_hour_type;  /* 不同的交易时间类型 */
+    int             period;
+    see_begin_end_t * pt_BEs[SEE_SGM_NUM];
+} see_BE_t; 
+
 typedef struct  {
-    int             i_hour_type ;
+    int             i_hour_type;  /* 不同的交易时间类型 */
     see_segment_t  *pt_segments[SEE_SGM_NUM] ;
 } see_hours_t ;     // 交易时间，用于记录一天的所有的交易时间段  每个期货品种有一个 see_fut_block_t，这个结构中会包含 
 

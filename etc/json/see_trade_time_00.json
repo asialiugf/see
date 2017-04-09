@@ -1,0 +1,100 @@
+{
+    "hours":{
+        "type_0":{
+            "time":[    "09:00:00-10:15:00",
+                        "10:30:00-11:30:00",
+                        "13:30:00-15:00:00"]},
+
+        "type_1":{
+            "time":[    "21:00:00-23:00:00",
+                        "09:00:00-10:15:00",
+                        "10:30:00-11:30:00",
+                        "13:30:00-15:00:00"]},
+
+
+        "type_2":{
+            "time":[    "21:00:00-23:30:00",
+                        "09:00:00-10:15:00",
+                        "10:30:00-11:30:00",
+                        "13:30:00-15:00:00"]},
+
+        "type_3":{
+            "time":[    "21:00:00-24:00:00",
+                        "00:00:00-01:00:00",
+                        "09:00:00-10:15:00",
+                        "10:30:00-11:30:00",
+                        "13:30:00-15:00:00"]},
+
+        "type_4":{
+            "time":[    "21:00:00-24:00:00",
+                        "00:00:00-02:30:00",
+                        "09:00:00-10:15:00",
+                        "10:30:00-11:30:00",
+                        "13:30:00-15:00:00"]},
+        "type_5":{
+            "time":[    "09:00:00-11:30:00",
+                        "13:00:00-15:00:00"]},
+
+        "type_6":{
+            "time":[    "09:15:00-11:30:00",
+                        "13:00:00-15:00:00"]},
+    },
+    "futures":{
+        "RM":{"time_type":2,"home_en":"zss","home_zh":"郑商所","name":"菜籽粕"},
+        "OI":{"time_type":2,"home_en":"zss","home_zh":"郑商所","name":"菜籽油"},
+        "TA":{"time_type":2,"home_en":"zss","home_zh":"郑商所","name":"PTA"},
+        "CF":{"time_type":2,"home_en":"zss","home_zh":"郑商所","name":"棉花"},
+        "FG":{"time_type":2,"home_en":"zss","home_zh":"郑商所","name":"玻璃"},
+        "SR":{"time_type":2,"home_en":"zss","home_zh":"郑商所","name":"白糖"},
+        "TC":{"time_type":2,"home_en":"zss","home_zh":"郑商所","name":"动力煤"},
+        "MA":{"time_type":2,"home_en":"zss","home_zh":"郑商所","name":"甲醇N"},
+        "JR":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"粳稻"},
+        "LR":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"晚籼稻"},
+        "SF":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"硅铁"},
+        "SM":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"锰硅"},
+        "PM":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"普麦"},
+        "ZC":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"新动力煤"},
+        "RI":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"早籼稻"},
+        "WH":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"强麦"},
+        "RS":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"油菜籽"},
+        "ME":{"time_type":0,"home_en":"zss","home_zh":"郑商所","name":"甲醇"},
+
+        "a": {"time_type":2,"home_en":"dss","home_zh":"大商所","name":"黄大豆"},
+        "b": {"time_type":2,"home_en":"dss","home_zh":"大商所","name":"豆二"},
+        "m": {"time_type":2,"home_en":"dss","home_zh":"大商所","name":"豆粕"},
+        "y": {"time_type":2,"home_en":"dss","home_zh":"大商所","name":"豆油"},
+        "j": {"time_type":2,"home_en":"dss","home_zh":"大商所","name":"焦炭"},
+        "i": {"time_type":2,"home_en":"dss","home_zh":"大商所","name":"铁矿石"},
+        "jm":{"time_type":2,"home_en":"dss","home_zh":"大商所","name":"焦煤"},
+        "p": {"time_type":2,"home_en":"dss","home_zh":"大商所","name":"棕榈油"},
+        "pp":{"time_type":0,"home_en":"dss","home_zh":"大商所","name":"聚丙烯"},
+        "cs":{"time_type":0,"home_en":"dss","home_zh":"大商所","name":"玉米淀粉"},
+        "fb":{"time_type":0,"home_en":"dss","home_zh":"大商所","name":"纤维板"},
+        "bb":{"time_type":0,"home_en":"dss","home_zh":"大商所","name":"胶合板"},
+        "l": {"time_type":0,"home_en":"dss","home_zh":"大商所","name":"聚乙烯"},
+        "jd":{"time_type":0,"home_en":"dss","home_zh":"大商所","name":"鸡蛋"},
+        "v": {"time_type":0,"home_en":"dss","home_zh":"大商所","name":"聚氯乙烯"},
+        "c": {"time_type":0,"home_en":"dss","home_zh":"大商所","name":"玉米"},
+
+        "cu":{"time_type":3,"home_en":"sqs","home_zh":"上期所","name":"铜"},
+        "al":{"time_type":3,"home_en":"sqs","home_zh":"上期所","name":"铝"},
+        "ni":{"time_type":3,"home_en":"sqs","home_zh":"上期所","name":"镍"},
+        "sn":{"time_type":3,"home_en":"sqs","home_zh":"上期所","name":"锡"},
+        "zn":{"time_type":3,"home_en":"sqs","home_zh":"上期所","name":"锌"},
+        "pb":{"time_type":3,"home_en":"sqs","home_zh":"上期所","name":"铅"},
+        "hc":{"time_type":1,"home_en":"sqs","home_zh":"上期所","name":"热轧卷板"},
+        "bu":{"time_type":1,"home_en":"sqs","home_zh":"上期所","name":"石油沥青"},
+        "rb":{"time_type":1,"home_en":"sqs","home_zh":"上期所","name":"螺纹"},
+        "ru":{"time_type":1,"home_en":"sqs","home_zh":"上期所","name":"橡胶"},
+        "au":{"time_type":4,"home_en":"sqs","home_zh":"上期所","name":"黄金"},
+        "ag":{"time_type":4,"home_en":"sqs","home_zh":"上期所","name":"白银"},
+        "wr":{"time_type":0,"home_en":"sqs","home_zh":"上期所","name":"线材"},
+        "fu":{"time_type":0,"home_en":"sqs","home_zh":"上期所","name":"燃料油"},
+
+        "IF":{"time_type":5,"home_en":"zjs","home_zh":"中金所","name":"沪深300"},
+        "IH":{"time_type":5,"home_en":"zjs","home_zh":"中金所","name":"上证50"},
+        "IC":{"time_type":5,"home_en":"zjs","home_zh":"中金所","name":"中证500"},
+        "T": {"time_type":6,"home_en":"zjs","home_zh":"中金所","name":"国债10年期"},
+        "TF":{"time_type":6,"home_en":"zjs","home_zh":"中金所","name":"国债5年期"}
+    }
+}
