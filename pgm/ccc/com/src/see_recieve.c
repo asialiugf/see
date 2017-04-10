@@ -32,12 +32,26 @@ main(int iArgCnt, char *pcaArgVec[])
     signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
     see_daemon(1,0) ;
-
     p_conf = &t_conf ;
     /*
         see_config_init()必须在 see_daemon()之后。
     */
     see_config_init(p_conf);
+
+    if(argc<=1) {
+        printf(" ctpget.x will enter into product mode! \n");
+        t_conf.c_test = 'p';
+    } else {
+        if(memcmp(argv[1],"-t",2)==0) {
+            printf(" ctpget.x will enter into test mode! \n");
+            t_conf.c_test = 't';
+        }
+        if(memcmp(argv[1],"-p",2)==0) {
+            t_conf.c_test = 'p';
+        }
+    }
+
+
     see_stt_blocks_init(p_conf);
 
     for(u=0; u<p_conf->i_future_num; u++) {

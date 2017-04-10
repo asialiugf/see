@@ -1,0 +1,2 @@
+gcc -o fork fork.c
+gcc -lpthread -o thread thread.c
