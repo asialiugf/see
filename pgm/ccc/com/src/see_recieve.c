@@ -17,7 +17,7 @@ see_config_t            *p_conf ;
 char ca_errtmp[512] ;
 
 int
-main(int iArgCnt, char *pcaArgVec[])
+main(int argc, char *argv[])
 {
     int u ;
     int i ;
@@ -86,7 +86,7 @@ main(int iArgCnt, char *pcaArgVec[])
     //pthread_create(&t_conf.p_bar, NULL, see_pthread_bar, &t_conf);
     //sleep(1) ;
 
-    if(iArgCnt<=1) {
+    if(argc<=1) {
         printf("Arg error!\n");
         return -1;
         see_errlog(1000,"Arg error!\n",RPT_TO_LOG,0,0);
@@ -110,7 +110,7 @@ main(int iArgCnt, char *pcaArgVec[])
       所以目前可以不需要使用 rrr.x 0 来接收 ctpget.x 传来的数据。
 
     */
-    if(memcmp(pcaArgVec[1],"0",1)==0) {
+    if(memcmp(argv[1],"0",1)==0) {
         printf("\n === Get tick data from nanomsg !!!\n") ;
 
         //  sock = see_pubsub_client( ca_pubsub_url, "iostest" ) ;
@@ -168,7 +168,7 @@ main(int iArgCnt, char *pcaArgVec[])
      一般进行测试用！
     */
 
-    if(memcmp(pcaArgVec[1],"1",1)==0) {
+    if(memcmp(argv[1],"1",1)==0) {
 
         printf("\n === Get tick data from ../dat/tst_dat/* !!!\n") ;
 
