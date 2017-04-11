@@ -13,34 +13,43 @@
 #define  SEE_SGM_NUM       50
 #define  MAX_BARS_LEN      1000000
 
-#define  BARS_TICK_LEN     1
-#define  BARS_1S_LEN       1000000
-#define  BARS_2S_LEN       1000000
-#define  BARS_3S_LEN       1000000
-#define  BARS_5S_LEN       1000000
-#define  BARS_10S_LEN      1000000
-#define  BARS_15S_LEN      1000000
-#define  BARS_30S_LEN      1000000
-#define  BARS_1F_LEN       1000000
-#define  BARS_2F_LEN       1000000
-#define  BARS_3F_LEN       1000000
-#define  BARS_5F_LEN       900000
-#define  BARS_10F_LEN      450000
-#define  BARS_15F_LEN      300000
-#define  BARS_30F_LEN      150000
-#define  BARS_1H_LEN       60000
-#define  BARS_2H_LEN       40000
-#define  BARS_3H_LEN       30000
-#define  BARS_4H_LEN       20000
-#define  BARS_5H_LEN       20000
-#define  BARS_1D_LEN       10000
-#define  BARS_1W_LEN       2000
-#define  BARS_1M_LEN       500
-#define  BARS_1J_LEN       200
-#define  BARS_1Y_LEN       50
-#define  BLOCK_BAR_LEN      1000000
+/*
+ * 定义工作一天需要保存的长度
+ * 注意：下面是按照一天交易时间不超过12小时来计算的
+ *       如果超过，下面的这些值需要修改。
+*/
+#define  BAR_1S_LEN   43200 
+#define  BAR_2S_LEN   21600 
+#define  BAR_3S_LEN   14400
+#define  BAR_5S_LEN   8640
+#define  BAR_10S_LEN  4320
+#define  BAR_15S_LEN  2880
+#define  BAR_20S_LEN  2160
+#define  BAR_30S_LEN  1440
+#define  BAR_1F_LEN   720
+#define  BAR_2F_LEN   360
+#define  BAR_3F_LEN   240
+#define  BAR_5F_LEN   144
+#define  BAR_10F_LEN  73
+#define  BAR_15F_LEN  49
+#define  BAR_20F_LEN  37
+#define  BAR_30F_LEN  23
+#define  BAR_1H_LEN   13
+#define  BAR_2H_LEN   7
+#define  BAR_3H_LEN   5
+#define  BAR_4H_LEN   4
+#define  BAR_5H_LEN   4
+#define  BAR_6H_LEN   4
+#define  BAR_8H_LEN   3
+#define  BAR_10H_LEN  3
+#define  BAR_12H_LEN  3
+#define  BAR_1D_LEN   2
+#define  BAR_1W_LEN   2
+#define  BAR_1M_LEN   2
+#define  BAR_1J_LEN   2
+#define  BAR_1Y_LEN   2 
+#define  BAR_TICK_LEN 0
 
-#define  K_LEN             10000
 
 /*
    注意：
@@ -154,6 +163,13 @@
 #define SEE_DIFF_KBAR         10007
 
 #define SEE_START_TICK        10008   // 开机后第一个交易时间段内的tick 
+
+/*
+ * 定义内存块
+*/
+
+
+
 
 typedef struct  {
     char c_oc_flag ;    /* 'o':open   ;c':close */

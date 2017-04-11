@@ -4,7 +4,7 @@ extern  double hh[10000];
 extern  double ll[10000];
 extern  double cc[10000];
 extern  double oo[10000];
-
+/*
 int       outBegIdx1;
 int       outBegIdx2;
 int       outBegIdx3;
@@ -32,11 +32,16 @@ double    outSlowD3[10000];
 double    outSlowJ3[10000];
 double    J3[10000];
 double    JE3[10000];
+*/
 
-/* periods defined */
-/*                0  1 2 3 4  5  6  7  8  9   10  11  12  13  14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30   */
-/*                1S 2 3 5 10 15 20 30 1F 2F  3F  5F  10F 15F 20 30 1H 2H 3H 4H 5H 6H 8H 10 12 1D 1W 1M 1J 1Y TICK */
-static const int pp[31] =  {1, 2,3,5,10,15,20,30,60,120,180,300,600,900,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+/* 
+ *  periods defined 
+ *  pp[31] 数组 定义每个period的秒数，比如 3F 是 180秒
+ */
+
+/*                         0  1 2 3 4  5  6  7  8  9   10  11  12  13  14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30   */
+/*                         1S 2 3 5 10 15 20 30 1F 2F  3F  5F  10F 15F 20 30 1H 2H 3H 4H 5H 6H 8H 10 12 1D 1W 1M 1J 1Y TICK */
+static const int pp[31] = {1, 2,3,5,10,15,20,30,60,120,180,300,600,900,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 int
 see_bars_index_forword(int start_index, int n)    // bar指针前移n个.
