@@ -72,17 +72,25 @@ TSTOBJS = $(MDSOBJ)see_sndtst.o \
 CTPOBJS = $(MDSOBJ)MdSpi.o \
 		  $(MDSOBJ)see_ctpget.o
 
+FUTOBJS = $(MDSOBJ)MdSpi.o \
+		  $(MDSOBJ)future.o
+
 #all: \
 #	$(BINEXE)ctpget.x \
 #	$(BINEXE)sss.x
 
 all: \
+	$(BINEXE)future.x \
 	$(BINEXE)ctpget.x \
 	$(BINEXE)sss.x
 
 $(BINEXE)ctpget.x: $(CTPOBJS) \
 					$(COMOBJS)
 		$(CC) -o $(BINEXE)ctpget.x $(CTPOBJS) $(CCCOBJ) $(CTPLIBS) -lzdb -lnanomsg -lerrlog -lcjson -lpthread -lzmq
+
+$(BINEXE)future.x: $(FUTOBJS) \
+					$(COMOBJS)
+		$(CC) -o $(BINEXE)future.x $(FUTOBJS) $(CCCOBJ) $(CTPLIBS) -lzdb -lnanomsg -lerrlog -lcjson -lpthread -lzmq
 
 $(BINEXE)sss.x: $(TSTOBJS) \
 					$(COMOBJS)
@@ -91,6 +99,10 @@ $(BINEXE)sss.x: $(TSTOBJS) \
 $(MDSOBJ)see_ctpget.o: $(MDSSRC)see_ctpget.cpp
 		$(CC) $(CCFLAGS) $(ALLINC) -I$(MDSINC) -c $(MDSSRC)see_ctpget.cpp
 		mv see_ctpget.o $(MDSOBJ)
+
+$(MDSOBJ)future.o: $(MDSSRC)future.cpp
+		$(CC) $(CCFLAGS) $(ALLINC) -I$(MDSINC) -c $(MDSSRC)future.cpp
+		mv future.o $(MDSOBJ)
 
 $(MDSOBJ)see_sndtst.o: $(MDSSRC)see_sndtst.cpp
 		$(CC) $(CCFLAGS) $(ALLINC) -I$(MDSINC) -c $(MDSSRC)see_sndtst.cpp

@@ -1,6 +1,8 @@
  sed -i "s/see_k_bar_init/see_block_init/g" `grep see_k_bar_init -rl ./*`         
  useradd -d /home/ctptst  -g ctp  -m ctptst
 
+ find ./ -name "*.c" | xargs grep "ngx_signal_t" 
+
 swapoff -a && swapon -a
 
 sync; sync; sync;

@@ -83,4 +83,6 @@ void see_cpuinfo(void);
 #define SEE_DISABLE_SYMLINKS_NOTOWNER   2
 #endif
 
+#define see_memzero(buf, n)       (void) memset(buf, 0, n)
+
 #endif /* _SEE_COM_COMMON_H_INCLUDED_ */

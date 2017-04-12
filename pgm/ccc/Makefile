@@ -63,7 +63,22 @@ objs: ccc/com/obj/see_errlog.o \
 	ccc/com/obj/see_zmq.o \
 	ccc/com/obj/see_testkdj.o
 
-CCCOBJ:= \
+CCCOBJS:= \
+     ccc/com/obj/see_errlog.o \
+     ccc/com/obj/see_signal.o \
+     ccc/com/obj/see_daemon.o \
+     ccc/com/obj/see_bars.o \
+     ccc/com/obj/see_pubsub.o \
+     ccc/com/obj/see_iofile.o \
+     ccc/com/obj/see_cjson.o \
+     ccc/com/obj/see_config.o \
+     ccc/com/obj/see_strategy.o \
+     ccc/com/obj/see_zdbfun.o \
+     ccc/com/obj/see_zmq.o \
+	 ccc/com/obj/see_recieve.o \
+     ccc/com/obj/see_future.o
+
+COMOBJS:= \
      ccc/com/obj/see_errlog.o \
      ccc/com/obj/see_signal.o \
      ccc/com/obj/see_daemon.o \
@@ -83,16 +98,11 @@ sttobjs: \
 	ccc/stt/obj/see_stt02.o
 
 
-$(BINEXE)rrr.x: $(objs)
-	$(CC) $(CFLAGS) -o $(BINEXE)rrr.x $(objs) ccc/com/obj/see_signal.o ccc/com/obj/see_daemon.o ccc/com/obj/see_errlog.o \
-			ccc/com/obj/see_bars.o ccc/com/obj/see_pubsub.o ccc/com/obj/see_recieve.o ccc/com/obj/see_strategy.o \
-			ccc/com/obj/see_future.o ccc/com/obj/see_iofile.o ccc/com/obj/see_config.o ccc/com/obj/see_cjson.o \
-			ccc/com/obj/see_zdbfun.o ccc/com/obj/see_zmq.o \
-			-lzdb -lnanomsg -lta_lib -lerrlog -lcjson -lzmq
+$(BINEXE)rrr.x: $(CCCOBJS)
+	$(CC) $(CFLAGS) -o $(BINEXE)rrr.x $(CCCOBJS) -lzdb -lnanomsg -lta_lib -lerrlog -lcjson -lzmq
 
 $(BINEXE)kdj.x: $(objs)
-	$(CC) $(CFLAGS) -o $(BINEXE)kdj.x $(CCCOBJ) $(COMOBJ)see_testkdj.o\
-			-lzdb -lnanomsg -lerrlog -lsee_talib -lcjson -lzmq 
+	$(CC) $(CFLAGS) -o $(BINEXE)kdj.x $(COMOBJS) ccc/com/obj/see_testkdj.o -lzdb -lnanomsg -lerrlog -lsee_talib -lcjson -lzmq 
 
 $(BINEXE)maria.x: $(objs)
 	$(CC) $(CFLAGS) -o $(BINEXE)maria.x $(objs) ccc/com/obj/see_signal.o ccc/com/obj/see_daemon.o ccc/com/obj/see_errlog.o \

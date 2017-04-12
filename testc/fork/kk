@@ -1,2 +1,3 @@
 gcc -o fork fork.c
+gcc -o signal.x signal.c -lm
 gcc -lpthread -o thread thread.c
