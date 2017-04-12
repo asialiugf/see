@@ -1,12 +1,9 @@
-/*
 #include <unistd.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/prctl.h>
-*/
-#include <see_com_common.h>
 
 # define MAXLINE 2048
 
@@ -67,7 +64,6 @@ void setproctitle(const char *fmt, ...)
     prctl(PR_SET_NAME,buf);
 }
 
-/*
 int main(int argc, char *argv[])
 {
     int mm = 0 ;
@@ -106,4 +102,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-*/

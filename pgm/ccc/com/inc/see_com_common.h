@@ -57,9 +57,7 @@ typedef char          CA_FUTURES    [FUTURE_NUMBER][FUTRUE_ID_LEN] ;        // å
 #include <see_config.h>
 #include <see_zdbfun.h>
 #include <see_strategy.h>
-
-#include <ThostFtdcUserApiDataType.h>
-#include <ThostFtdcUserApiStruct.h>
+#include <../../unx/inc/see_setproctitle.h>
 
 // extern see_hours_t t_hours[SEE_HOUR_TYPE_NUM] ;
 
@@ -83,6 +81,9 @@ void see_cpuinfo(void);
 #define SEE_DISABLE_SYMLINKS_NOTOWNER   2
 #endif
 
-#define see_memzero(buf, n)       (void) memset(buf, 0, n)
+#define     see_memzero(buf, n)       (void) memset(buf, 0, n)
+typedef     pid_t               see_pid_t;
+typedef     int                 see_err_t;
+#define     see_errno           errno
 
 #endif /* _SEE_COM_COMMON_H_INCLUDED_ */

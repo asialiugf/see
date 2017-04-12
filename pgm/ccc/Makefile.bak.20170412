@@ -24,7 +24,7 @@ ALL_INCS = -I ccc/com/inc \
        -I /usr/local/include/nanomsg \
        -I /usr/local/include/zdb \
        -I /usr/local/include/errlog \
-       -I ./ctp/
+       -I ctp
 
 
 ALL_DEPS = ccc/com/inc/see_com_auto.h \
@@ -45,7 +45,9 @@ ALL_DEPS = ccc/com/inc/see_com_auto.h \
 STT_DEPS = ccc/stt/inc/see_stt01.h \
 		ccc/stt/inc/see_stt02.h
 
-UNX_DEPS = ccc/unx/inc/see_setproctitle.h
+UNX_DEPS = ccc/unx/inc/see_process.h \
+    	ccc/unx/inc/see_setproctitle.h \
+    	ccc/unx/inc/see_process_cycle.h
 
 build:  binary
 
@@ -103,7 +105,9 @@ COMOBJS:= \
 
 
 unxobjs: \
-	ccc/unx/obj/see_setproctitle.o
+	ccc/unx/obj/see_process.o \
+	ccc/unx/obj/see_setproctitle.o \
+	ccc/unx/obj/see_process_cycle.o
 
 sttobjs: \
 	ccc/stt/obj/see_stt01.o \
@@ -168,6 +172,12 @@ $(STTOBJ)see_stt01.o: $(STT_DEPS) $(STTSRC)see_stt01.c
 
 $(STTOBJ)see_stt02.o: $(STT_DEPS) $(STTSRC)see_stt02.c
 	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(STTOBJ)see_stt02.o  $(STTSRC)see_stt02.c
+
+$(UNXOBJ)see_process.o: $(UNX_DEPS) $(UNXSRC)see_process.c
+	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(UNXOBJ)see_process.o  $(UNXSRC)see_process.c
+
+$(UNXOBJ)see_process_cycle.o: $(UNX_DEPS) $(UNXSRC)see_process_cycle.c
+	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(UNXOBJ)see_process_cycle.o  $(UNXSRC)see_process_cycle.c
 
 $(UNXOBJ)see_setproctitle.o: $(UNX_DEPS) $(UNXSRC)see_setproctitle.c
 	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(UNXOBJ)see_setproctitle.o  $(UNXSRC)see_setproctitle.c

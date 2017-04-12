@@ -3,9 +3,11 @@ CC:=g++
 CCFLAGS := -g -Wall -O3 -pthread 
 
 ALLINC = -I ccc/com/inc \
+		 -I ccc/unx/inc \
 		-I /usr/local/include/nanomsg \
 		-I /usr/local/include/zdb \
 		-I /usr/local/include/ta-lib \
+		-I ./ctp
 
 CTPINC:= ./ctp/
 CTPLIB:= ./ctp/
@@ -64,7 +66,8 @@ CCCOBJ:= \
      ccc/com/obj/see_strategy.o \
      ccc/com/obj/see_zdbfun.o \
      ccc/com/obj/see_zmq.o \
-     ccc/com/obj/see_future.o
+     ccc/com/obj/see_future.o \
+	 ccc/unx/obj/see_setproctitle.o
 
 TSTOBJS = $(MDSOBJ)see_sndtst.o \
 		  $(MDSOBJ)MdSpi.o

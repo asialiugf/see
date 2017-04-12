@@ -59,7 +59,6 @@
 #include <dlfcn.h>
 
 
-//#include <see_auto_config.h>
 
 
 #if (SEE_HAVE_POSIX_SEM)
@@ -100,9 +99,6 @@ typedef struct iocb  see_aiocb_t;
 #endif
 
 
-#define SEE_LISTEN_BACKLOG        511
-
-
 #ifndef SEE_HAVE_SO_SNDLOWAT
 /* setsockopt(SO_SNDLOWAT) returns ENOPROTOOPT */
 #define SEE_HAVE_SO_SNDLOWAT         0
@@ -113,10 +109,8 @@ typedef struct iocb  see_aiocb_t;
 #define SEE_HAVE_INHERITED_NONBLOCK  0
 #endif
 
-
 #define SEE_HAVE_OS_SPECIFIC_INIT    1
 #define see_debug_init()
-
 
 extern char **environ;
 

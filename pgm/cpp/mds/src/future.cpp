@@ -105,10 +105,10 @@ int
 main(int argc,char *argv[])
 {
 
-    int pid ;
+    int pid = 0;
     //see_stt_blocks_init( &t_conf );
     see_show_version();
-    exit(1);
+   
 
     see_signal_init();                 // ÐèÒªÏêÏ¸¿¼ÂÇ
     signal(SIGHUP, SIG_IGN);
@@ -129,18 +129,23 @@ main(int argc,char *argv[])
         }
     }
 
-    pid = fork();
+    pid = getpid();
+    setproctitle_init(argc, argv, environ);
+    setproctitle("%s %s", "future:", "master");
 
+    pid = fork();
     switch(pid) {
     case -1:
         return -1;
 
     case 0:
+        pid = getpid();
+        setproctitle("%s %s", "future:", "ctpget");
         ctpget() ;
         break;
 
     default:
-        while(1){
+        while(1) {
             sleep(100);
         }
         break;
@@ -157,26 +162,26 @@ see_show_version()
     see_write_stderr(" -- future.x -- version: " FUTURE_VER_BUILD SEE_LINEFEED);
 
     //if (ngx_show_help) {
-    if (1) {
+    if(1) {
         see_write_stderr(
             "Usage: future.x [-?hvVtTq] [-s signal] [-c filename] "
-                         "[-p prefix] [-g directives]" SEE_LINEFEED
-                         SEE_LINEFEED
+            "[-p prefix] [-g directives]" SEE_LINEFEED
+            SEE_LINEFEED
             "Options:" SEE_LINEFEED
             "  -?,-h         : this help" SEE_LINEFEED
             "  -v            : show version and exit" SEE_LINEFEED
             "  -V            : show version and configure options then exit"
-                               SEE_LINEFEED
+            SEE_LINEFEED
             "  -t            : test configuration and exit" SEE_LINEFEED
             "  -T            : test configuration, dump it and exit"
-                               SEE_LINEFEED
+            SEE_LINEFEED
             "  -q            : suppress non-error messages "
-                               "during configuration testing" SEE_LINEFEED
+            "during configuration testing" SEE_LINEFEED
             "  -s signal     : send signal to a master process: "
-                               "stop, quit, reopen, reload" SEE_LINEFEED
+            "stop, quit, reopen, reload" SEE_LINEFEED
             "  -p prefix     : set prefix path (default: NONE)" SEE_LINEFEED
             "  -g directives : set global directives out of configuration "
-                               "file" SEE_LINEFEED SEE_LINEFEED
+            "file" SEE_LINEFEED SEE_LINEFEED
         );
     }
 }
