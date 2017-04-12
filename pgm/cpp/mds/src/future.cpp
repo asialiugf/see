@@ -131,7 +131,7 @@ main(int argc,char *argv[])
 
     pid = getpid();
     setproctitle_init(argc, argv, environ);
-    setproctitle("%s %s", "future:", "master");
+    setproctitle("%s %s", "future.x :", "master");
 
     pid = fork();
     switch(pid) {
@@ -140,7 +140,7 @@ main(int argc,char *argv[])
 
     case 0:
         pid = getpid();
-        setproctitle("%s %s", "future:", "ctpget");
+        setproctitle("%s %s [ %s ]", "future.x :", "ctpget","TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 ");
         ctpget() ;
         break;
 
