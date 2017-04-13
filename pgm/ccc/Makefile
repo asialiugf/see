@@ -40,7 +40,9 @@ ALL_DEPS = ccc/com/inc/see_com_auto.h \
 		ccc/com/inc/see_config.h \
 		ccc/com/inc/see_zdbfun.h \
 		ccc/com/inc/see_zmq.h \
-		ccc/com/inc/see_pubsub.h
+		ccc/com/inc/see_pubsub.h \
+		ccc/unx/inc/see_shmem.h \
+		ccc/unx/inc/see_setproctitle.h \
 
 STT_DEPS = ccc/stt/inc/see_stt01.h \
 		ccc/stt/inc/see_stt02.h
@@ -103,7 +105,8 @@ COMOBJS:= \
 
 
 unxobjs: \
-	ccc/unx/obj/see_setproctitle.o
+	ccc/unx/obj/see_setproctitle.o \
+	ccc/unx/obj/see_shmem.o
 
 sttobjs: \
 	ccc/stt/obj/see_stt01.o \
@@ -171,3 +174,6 @@ $(STTOBJ)see_stt02.o: $(STT_DEPS) $(STTSRC)see_stt02.c
 
 $(UNXOBJ)see_setproctitle.o: $(UNX_DEPS) $(UNXSRC)see_setproctitle.c
 	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(UNXOBJ)see_setproctitle.o  $(UNXSRC)see_setproctitle.c
+
+$(UNXOBJ)see_shmem.o: $(UNX_DEPS) $(UNXSRC)see_shmem.c
+	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(UNXOBJ)see_shmem.o  $(UNXSRC)see_shmem.c

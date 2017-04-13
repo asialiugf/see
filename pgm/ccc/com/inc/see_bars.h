@@ -18,8 +18,8 @@
  * 注意：下面是按照一天交易时间不超过12小时来计算的
  *       如果超过，下面的这些值需要修改。
 */
-#define  BAR_1S_LEN   43200 
-#define  BAR_2S_LEN   21600 
+#define  BAR_1S_LEN   43200
+#define  BAR_2S_LEN   21600
 #define  BAR_3S_LEN   14400
 #define  BAR_5S_LEN   8640
 #define  BAR_10S_LEN  4320
@@ -47,20 +47,97 @@
 #define  BAR_1W_LEN   2
 #define  BAR_1M_LEN   2
 #define  BAR_1J_LEN   2
-#define  BAR_1Y_LEN   2 
+#define  BAR_1Y_LEN   2
 #define  BAR_TICK_LEN 0
+
+
+typedef struct {
+    double  o ;             // open
+    double  c ;             // close
+    double  h ;             // high
+    double  l ;             // low
+    int     v ;             // volume
+    char                UpdateTime[9];
+} see_kbar_t;
+
+typedef struct {
+    char               InstrumentID[31];
+    char               TradingDay[9];
+    char               ActionDay[9];
+    see_kbar_t         kbars_1S[BAR_1S_LEN];
+    see_kbar_t         kbars_2S[BAR_2S_LEN];
+    see_kbar_t         kbars_3S[BAR_3S_LEN];
+    see_kbar_t         kbars_5S[BAR_5S_LEN];
+    see_kbar_t         kbars_10S[BAR_10S_LEN];
+    see_kbar_t         kbars_15S[BAR_15S_LEN];
+    see_kbar_t         kbars_20S[BAR_20S_LEN];
+    see_kbar_t         kbars_30S[BAR_30S_LEN];
+    see_kbar_t         kbars_1F[BAR_1F_LEN];
+    see_kbar_t         kbars_2F[BAR_2F_LEN];
+    see_kbar_t         kbars_3F[BAR_3F_LEN];
+    see_kbar_t         kbars_5F[BAR_5F_LEN];
+    see_kbar_t         kbars_10F[BAR_10F_LEN];
+    see_kbar_t         kbars_15F[BAR_15F_LEN];
+    see_kbar_t         kbars_20F[BAR_20F_LEN];
+    see_kbar_t         kbars_30F[BAR_30F_LEN];
+    see_kbar_t         kbars_1H[BAR_1H_LEN];
+    see_kbar_t         kbars_2H[BAR_2H_LEN];
+    see_kbar_t         kbars_3H[BAR_3H_LEN];
+    see_kbar_t         kbars_4H[BAR_4H_LEN];
+    see_kbar_t         kbars_5H[BAR_5H_LEN];
+    see_kbar_t         kbars_6H[BAR_6H_LEN];
+    see_kbar_t         kbars_8H[BAR_8H_LEN];
+    see_kbar_t         kbars_10H[BAR_10H_LEN];
+    see_kbar_t         kbars_12H[BAR_12H_LEN];
+    see_kbar_t         kbars_1D[BAR_1D_LEN];
+    see_kbar_t         kbars_1W[BAR_1W_LEN];
+    see_kbar_t         kbars_1M[BAR_1M_LEN];
+    see_kbar_t         kbars_1J[BAR_1J_LEN];
+    see_kbar_t         kbars_1Y[BAR_1Y_LEN];
+    int                cur_1s;
+    int                cur_1S;
+    int                cur_2S;
+    int                cur_3S;
+    int                cur_5S;
+    int                cur_10S;
+    int                cur_15S;
+    int                cur_20S;
+    int                cur_30S;
+    int                cur_1F;
+    int                cur_2F;
+    int                cur_3F;
+    int                cur_5F;
+    int                cur_10F;
+    int                cur_15F;
+    int                cur_20F;
+    int                cur_30F;
+    int                cur_1H;
+    int                cur_2H;
+    int                cur_3H;
+    int                cur_4H;
+    int                cur_5H;
+    int                cur_6H;
+    int                cur_8H;
+    int                cur_10H;
+    int                cur_12H;
+    int                cur_1D;
+    int                cur_1W;
+    int                cur_1M;
+    int                cur_1J;
+    int                cur_1Y;
+} see_fut_mem_t;
 
 
 /*
    注意：
     下面的定义，与数组下标是严格一致的。
-    block->bar_block[0]  = block->bar_block[BAR_1S] 
-    block->bar_block[13]  = block->bar_block[BAR_15F] 
+    block->bar_block[0]  = block->bar_block[BAR_1S]
+    block->bar_block[13]  = block->bar_block[BAR_15F]
     各种函数的 period 也用的是下面的定义。
- 
+
 */
-#define  BAR_1S       0 
-#define  BAR_2S       1 
+#define  BAR_1S       0
+#define  BAR_2S       1
 #define  BAR_3S       2
 #define  BAR_5S       3
 #define  BAR_10S      4
@@ -207,21 +284,21 @@ typedef struct {
     int             i_hour_type;  /* 不同的交易时间类型 */
     int             period;
     see_begin_end_t * pt_BEs[SEE_SGM_NUM];
-} see_BE_t; 
+} see_BE_t;
 
 typedef struct  {
     int             i_hour_type;  /* 不同的交易时间类型 */
     see_segment_t  *pt_segments[SEE_SGM_NUM] ;
-} see_hours_t ;     // 交易时间，用于记录一天的所有的交易时间段  每个期货品种有一个 see_fut_block_t，这个结构中会包含 
+} see_hours_t ;     // 交易时间，用于记录一天的所有的交易时间段  每个期货品种有一个 see_fut_block_t，这个结构中会包含
 
 typedef struct {
 //    char    InstrumentID[31];
-    char    TradingDay[9]; 
-    char    ActionDay[9]; 
+    char    TradingDay[9];
+    char    ActionDay[9];
     char    ca_btime[9];   //begin time
     char    ca_etime[9];  //end time
     double  o ;             // open
-    double  c ;             // close 
+    double  c ;             // close
     double  h ;             // high
     double  l ;             // low
     int     v ;             // volume
@@ -256,7 +333,7 @@ typedef struct {
     char                ActionDay[9];
     char                UpdateTime[9];
     double              o ;             // open
-    double              c ;             // close 
+    double              c ;             // close
     double              h ;             // high
     double              l ;             // low
     int                 v ;             // volume
@@ -269,7 +346,7 @@ typedef struct {
     int                 period ;
     int                 i_another_day ;
 } see_pthread_bar_arg_t ;
-    
+
 
 typedef struct {
     see_fut_block_t    *pt_fut_block ;
@@ -287,7 +364,7 @@ typedef struct {
     char                UpdateTime[9];
     char                c_save ;                        /* 's' 表示 save  'n' 表示 不需要save */
     double              o ;                             // open
-    double              c ;                             // close 
+    double              c ;                             // close
     double              h ;                             // high
     double              l ;                             // low
     int                 v ;                             // volume
@@ -298,7 +375,7 @@ typedef struct {
     char        ca_ActionDays   [10000][9] ;
     char        ca_UpdateTimes  [10000][9] ;
     double      oo[10000] ;             // open
-    double      cc[10000] ;             // close 
+    double      cc[10000] ;             // close
     double      hh[10000] ;             // high
     double      ll[10000] ;             // low
     int         vv[10000] ;             // volume
@@ -306,8 +383,7 @@ typedef struct {
 } see_kkone_t ;
 
 
-typedef struct node
-{
+typedef struct node {
     int             period ;
     struct node    *next;
 } see_node ;
@@ -319,7 +395,7 @@ typedef struct node
     因为真正的策略，可能会用到不同周期的K柱数据，所以，首先给每个K柱数据块（see_kkone_t）
     分配一个指针，共31个指针：see_kkone_t         *pt_kkall[31] ;
     在实际中，可能只需要 其中 1f 5f 30f 这三个同期。所以，在初始化时，
-    只为这三个同期分配真正的内存块。   
+    只为这三个同期分配真正的内存块。
 
     具体是哪个周期，在配置文件中：
 */
@@ -389,38 +465,38 @@ typedef struct {
 
 typedef see_fut_block_t  *PT_BLOCKS     [FUTURE_NUMBER] ;
 
-int see_bars_index_next (int start_index) ;
-int see_bars_index_back (int start_index, int n) ;
-int see_bars_index_forword (int start_index, int n) ;
+int see_bars_index_next(int start_index) ;
+int see_bars_index_back(int start_index, int n) ;
+int see_bars_index_forword(int start_index, int n) ;
 
-int see_bars_load (see_bar_t bars[], int start_index, int n) ; //从start_index开始装n个bar,装完后，需要将g_bar_cur_index 改成 start_index + n - 1 ;
-int see_bars_add (see_bar_t bars[], int start_index ) ;  // 规定：g_bar_cur_index 所指的是最后一个K线bar，所以要add一个K线bar时，要将start_index的值设为g_bar_cur_index+1，并在add完成后， g_bar_cur_index 应该是 加1了。
+int see_bars_load(see_bar_t bars[], int start_index, int n) ;  //从start_index开始装n个bar,装完后，需要将g_bar_cur_index 改成 start_index + n - 1 ;
+int see_bars_add(see_bar_t bars[], int start_index) ;    // 规定：g_bar_cur_index 所指的是最后一个K线bar，所以要add一个K线bar时，要将start_index的值设为g_bar_cur_index+1，并在add完成后， g_bar_cur_index 应该是 加1了。
 
-int see_date_comp( char * pca_first, char * pca_last ) ;
-int see_time_comp( char * pca_first, char * pca_last ) ;
-see_bar_t * see_create_bar( char * p_future_id, char c_period  ) ;
+int see_date_comp(char * pca_first, char * pca_last) ;
+int see_time_comp(char * pca_first, char * pca_last) ;
+see_bar_t * see_create_bar(char * p_future_id, char c_period) ;
 
 int split_string(char *s,char _cmd[SEE_SGM_NUM][20]) ;
-int see_time_to_int(char *f ) ;
-int see_handle_bars( see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick ) ;
-int see_send_bar( see_fut_block_t *p_block,char *pc_msg) ; 
-int see_save_bar ( see_fut_block_t * p_block, struct CThostFtdcDepthMarketDataField *tick, int period ) ;
-int see_save_bar_last ( see_fut_block_t *p_block, int period, int i_another_day ) ;
-int is_weekend( char * pc_day) ;
-int is_holiday( char * pc_day) ;
-int is_notrade( see_fut_block_t * p_blick,char * time0 ) ;
-int see_first_tick( see_fut_block_t                         *p_block, 
-                    struct CThostFtdcDepthMarketDataField   *tick, 
-                    see_bar_t                               *p_bar0,
-                    see_bar_t                               *p_bar1, 
-                    int                                      period ) ;
-int see_calc_bar_block( see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick, int period ) ;
+int see_time_to_int(char *f) ;
+int see_handle_bars(see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick) ;
+int see_send_bar(see_fut_block_t *p_block,char *pc_msg) ;
+int see_save_bar(see_fut_block_t * p_block, struct CThostFtdcDepthMarketDataField *tick, int period) ;
+int see_save_bar_last(see_fut_block_t *p_block, int period, int i_another_day) ;
+int is_weekend(char * pc_day) ;
+int is_holiday(char * pc_day) ;
+int is_notrade(see_fut_block_t * p_blick,char * time0) ;
+int see_first_tick(see_fut_block_t                         *p_block,
+                   struct CThostFtdcDepthMarketDataField   *tick,
+                   see_bar_t                               *p_bar0,
+                   see_bar_t                               *p_bar1,
+                   int                                      period) ;
+int see_calc_bar_block(see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick, int period) ;
 int is_mkt_open(see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField *tick) ;
 
-int is_same_k_bar ( see_fut_block_t                         *p_block,
-                    see_bar_t                               *p_bar1,
-                    struct CThostFtdcDepthMarketDataField   *tick,
-                    int                                      period );
+int is_same_k_bar(see_fut_block_t                         *p_block,
+                  see_bar_t                               *p_bar1,
+                  struct CThostFtdcDepthMarketDataField   *tick,
+                  int                                      period);
 
 void *see_pthread_dat(void *) ;
 void *see_pthread_bar(void *) ;

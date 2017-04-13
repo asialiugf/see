@@ -8,7 +8,7 @@
 */
 #include <see_com_common.h>
 
-# define MAXLINE 2048
+# define MAXLINE 1024
 
 extern char **environ;
 
@@ -41,7 +41,7 @@ void setproctitle(const char *fmt, ...)
     char *p;
     int i;
     char buf[MAXLINE];
-
+    memset(buf,'\0',MAXLINE);
     extern char **g_main_Argv;
     extern char *g_main_LastArgv;
     va_list ap;

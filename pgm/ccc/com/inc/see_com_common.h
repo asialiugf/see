@@ -57,7 +57,9 @@ typedef char          CA_FUTURES    [FUTURE_NUMBER][FUTRUE_ID_LEN] ;        // å
 #include <see_config.h>
 #include <see_zdbfun.h>
 #include <see_strategy.h>
-#include <../../unx/inc/see_setproctitle.h>
+//#include <../../unx/inc/see_setproctitle.h>
+#include <see_setproctitle.h>
+#include <see_shmem.h>
 
 // extern see_hours_t t_hours[SEE_HOUR_TYPE_NUM] ;
 
@@ -81,7 +83,19 @@ void see_cpuinfo(void);
 #define SEE_DISABLE_SYMLINKS_NOTOWNER   2
 #endif
 
-#define     see_memzero(buf, n)       (void) memset(buf, 0, n)
+
+#define see_tolower(c)              (u_char) ((c >= 'A' && c <= 'Z') ? (c | 0x20) : c)
+#define see_toupper(c)              (u_char) ((c >= 'a' && c <= 'z') ? (c & ~0x20) : c)
+
+#define see_strlen(s)               strlen((const char *) s)
+#define see_strcmp(s1, s2)          strcmp((const char *) s1, (const char *) s2)
+#define see_strncmp(s1, s2, n)      strncmp((const char *) s1, (const char *) s2, n)
+
+#define see_memzero(buf, n)         (void) memset(buf, 0, n)
+#define see_memset(buf, c, n)       (void) memset(buf, c, n)
+#define see_memcmp(s1, s2, n)       memcmp((const char *) s1, (const char *) s2, n)
+
+
 typedef     pid_t               see_pid_t;
 typedef     int                 see_err_t;
 #define     see_errno           errno

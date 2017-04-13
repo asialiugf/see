@@ -5,8 +5,7 @@
  */
 
 
-#include <see_config.h>
-#include <see_core.h>
+#include <see_com_common.h>
 
 
 static u_char *see_sprintf_num(u_char *buf, u_char *last, uint64_t ui64,
@@ -308,7 +307,7 @@ see_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)
                 }
 
                 if (max_width) {
-                    width = SEE_INT_T_LEN;
+                    width = NGX_INT_T_LEN;
                 }
 
                 break;
@@ -353,7 +352,7 @@ see_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)
                 }
 
                 if (max_width) {
-                    width = SEE_ATOMIC_T_LEN;
+                    width = NGX_ATOMIC_T_LEN;
                 }
 
                 break;
@@ -398,7 +397,7 @@ see_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)
 
                 continue;
 
-#if !(SEE_WIN32)
+#if !(NGX_WIN32)
             case 'r':
                 i64 = (int64_t) va_arg(args, rlim_t);
                 sign = 1;
@@ -427,7 +426,7 @@ see_vslprintf(u_char *buf, u_char *last, const char *fmt, va_list args)
                 continue;
 
             case 'N':
-#if (SEE_WIN32)
+#if (NGX_WIN32)
                 *buf++ = CR;
                 if (buf < last) {
                     *buf++ = LF;
@@ -478,9 +477,9 @@ static u_char *
 see_sprintf_num(u_char *buf, u_char *last, uint64_t ui64, u_char zero,
     see_uint_t hexadecimal, see_uint_t width)
 {
-    u_char         *p, temp[SEE_INT64_LEN + 1];
+    u_char         *p, temp[NGX_INT64_LEN + 1];
                        /*
-                        * we need temp[SEE_INT64_LEN] only,
+                        * we need temp[NGX_INT64_LEN] only,
                         * but icc issues the warning
                         */
     size_t          len;
@@ -488,11 +487,11 @@ see_sprintf_num(u_char *buf, u_char *last, uint64_t ui64, u_char zero,
     static u_char   hex[] = "0123456789abcdef";
     static u_char   HEX[] = "0123456789ABCDEF";
 
-    p = temp + SEE_INT64_LEN;
+    p = temp + NGX_INT64_LEN;
 
     if (hexadecimal == 0) {
 
-        if (ui64 <= (uint64_t) SEE_MAX_UINT32_VALUE) {
+        if (ui64 <= (uint64_t) NGX_MAX_UINT32_VALUE) {
 
             /*
              * To divide 64-bit numbers and to find remainders
@@ -542,7 +541,7 @@ see_sprintf_num(u_char *buf, u_char *last, uint64_t ui64, u_char zero,
 
     /* zero or space padding */
 
-    len = (temp + SEE_INT64_LEN) - p;
+    len = (temp + NGX_INT64_LEN) - p;
 
     while (len++ < width && buf < last) {
         *buf++ = zero;
@@ -550,7 +549,7 @@ see_sprintf_num(u_char *buf, u_char *last, uint64_t ui64, u_char zero,
 
     /* number safe copy */
 
-    len = (temp + SEE_INT64_LEN) - p;
+    len = (temp + NGX_INT64_LEN) - p;
 
     if (buf + len > last) {
         len = last - buf;
@@ -867,7 +866,7 @@ see_filename_cmp(u_char *s1, u_char *s2, size_t n)
         c1 = (see_uint_t) *s1++;
         c2 = (see_uint_t) *s2++;
 
-#if (SEE_HAVE_CASELESS_FILESYSTEM)
+#if (NGX_HAVE_CASELESS_FILESYSTEM)
         c1 = tolower(c1);
         c2 = tolower(c2);
 #endif
@@ -904,19 +903,19 @@ see_atoi(u_char *line, size_t n)
     see_int_t  value, cutoff, cutlim;
 
     if (n == 0) {
-        return SEE_ERROR;
+        return NGX_ERROR;
     }
 
-    cutoff = SEE_MAX_INT_T_VALUE / 10;
-    cutlim = SEE_MAX_INT_T_VALUE % 10;
+    cutoff = NGX_MAX_INT_T_VALUE / 10;
+    cutlim = NGX_MAX_INT_T_VALUE % 10;
 
     for (value = 0; n--; line++) {
         if (*line < '0' || *line > '9') {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         value = value * 10 + (*line - '0');
@@ -935,23 +934,23 @@ see_atofp(u_char *line, size_t n, size_t point)
     see_uint_t  dot;
 
     if (n == 0) {
-        return SEE_ERROR;
+        return NGX_ERROR;
     }
 
-    cutoff = SEE_MAX_INT_T_VALUE / 10;
-    cutlim = SEE_MAX_INT_T_VALUE % 10;
+    cutoff = NGX_MAX_INT_T_VALUE / 10;
+    cutlim = NGX_MAX_INT_T_VALUE % 10;
 
     dot = 0;
 
     for (value = 0; n--; line++) {
 
         if (point == 0) {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         if (*line == '.') {
             if (dot) {
-                return SEE_ERROR;
+                return NGX_ERROR;
             }
 
             dot = 1;
@@ -959,11 +958,11 @@ see_atofp(u_char *line, size_t n, size_t point)
         }
 
         if (*line < '0' || *line > '9') {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         value = value * 10 + (*line - '0');
@@ -972,7 +971,7 @@ see_atofp(u_char *line, size_t n, size_t point)
 
     while (point--) {
         if (value > cutoff) {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         value = value * 10;
@@ -988,19 +987,19 @@ see_atosz(u_char *line, size_t n)
     ssize_t  value, cutoff, cutlim;
 
     if (n == 0) {
-        return SEE_ERROR;
+        return NGX_ERROR;
     }
 
-    cutoff = SEE_MAX_SIZE_T_VALUE / 10;
-    cutlim = SEE_MAX_SIZE_T_VALUE % 10;
+    cutoff = NGX_MAX_SIZE_T_VALUE / 10;
+    cutlim = NGX_MAX_SIZE_T_VALUE % 10;
 
     for (value = 0; n--; line++) {
         if (*line < '0' || *line > '9') {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         value = value * 10 + (*line - '0');
@@ -1016,19 +1015,19 @@ see_atoof(u_char *line, size_t n)
     off_t  value, cutoff, cutlim;
 
     if (n == 0) {
-        return SEE_ERROR;
+        return NGX_ERROR;
     }
 
-    cutoff = SEE_MAX_OFF_T_VALUE / 10;
-    cutlim = SEE_MAX_OFF_T_VALUE % 10;
+    cutoff = NGX_MAX_OFF_T_VALUE / 10;
+    cutlim = NGX_MAX_OFF_T_VALUE % 10;
 
     for (value = 0; n--; line++) {
         if (*line < '0' || *line > '9') {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         value = value * 10 + (*line - '0');
@@ -1044,19 +1043,19 @@ see_atotm(u_char *line, size_t n)
     time_t  value, cutoff, cutlim;
 
     if (n == 0) {
-        return SEE_ERROR;
+        return NGX_ERROR;
     }
 
-    cutoff = SEE_MAX_TIME_T_VALUE / 10;
-    cutlim = SEE_MAX_TIME_T_VALUE % 10;
+    cutoff = NGX_MAX_TIME_T_VALUE / 10;
+    cutlim = NGX_MAX_TIME_T_VALUE % 10;
 
     for (value = 0; n--; line++) {
         if (*line < '0' || *line > '9') {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         if (value >= cutoff && (value > cutoff || *line - '0' > cutlim)) {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         value = value * 10 + (*line - '0');
@@ -1073,14 +1072,14 @@ see_hextoi(u_char *line, size_t n)
     see_int_t  value, cutoff;
 
     if (n == 0) {
-        return SEE_ERROR;
+        return NGX_ERROR;
     }
 
-    cutoff = SEE_MAX_INT_T_VALUE / 16;
+    cutoff = NGX_MAX_INT_T_VALUE / 16;
 
     for (value = 0; n--; line++) {
         if (value > cutoff) {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
 
         ch = *line;
@@ -1097,7 +1096,7 @@ see_hextoi(u_char *line, size_t n)
             continue;
         }
 
-        return SEE_ERROR;
+        return NGX_ERROR;
     }
 
     return value;
@@ -1248,12 +1247,12 @@ see_decode_base64_internal(see_str_t *dst, see_str_t *src, const u_char *basis)
         }
 
         if (basis[src->data[len]] == 77) {
-            return SEE_ERROR;
+            return NGX_ERROR;
         }
     }
 
     if (len % 4 == 1) {
-        return SEE_ERROR;
+        return NGX_ERROR;
     }
 
     s = src->data;
@@ -1278,7 +1277,7 @@ see_decode_base64_internal(see_str_t *dst, see_str_t *src, const u_char *basis)
 
     dst->len = d - dst->data;
 
-    return SEE_OK;
+    return NGX_OK;
 }
 
 
@@ -1613,7 +1612,7 @@ see_unescape_uri(u_char **dst, u_char **src, size_t size, see_uint_t type)
         switch (state) {
         case sw_usual:
             if (ch == '?'
-                && (type & (SEE_UNESCAPE_URI|SEE_UNESCAPE_REDIRECT)))
+                && (type & (NGX_UNESCAPE_URI|NGX_UNESCAPE_REDIRECT)))
             {
                 *d++ = ch;
                 goto done;
@@ -1657,7 +1656,7 @@ see_unescape_uri(u_char **dst, u_char **src, size_t size, see_uint_t type)
             if (ch >= '0' && ch <= '9') {
                 ch = (u_char) ((decoded << 4) + ch - '0');
 
-                if (type & SEE_UNESCAPE_REDIRECT) {
+                if (type & NGX_UNESCAPE_REDIRECT) {
                     if (ch > '%' && ch < 0x7f) {
                         *d++ = ch;
                         break;
@@ -1677,7 +1676,7 @@ see_unescape_uri(u_char **dst, u_char **src, size_t size, see_uint_t type)
             if (c >= 'a' && c <= 'f') {
                 ch = (u_char) ((decoded << 4) + c - 'a' + 10);
 
-                if (type & SEE_UNESCAPE_URI) {
+                if (type & NGX_UNESCAPE_URI) {
                     if (ch == '?') {
                         *d++ = ch;
                         goto done;
@@ -1687,7 +1686,7 @@ see_unescape_uri(u_char **dst, u_char **src, size_t size, see_uint_t type)
                     break;
                 }
 
-                if (type & SEE_UNESCAPE_REDIRECT) {
+                if (type & NGX_UNESCAPE_REDIRECT) {
                     if (ch == '?') {
                         *d++ = ch;
                         goto done;
@@ -1844,6 +1843,89 @@ see_escape_json(u_char *dst, u_char *src, size_t size)
 }
 
 
+void
+see_str_rbtree_insert_value(see_rbtree_node_t *temp,
+    see_rbtree_node_t *node, see_rbtree_node_t *sentinel)
+{
+    see_str_node_t      *n, *t;
+    see_rbtree_node_t  **p;
+
+    for ( ;; ) {
+
+        n = (see_str_node_t *) node;
+        t = (see_str_node_t *) temp;
+
+        if (node->key != temp->key) {
+
+            p = (node->key < temp->key) ? &temp->left : &temp->right;
+
+        } else if (n->str.len != t->str.len) {
+
+            p = (n->str.len < t->str.len) ? &temp->left : &temp->right;
+
+        } else {
+            p = (see_memcmp(n->str.data, t->str.data, n->str.len) < 0)
+                 ? &temp->left : &temp->right;
+        }
+
+        if (*p == sentinel) {
+            break;
+        }
+
+        temp = *p;
+    }
+
+    *p = node;
+    node->parent = temp;
+    node->left = sentinel;
+    node->right = sentinel;
+    see_rbt_red(node);
+}
+
+
+see_str_node_t *
+see_str_rbtree_lookup(see_rbtree_t *rbtree, see_str_t *val, uint32_t hash)
+{
+    see_int_t           rc;
+    see_str_node_t     *n;
+    see_rbtree_node_t  *node, *sentinel;
+
+    node = rbtree->root;
+    sentinel = rbtree->sentinel;
+
+    while (node != sentinel) {
+
+        n = (see_str_node_t *) node;
+
+        if (hash != node->key) {
+            node = (hash < node->key) ? node->left : node->right;
+            continue;
+        }
+
+        if (val->len != n->str.len) {
+            node = (val->len < n->str.len) ? node->left : node->right;
+            continue;
+        }
+
+        rc = see_memcmp(val->data, n->str.data, val->len);
+
+        if (rc < 0) {
+            node = node->left;
+            continue;
+        }
+
+        if (rc > 0) {
+            node = node->right;
+            continue;
+        }
+
+        return n;
+    }
+
+    return NULL;
+}
+
+
 /* see_sort() is implemented as insertion sort because we need stable sort */
 
 void
@@ -1877,13 +1959,13 @@ see_sort(void *base, size_t n, size_t size,
 }
 
 
-#if (SEE_MEMCPY_LIMIT)
+#if (NGX_MEMCPY_LIMIT)
 
 void *
 see_memcpy(void *dst, const void *src, size_t n)
 {
-    if (n > SEE_MEMCPY_LIMIT) {
-        see_log_error(SEE_LOG_ALERT, see_cycle->log, 0, "memcpy %uz bytes", n);
+    if (n > NGX_MEMCPY_LIMIT) {
+        see_log_error(NGX_LOG_ALERT, see_cycle->log, 0, "memcpy %uz bytes", n);
         see_debug_point();
     }
 

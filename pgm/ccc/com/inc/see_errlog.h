@@ -11,6 +11,7 @@
 
 int see_chglog(char cChgCode,char *pcChgStr);
 int see_errlog(int iErrCode,char *pcaDispMsg,char cDumpDev,char *pcaDumpAddr,long llen);
+int see_err_log( char *add, long len, const char *fmt, ... );
 void see_disp_errmsg(int iFileId,char *pcaMsgStr,char *pcaDumpAddr,long llen);
 void see_mem_dump(int iFileId,char *pucaAddr,long llen);
 void see_DumpHex(int ifile,unsigned char *buf, int len) ;

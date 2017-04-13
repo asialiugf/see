@@ -224,3 +224,15 @@ void see_DumpHex(int ifile, unsigned char* buf, int len)
     see_DumpLine(ifile, 16*i, &buf[16*i], len % 16);  
   }  
 }  
+
+int
+see_err_log( char *add, long len, const char *fmt, ... ) 
+{
+    va_list ap;
+    memset(ca_errmsg,'\0',1024);
+    va_start(ap, fmt);
+    vsprintf(ca_errmsg, fmt, ap);
+    va_end(ap);
+    see_errlog(1000,ca_errmsg,RPT_TO_LOG,add,len);
+    return 0;
+}

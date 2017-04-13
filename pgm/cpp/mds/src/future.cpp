@@ -105,10 +105,26 @@ int
 main(int argc,char *argv[])
 {
 
+    /*
+    char ca_kkkf[100] ;
+    memset( ca_kkkf,'o',99 );
+    ca_kkkf[99] ='\0';
+    see_err_log(ca_kkkf,strlen(ca_kkkf),"%s %d\n","kkkk",sizeof(ca_kkkf));
+    exit(1);
+    */
+
+    int iu = 0;
+    see_shm_t shm;
+    shm.size = sizeof(see_fut_mem_t)*100;
+    see_shm_alloc(&shm);
+    memset(shm.addr, '\0', 100);
+    memset(shm.addr, 'p',88);
+    printf((const char *) shm.addr);
+    see_shm_free(&shm);
+
     int pid = 0;
     //see_stt_blocks_init( &t_conf );
     see_show_version();
-   
 
     see_signal_init();                 // ÐèÒªÏêÏ¸¿¼ÂÇ
     signal(SIGHUP, SIG_IGN);
@@ -140,7 +156,18 @@ main(int argc,char *argv[])
 
     case 0:
         pid = getpid();
-        setproctitle("%s %s [ %s ]", "future.x :", "ctpget","TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 TA701 ");
+        setproctitle("%s %s [ %s ]", "future.x :", "ctpget","TA701 TA701 TA701");
+        see_shm_alloc(&shm);
+
+        while(1) {
+            iu ++;
+            memset(shm.addr, '\0', 100);
+            memset(shm.addr, 'l',88);
+            sprintf((char *)shm.addr, " this a test %d \n",iu);
+            printf((const char *) shm.addr);
+            sleep(1);
+        }
+
         ctpget() ;
         break;
 
