@@ -132,6 +132,54 @@ main(int argc,char *argv[])
     see_daemon(1,0) ;
     see_config_init(&t_conf);
 
+    stt_bars_t K;
+    stt_init(&K, (char *)"stt01",t_conf.j_conf);
+    stt_init(&K, (char *)"stt03",t_conf.j_conf);
+    stt_init(&K, (char *)"stt02",t_conf.j_conf);
+    
+    int x;
+    for (x = 99;x < 199; x++) {
+        printf ( "%lf\n",K.B[K.p[1]]->oo[x]) ;
+    }
+
+    cJSON   *j_strategy ;
+    j_strategy = cJSON_GetObjectItem(t_conf.j_conf, "strategy");
+    if(j_strategy <=0) {
+        printf(" json error!\n ") ;
+    }
+    if(j_strategy) {
+        int num ;
+        int num2 ;
+        cJSON *j_stt;
+        cJSON *j_map;
+        cJSON *j_ttt;
+        cJSON *j_period;
+        cJSON *j_ccc;
+        int i;
+        int k;
+
+        num = cJSON_GetArraySize(j_strategy);
+        for(i = 0; i< num ; i++) {
+            j_stt = cJSON_GetArrayItem(j_strategy,i);
+            if(j_stt) {
+                printf("%s\n",j_stt->string);
+                j_ttt = cJSON_GetObjectItem(j_stt, "period");
+                num2 = cJSON_GetArraySize(j_ttt);
+                for(k=0; k<num2; k++) {
+                    j_period = cJSON_GetArrayItem(j_ttt,k);
+                    if(j_period) {
+                        printf("%s \n", j_period->valuestring) ;
+                        j_map = cJSON_GetObjectItem(t_conf.j_conf,"period_map");
+                        j_ccc = cJSON_GetObjectItem(j_map,j_period->valuestring);
+                        printf("%s: %s %d \n",j_stt->string, j_period->valuestring,j_ccc->valueint);
+                    }
+                }
+            }
+        }
+    }
+
+    exit(1);
+
     if(argc<=1) {
         printf(" ctpget.x will enter into product mode! \n");
         t_conf.c_test = 'p';

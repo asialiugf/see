@@ -16,6 +16,18 @@ int test(int i, const char *fmt, ...)
     va_end(ap);
     printf(p) ;
 
+
+    /* */
+    double * oo;
+    double kk[100];
+    kk[10] = 111;
+    kk[20] = 444;
+    oo = kk;
+    oo[78] = 3456;
+    printf( "\n %lf \n", oo[10] );
+    printf( "\n %lf \n", kk[78] );
+    /* */
+
     return 0;
 }
 int main()

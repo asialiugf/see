@@ -80,8 +80,11 @@ int see_block_init(see_fut_block_t * p_block, char * pc_future, see_hours_t t_ho
     FILE            *pf_future_days ;
     see_bar_block_t     bar_block ;
 
-    memset(bar_block.ca_table, '\0', 128) ;
-    memset(bar_block.ca_home, '\0', 512) ;
+    //memset(bar_block.ca_table, '\0', 128) ;
+    //memset(bar_block.ca_home, '\0', 512) ;
+    see_memzero(bar_block.ca_table,128) ;
+    see_memzero(bar_block.ca_home, 512) ;
+
     bar_block.bar0.o = SEE_NULL;
     bar_block.bar1.o = SEE_NULL;
     bar_block.bar0.c = SEE_NULL;

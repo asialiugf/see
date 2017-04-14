@@ -1344,6 +1344,10 @@ int see_save_bar_last(see_fut_block_t *p_block, int period, int i_another_day)
     return 0;
 }
 
+
+/*
+ * 定时，将K线数据 从文件 写入到数据库里
+ */
 void *see_pthread_dat(void *data)
 {
     volatile int            i,j,k;
@@ -1371,14 +1375,12 @@ void *see_pthread_dat(void *data)
         memset(&outtime, 0, sizeof(outtime));
         clock_gettime(CLOCK_REALTIME, &outtime);
 
-        printf("--------------------------%d,%d\n",(int)outtime.tv_sec,(int)outtime.tv_nsec);
 
         /* t 取得开启程序时的当前时间 */
         time(&now);
         timenow = localtime(&now);
         t = timenow->tm_hour*3600 + timenow->tm_min*60 + timenow->tm_sec;
 
-        printf("-----------------%d,%d,%d,--------t:%d\n",timenow->tm_hour,timenow->tm_min,timenow->tm_sec,t);
 
         /* 设定定时执行线程的时间点 */
         if(t<t1) {
@@ -1410,29 +1412,10 @@ void *see_pthread_dat(void *data)
            调用  pthread_mutex_unlock() 解锁。
         */
         pthread_cond_timedwait(&p_conf->cond_bar, &p_conf->mutex_bar, &outtime);
+
+
         see_zdb_open(p_conf);
 
-        /*
-        volatile see_node *node;
-        for ( i=0;i<p_conf->i_future_num;i++ ){
-            memset(ca_state,'\0',512);
-            memset(ca_filename,'\0',512);
-            node = p_conf->pt_stt_blks[i]->list;
-            while( node != NULL ){
-                // p_conf->pt_fut_blks[i].bar_block[node->period].ca_table;
-                printf(p_conf->pt_fut_blks[i]->bar_block[node->period].ca_table);
-                printf("\n");
-                //memcpy(ca_filename,"%s/%s",p_conf->pt_fut_blks[i].bar_block[node->period].ca_home
-
-                see_trave_dir(p_conf->pt_fut_blks[i]->bar_block[node->period].ca_home,&i_num, ca_files);
-                see_zdb_create_table( p_conf, p_conf->pt_fut_blks[i]->bar_block[node->period].ca_table );
-                for( j=0;j<i_num;j++ ){
-                    see_zdb_insert_file( p_conf, ca_files[j], p_conf->pt_fut_blks[i]->bar_block[node->period].ca_table );
-                }
-                node = node->next;
-            }
-        }
-        */
 
         for(i=0; i<p_conf->i_future_num; i++) {
             memset(ca_state,'\0',512);

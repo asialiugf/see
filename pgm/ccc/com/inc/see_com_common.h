@@ -45,6 +45,7 @@ typedef char         *PC_FUTURES    [FUTURE_NUMBER] ;                      // �
 typedef char          CA_FUTURES    [FUTURE_NUMBER][FUTRUE_ID_LEN] ;        // 合约 名称字串数组 真正存放 合约名称的地方
 //typedef see_fut_block_t  *PT_BLOCKS     [FUTURE_NUMBER] ;
 
+#include <see_shmem.h>
 #include <see_cjson.h>
 #include <see_errlog.h>
 #include <see_signal.h>
@@ -59,7 +60,6 @@ typedef char          CA_FUTURES    [FUTURE_NUMBER][FUTRUE_ID_LEN] ;        // �
 #include <see_strategy.h>
 //#include <../../unx/inc/see_setproctitle.h>
 #include <see_setproctitle.h>
-#include <see_shmem.h>
 
 // extern see_hours_t t_hours[SEE_HOUR_TYPE_NUM] ;
 

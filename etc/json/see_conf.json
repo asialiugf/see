@@ -14,7 +14,7 @@
     },
     "futures":{
         "TA705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
-        "TA701":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "TA701":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt02", "auto_trade":"no","period":["1f","5f","30f"] },
         "cs1705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "p1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "l1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
@@ -29,6 +29,11 @@
         "j1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "i1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "CF705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["2f","5f","1h"] }
+    },
+    "strategy":{
+        "stt01":{"auto_trade":"no","period":["1f","5f","30f"]},
+        "stt02":{"auto_trade":"no","period":["1f","5f","30f"]},
+        "stt03":{"auto_trade":"no","period":["1f","5f","30f"]}
     },
     "get.x":{ "daemon":"yes", "all_in_get":"no","bar_in_get":"yes","stt_in_get":"yes" },
     "bar.x":{ "daemon":"yes", "all_in_bar":"no","stt_in_bar":"yes" },

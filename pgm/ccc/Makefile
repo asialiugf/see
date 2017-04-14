@@ -51,7 +51,7 @@ UNX_DEPS = ccc/unx/inc/see_setproctitle.h
 
 build:  binary
 
-binary: objs exes sttobjs unxobjs
+binary: objs exes 
 
 exes: \
 	$(BINEXE)rrr.x \
@@ -72,22 +72,33 @@ objs: ccc/com/obj/see_errlog.o \
 	ccc/com/obj/see_config.o \
 	ccc/com/obj/see_zdbfun.o \
 	ccc/com/obj/see_zmq.o \
-	ccc/com/obj/see_testkdj.o
+	ccc/com/obj/see_testkdj.o \
+	ccc/unx/obj/see_setproctitle.o \
+	ccc/unx/obj/see_shmem.o \
+	ccc/stt/obj/see_stt01.o \
+	ccc/stt/obj/see_stt02.o
+
 
 CCCOBJS:= \
-     ccc/com/obj/see_errlog.o \
-     ccc/com/obj/see_signal.o \
-     ccc/com/obj/see_daemon.o \
-     ccc/com/obj/see_bars.o \
-     ccc/com/obj/see_pubsub.o \
-     ccc/com/obj/see_iofile.o \
-     ccc/com/obj/see_cjson.o \
-     ccc/com/obj/see_config.o \
-     ccc/com/obj/see_strategy.o \
-     ccc/com/obj/see_zdbfun.o \
-     ccc/com/obj/see_zmq.o \
-	 ccc/com/obj/see_recieve.o \
-     ccc/com/obj/see_future.o
+	ccc/com/obj/see_errlog.o \
+    ccc/com/obj/see_signal.o \
+    ccc/com/obj/see_daemon.o \
+    ccc/com/obj/see_bars.o \
+    ccc/com/obj/see_pubsub.o \
+    ccc/com/obj/see_future.o \
+    ccc/com/obj/see_iofile.o \
+    ccc/com/obj/see_recieve.o \
+    ccc/com/obj/see_cjson.o \
+    ccc/com/obj/see_mariadb.o \
+    ccc/com/obj/see_strategy.o \
+    ccc/com/obj/see_config.o \
+    ccc/com/obj/see_zdbfun.o \
+    ccc/com/obj/see_zmq.o \
+    ccc/com/obj/see_testkdj.o \
+    ccc/unx/obj/see_setproctitle.o \
+    ccc/unx/obj/see_shmem.o \
+    ccc/stt/obj/see_stt01.o \
+    ccc/stt/obj/see_stt02.o
 
 COMOBJS:= \
      ccc/com/obj/see_errlog.o \
@@ -103,23 +114,24 @@ COMOBJS:= \
      ccc/com/obj/see_zmq.o \
      ccc/com/obj/see_future.o
 
-
-unxobjs: \
+UNXOBJS:= \
 	ccc/unx/obj/see_setproctitle.o \
 	ccc/unx/obj/see_shmem.o
 
-sttobjs: \
+STTOBJS:= \
 	ccc/stt/obj/see_stt01.o \
 	ccc/stt/obj/see_stt02.o
 
 $(BINEXE)rrr.x: $(CCCOBJS)
-	$(CC) $(CFLAGS) -o $(BINEXE)rrr.x $(CCCOBJS) -lzdb -lnanomsg -lta_lib -lerrlog -lcjson -lzmq
+	$(CC) $(CFLAGS) -o $(BINEXE)rrr.x $(COMOBJS) $(UNXOBJS) $(STTOBJS) ccc/com/obj/see_recieve.o -lzdb -lnanomsg -lta_lib -lerrlog -lcjson -lzmq -lsee_talib
 
 $(BINEXE)kdj.x: $(objs)
-	$(CC) $(CFLAGS) -o $(BINEXE)kdj.x $(COMOBJS) ccc/com/obj/see_testkdj.o -lzdb -lnanomsg -lerrlog -lsee_talib -lcjson -lzmq 
+	$(CC) $(CFLAGS) -o $(BINEXE)kdj.x $(COMOBJS) $(UNXOBJS) \
+	ccc/com/obj/see_testkdj.o \
+	-lzdb -lnanomsg -lerrlog -lsee_talib -lcjson -lzmq 
 
 $(BINEXE)maria.x: $(objs)
-	$(CC) $(CFLAGS) -o $(BINEXE)maria.x $(COMOBJS) ccc/com/obj/see_mariadb.o -lzdb -lnanomsg -lerrlog -lsee_talib -lcjson -lzmq
+	$(CC) $(CFLAGS) -o $(BINEXE)maria.x $(COMOBJS) $(UNXOBJS) ccc/com/obj/see_mariadb.o -lzdb -lnanomsg -lerrlog -lsee_talib -lcjson -lzmq
 
 $(COMOBJ)see_cjson.o: $(ALL_DEPS) $(COMSRC)see_cjson.c
 	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(COMOBJ)see_cjson.o  $(COMSRC)see_cjson.c

@@ -1,26 +1,27 @@
 #include <see_com_common.h>
 
 
-int see_config_init( see_config_t *p_conf )
+int see_config_init(see_config_t *p_conf)
 {
     int     i_rtn ;
     int     i ;
     int     u ;
-    char ca_conf_json[] = "../../etc/json/see_conf.json" ;
     cJSON   *j_root ;
     cJSON   *j_item ;
     cJSON   *j_temp ;
     cJSON   *j_period ;
+    char    ca_conf_json[] = "../../etc/json/see_conf.json" ;
     
+
     p_conf-> i_future_num = 0;
-    memset( p_conf->ca_nn_pair_url,'\0',512 );
-    memset( p_conf->ca_nn_pubsub_url,'\0',512 );
-    memset( p_conf->ca_db_url,'\0',512 );
-    for( u=0;u<FUTURE_NUMBER;u++ ){
-        memset( p_conf->ca_futures[u],'\0',FUTRUE_ID_LEN ) ;
-        p_conf->pc_futures[u] = NULL;
-        p_conf->pt_stt_blks[u] = NULL;
-        p_conf->pt_fut_blks[u] = NULL;
+    memset(p_conf->ca_nn_pair_url,'\0',512);
+    memset(p_conf->ca_nn_pubsub_url,'\0',512);
+    memset(p_conf->ca_db_url,'\0',512);
+    for(i=0; i<FUTURE_NUMBER; i++) {
+        memset(p_conf->ca_futures[i],'\0',FUTRUE_ID_LEN) ;
+        p_conf->pc_futures[i] = NULL;
+        p_conf->pt_stt_blks[i] = NULL;
+        p_conf->pt_fut_blks[i] = NULL;
     }
 
     pthread_mutex_init(&p_conf->mutex_dat, NULL);
@@ -28,69 +29,71 @@ int see_config_init( see_config_t *p_conf )
     pthread_cond_init(&p_conf->cond_dat, NULL);
     pthread_cond_init(&p_conf->cond_bar, NULL);
 
-    /* p_conf->t_hours init !!!!!!!!!!!  */ 
-    see_trading_hours_init( &p_conf->t_hours[0] ) ;
+    /* p_conf->t_hours init !!!!!!!!!!!  */
+    see_trading_hours_init(&p_conf->t_hours[0]) ;
 
-    sprintf( p_conf->ca_home, "%s", (char *)getenv("HOME") );
+    sprintf(p_conf->ca_home, "%s", (char *)getenv("HOME"));
 
     /* deal futures from conf.json */
-    i_rtn = see_file_to_json((char *)ca_conf_json, &j_root );
-    if( i_rtn!=0 ){
+    i_rtn = see_file_to_json((char *)ca_conf_json, &j_root);
+    if(i_rtn!=0) {
         exit(1) ;
     }
-    
-    j_item = cJSON_GetObjectItem( j_root, "nanomsg" );   
-    if( j_item == NULL ){
-        printf ( " see_config_init() get nanomsg error !!  \n " );
+   
+    j_item = cJSON_GetObjectItem(j_root, "nanomsg");
+    if(j_item == NULL) {
+        printf(" see_config_init() get nanomsg error !!  \n ");
     }
-    j_temp = cJSON_GetObjectItem( j_item, "pair_url" );
-    memcpy( p_conf->ca_nn_pair_url, j_temp->valuestring, strlen(j_temp->valuestring) );
+    j_temp = cJSON_GetObjectItem(j_item, "pair_url");
+    memcpy(p_conf->ca_nn_pair_url, j_temp->valuestring, strlen(j_temp->valuestring));
     //p_conf->i_pair_sock = see_pair_server(p_conf->ca_nn_pair_url) ;
 
     /* topy : to python rose */
-    j_temp = cJSON_GetObjectItem( j_item, "topy_url" );
-    memcpy( p_conf->ca_nn_topy_url, j_temp->valuestring, strlen(j_temp->valuestring) );
+    j_temp = cJSON_GetObjectItem(j_item, "topy_url");
+    memcpy(p_conf->ca_nn_topy_url, j_temp->valuestring, strlen(j_temp->valuestring));
     //p_conf->i_topy_sock = see_pair_server(p_conf->ca_nn_topy_url) ;
 
     /* zmq_pub : to python rose */
-    j_temp = cJSON_GetObjectItem( j_item, "zmq_pubsub_url" );
-    memcpy( p_conf->ca_zmq_pubsub_url, j_temp->valuestring, strlen(j_temp->valuestring) );
+    j_temp = cJSON_GetObjectItem(j_item, "zmq_pubsub_url");
+    memcpy(p_conf->ca_zmq_pubsub_url, j_temp->valuestring, strlen(j_temp->valuestring));
     p_conf->v_sock = see_zmq_pub_init(p_conf->ca_zmq_pubsub_url);
-    
+
     /* for test begin */
     int rc = 0;
-    for( i = 0;i<=1 ; i++) {
-        printf("ddddddddddddd: %d\n",i );
+    for(i = 0; i<=1 ; i++) {
+        printf("ddddddddddddd: %d\n",i);
         rc = zmq_send(p_conf->v_sock, "kkkk", 4, ZMQ_DONTWAIT);
-        if (rc !=4 ) { printf( " zmq_send kkkk 4 err!!!!!!!!!\n" ); }
+        if(rc !=4) {
+            printf(" zmq_send kkkk 4 err!!!!!!!!!\n");
+        }
         sleep(1);
     }
     /* for test end */
 
     /* 这里其实是 pipeline sock !! */
-    j_temp = cJSON_GetObjectItem( j_item, "pubsub_url" );
-    memcpy( p_conf->ca_nn_pubsub_url, j_temp->valuestring, strlen(j_temp->valuestring) );
+    j_temp = cJSON_GetObjectItem(j_item, "pubsub_url");
+    memcpy(p_conf->ca_nn_pubsub_url, j_temp->valuestring, strlen(j_temp->valuestring));
     p_conf->i_pubsub_sock = see_pipeline_server(p_conf->ca_nn_pubsub_url) ;
 
-    j_item = cJSON_GetObjectItem( j_root, "database" );
-    if( j_item == NULL ){
-        printf ( " see_config_init() get database error !!  \n " );
+    j_item = cJSON_GetObjectItem(j_root, "database");
+    if(j_item == NULL) {
+        printf(" see_config_init() get database error !!  \n ");
     }
-    j_item = cJSON_GetObjectItem( j_item, "mariadb" );
-    j_temp = cJSON_GetObjectItem( j_item, "url" );
-    memcpy( p_conf->ca_db_url, j_temp->valuestring, strlen(j_temp->valuestring) );
+    j_item = cJSON_GetObjectItem(j_item, "mariadb");
+    j_temp = cJSON_GetObjectItem(j_item, "url");
+    memcpy(p_conf->ca_db_url, j_temp->valuestring, strlen(j_temp->valuestring));
 
 
-    j_item = cJSON_GetObjectItem( j_root, "futures" );
-    if( j_item == NULL ){
-        printf ( " see_config_init() get futures error !!  \n " );
+    j_item = cJSON_GetObjectItem(j_root, "futures");
+    if(j_item == NULL) {
+        printf(" see_config_init() get futures error !!  \n ");
     }
     p_conf->i_future_num = cJSON_GetArraySize(j_item);
-    if( p_conf->i_future_num <=0 ){
+    if(p_conf->i_future_num <=0) {
         exit(-1) ;
     }
-    if( p_conf->i_future_num > FUTURE_NUMBER ){
-        printf ( " see_config_init() futures number is overload !!  \n " );
+    if(p_conf->i_future_num > FUTURE_NUMBER) {
+        printf(" see_config_init() futures number is overload !!  \n ");
         exit(-1) ;
     }
 
@@ -98,33 +101,41 @@ int see_config_init( see_config_t *p_conf )
     /* p_conf->pc_futures[u] init !         */
     /* p_conf->pt_stt_blks[u]->list init !! */
 
-    for( u=0; u<p_conf->i_future_num; u++ )
-    {
+    for(u=0; u<p_conf->i_future_num; u++) {
         j_temp = cJSON_GetArrayItem(j_item,u);
-        if(j_temp)
-        {
-            printf ("%s\n",j_temp->string );
-            memcpy( p_conf->ca_futures[u], j_temp->string, strlen(j_temp->string) );
+        if(j_temp) {
+            printf("%s\n",j_temp->string);
+            memcpy(p_conf->ca_futures[u], j_temp->string, strlen(j_temp->string));
             p_conf->pc_futures[u] = &(p_conf->ca_futures[u][0]) ;
 
             p_conf->pt_fut_blks[u] = (see_fut_block_t *)malloc(sizeof(see_fut_block_t)) ;
-            if (p_conf->pt_fut_blks[u] == NULL ) {
-                see_errlog( 1000,"malloc(sizeof(see_fut_block_t) error !\n",RPT_TO_LOG,0,0 ) ;
+            if(p_conf->pt_fut_blks[u] == NULL) {
+                see_errlog(1000,"malloc(sizeof(see_fut_block_t) error !\n",RPT_TO_LOG,0,0) ;
             }
-            see_block_init( p_conf->pt_fut_blks[u], p_conf->pc_futures[u], &p_conf->t_hours[0] ) ;
+            see_block_init(p_conf->pt_fut_blks[u], p_conf->pc_futures[u], &p_conf->t_hours[0]) ;
+
+
             /*
-                下面这句，是为每个 future block 的 v_sock赋值。v_sock是指 zmq  
+                下面这句，是为每个 future block 的 v_sock赋值。v_sock是指 zmq
                 前面 see_zmq_pub_init() 会产生 v_sock值。
                 目前，所有的future block  的 v_sock 的值是一样的。
                 在 see_bars.c 的 see_send_bar() 会 使用到 v_sock !
             */
             p_conf->pt_fut_blks[u]->v_sock = p_conf->v_sock ; // for zmq pub
 
+
+            /*
+             *  每个future block 分配一块内存区 share memory !!
+             */
+            p_conf->pt_fut_blks[u]->shm.size = sizeof(see_fut_mem_t);
+            see_shm_alloc(&(p_conf->pt_fut_blks[u]->shm));
+
+
             p_conf->pt_stt_blks[u] = (see_stt_block_t *)malloc(sizeof(see_stt_block_t)) ;
-            if ( p_conf->pt_stt_blks[u] == NULL ) {
-                see_errlog( 1000,"malloc(sizeof(see_stt_block_t) error !\n",RPT_TO_LOG,0,0 ) ;
+            if(p_conf->pt_stt_blks[u] == NULL) {
+                see_errlog(1000,"malloc(sizeof(see_stt_block_t) error !\n",RPT_TO_LOG,0,0) ;
             }
-            for( i=0;i<31;i++ ){
+            for(i=0; i<31; i++) {
                 p_conf->pt_stt_blks[u]->pt_kkall[i] = NULL ;
                 p_conf->pt_stt_blks[u]->list = NULL ;
             }
@@ -132,11 +143,11 @@ int see_config_init( see_config_t *p_conf )
             see_stt_blk_init( p_conf->pt_stt_blks[u], p_conf->pc_futures[u] ) ;
             */
 
-            j_period = cJSON_GetObjectItem( j_temp, "period" );
-            if( j_period ){
+            j_period = cJSON_GetObjectItem(j_temp, "period");
+            if(j_period) {
                 /*
                 char *s = cJSON_Print(j_period) ;
-                printf( "%s\n",s ); 
+                printf( "%s\n",s );
                 free( s );
                 */
                 int num ;
@@ -144,45 +155,46 @@ int see_config_init( see_config_t *p_conf )
                 cJSON *j_map;
                 cJSON *j_ttt;
 
-                num = cJSON_GetArraySize( j_period );
-                if( num>0 ){
+                num = cJSON_GetArraySize(j_period);
+                if(num>0) {
                     see_node * temp ;
                     see_node * node ;
-                    see_node * n_this = malloc( sizeof(see_node) );
+                    see_node * n_this = malloc(sizeof(see_node));
                     temp = n_this ;
                     p_conf->pt_stt_blks[u]->list = n_this ;
-                    for( i=0;i<num;i++ ){
-                        j_kkk = cJSON_GetArrayItem( j_period,i );
-                        if( j_kkk ){
-                            j_map = cJSON_GetObjectItem( j_root,"period_map" );
-                            j_ttt = cJSON_GetObjectItem( j_map,j_kkk->valuestring );
-                            node = malloc( sizeof(see_node) );
+                    for(i=0; i<num; i++) {
+                        j_kkk = cJSON_GetArrayItem(j_period,i);
+                        if(j_kkk) {
+                            j_map = cJSON_GetObjectItem(j_root,"period_map");
+                            j_ttt = cJSON_GetObjectItem(j_map,j_kkk->valuestring);
+                            node = malloc(sizeof(see_node));
                             temp = n_this ;
                             n_this->period = j_ttt->valueint ;
                             n_this->next = node ;
                             n_this = node ;
                         }
                     }
-                    if( p_conf->pt_stt_blks[u]->list != n_this ){
+                    if(p_conf->pt_stt_blks[u]->list != n_this) {
                         temp->next = NULL ;
-                    }else{
+                    } else {
                         p_conf->pt_stt_blks[u]->list = NULL ;
                     }
-                    free( n_this ) ;
+                    free(n_this) ;
                 }
             } /* end of if( j_period ) */
         } /* end of if(j_temp) */
     } /* end of for */
 
-    cJSON_Delete( j_root );
+    p_conf->j_conf = j_root ;
+    // cJSON_Delete(j_root);
 
-    /* p_conf->pt_stt_blks[u]->list init !! 
+    /* p_conf->pt_stt_blks[u]->list init !!
      * pt_stt_blks[1] : TA705 { 1f : ->pt_kkall[8],
      *                          5f : ->pt_kkall[11],
-     *                          30f: ->pt_kkall[15], } 
+     *                          30f: ->pt_kkall[15], }
      * pt_stt_blks[2] : v1705 { 1f : ->pt_kkall[8],
      *                          5f : ->pt_kkall[11],
-     *                          30f: ->pt_kkall[15], } 
+     *                          30f: ->pt_kkall[15], }
      * pt_stt_blks[u] : v1705 { 1f : ->pt_kkall[node->period] }
     */
 
@@ -193,7 +205,7 @@ int see_config_init( see_config_t *p_conf )
         see_kkone_t *p_kkone ;
         node = p_conf->pt_stt_blks[u]->list ;
         while( node != NULL ){
-            p_kkone = (see_kkone_t *)malloc(sizeof(see_kkone_t)) ; 
+            p_kkone = (see_kkone_t *)malloc(sizeof(see_kkone_t)) ;
             if( p_kkone == NULL ){
                 return -1 ;
             }
@@ -214,8 +226,8 @@ int see_config_init( see_config_t *p_conf )
     }
     */
 
-    /* p_conf->p_conf->pt_fut_blks init !!!!!!!!!!!  */ 
-    /* p_conf->p_conf->pt_stt_blks init !!!!!!!!!!!  */ 
+    /* p_conf->p_conf->pt_fut_blks init !!!!!!!!!!!  */
+    /* p_conf->p_conf->pt_stt_blks init !!!!!!!!!!!  */
 
-    return 0 ;    
+    return 0 ;
 }

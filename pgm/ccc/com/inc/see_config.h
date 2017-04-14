@@ -20,7 +20,7 @@ typedef struct {
     char                ca_nn_topy_url          [512] ;
     int                 i_topy_sock;
     char                ca_zmq_pubsub_url       [512] ;
-    void       *        v_sock;
+    void               *v_sock;
 
     char                ca_nn_pubsub_url        [512] ;
     int                 i_pubsub_sock;
@@ -29,6 +29,8 @@ typedef struct {
     see_stt_block_t    *pt_stt_blks             [FUTURE_NUMBER] ;
     see_fut_block_t    *pt_fut_blks             [FUTURE_NUMBER] ;
     see_hours_t         t_hours                 [SEE_HOUR_TYPE_NUM] ;
+
+    cJSON              *j_conf ;
 
     pthread_t           p_dat;
     pthread_t           p_bar;

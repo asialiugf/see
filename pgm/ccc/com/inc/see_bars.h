@@ -325,6 +325,7 @@ typedef struct  {
     int                 i_sgm_idx ;                     // 用于记录收到tick时，是在哪个交易时间段内 每收到一个记一次
     see_hours_t         *pt_hour ;                      // 每个品种的交易时间类型 不一样
     see_bar_block_t     bar_block[31] ;                 // 1s 2s 3s ... 1f 2f 3f 5f ... 1h 5h ... 1y tick
+    see_shm_t           shm ;                    /* 用于记录sharememory, 每个future有一个shmem */
 } see_fut_block_t ;                                         // 每个future 有一个 block !
 
 typedef struct {
@@ -403,9 +404,6 @@ typedef struct {
     see_kkone_t         *pt_kkall[31] ;
     see_node            *list ;
 } see_stt_block_t ;
-
-
-
 
 
 
