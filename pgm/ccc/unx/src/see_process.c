@@ -25,35 +25,42 @@ int see_quit;
 int see_terminate;
 
 #define SEE_PROCESS_WORKER 1
-#define SEE_PROCESS_HELPER 1
-#define SEE_REOPEN_SIGNAL 1
-#define SEE_CHANGEBIN_SIGNAL 1
+//#define SEE_PROCESS_HELPER 1
+//#define SEE_REOPEN_SIGNAL 1
+//#define SEE_CHANGEBIN_SIGNAL 1
 #define SEE_PROCESS_MASTER 1
 
+static int see_sttrun(see_config_t *p_conf,char * pc_future, char *pc_sttname);
 
 typedef struct {
     int     signo;
     char   *signame;
     char   *name;
-    void  (*handler)(int signo);
+    void (*handler)(int signo);
 } see_signal_t;
 
 
 see_signal_t  signals[] = {
-    { SIGHUP,
-      "SIGHUP",
-      "reload",
-      see_signal_handler },
+    {
+        SIGHUP,
+        "SIGHUP",
+        "reload",
+        see_signal_handler
+    },
 
-    { SIGTERM,
-      "SIGTERM",
-      "stop",
-      see_signal_handler },
+    {
+        SIGTERM,
+        "SIGTERM",
+        "stop",
+        see_signal_handler
+    },
 
-    { SIGQUIT,
-      "SIGQUIT", 
-      "quit",
-      see_signal_handler },
+    {
+        SIGQUIT,
+        "SIGQUIT",
+        "quit",
+        see_signal_handler
+    },
 
     { SIGALRM, "SIGALRM", "", see_signal_handler },
     { SIGINT, "SIGINT", "", see_signal_handler },
@@ -74,13 +81,13 @@ void
 see_signal_handler(int signo)
 {
     //char            *action;
-    int        ignore;
+    int             ignore;
     see_signal_t    *sig;
 
     ignore = 0;
 
-    for (sig = signals; sig->signo != 0; sig++) {
-        if (sig->signo == signo) {
+    for(sig = signals; sig->signo != 0; sig++) {
+        if(sig->signo == signo) {
             break;
         }
     }
@@ -89,14 +96,14 @@ see_signal_handler(int signo)
 
     //action = (char *)"";
 
-    switch (see_process) {
+    switch(see_process) {
 
     case 1:
     case 2:
-        switch (signo) {
+        switch(signo) {
 
         case SIGHUP:
-            if (!see_daemonized) {
+            if(!see_daemonized) {
                 break;
             }
             see_debug_quit = 1;
@@ -124,7 +131,7 @@ see_signal_handler(int signo)
                   "signal %d (%s) received%s", signo, sig->signame, action);
     */
 
-    if (ignore) {
+    if(ignore) {
         /*
         see_log_error(SEE_LOG_CRIT, see_cycle->log, 0,
                       "the changing binary signal is ignored: "
@@ -133,9 +140,60 @@ see_signal_handler(int signo)
         */
     }
 
-    if (signo == SIGCHLD) {
+    if(signo == SIGCHLD) {
         //see_process_get_status();
     }
 
     //see_set_errno(err);
+}
+
+int see_waiter(see_config_t *p_conf)
+{
+    int pid = 0;
+    while(1) {
+        //see_zmq_sub();
+        char pc_future[] = "TA705" ;
+        char pc_sttname[] = "stt02" ;
+        /*
+          get  char * pc_future, char *pc_stt_name from see_zmq_sub() !!!
+        */
+
+        pid = fork();
+        switch(pid) {
+        case -1:
+            return -1;
+
+        case 0:
+            pid = getpid();
+            setproctitle("%s %s [%s %s]", "future.x :", "sttrun",pc_future,pc_sttname);
+            see_sttrun(p_conf,pc_future, pc_sttname) ;
+
+            break;
+
+        default:
+            printf( " main of waiter !! \n" );
+            /*
+            while(1) {
+                sleep(1000);
+            }
+            */
+            break;
+        }
+        sleep(100) ;
+    }
+    return 0;
+}
+
+static int see_sttrun(see_config_t *p_conf,char * pc_future, char *pc_sttname)
+{
+    stt_kkall_t K;
+    stt_kkall_init(p_conf, pc_future, pc_sttname, &K);
+    //stt_run() ;
+    while(1){
+        int k;
+        k =1;
+        see_err_log(0,0,"%d",k);
+        sleep(100);
+    }
+    return 0;
 }

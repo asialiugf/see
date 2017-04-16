@@ -105,15 +105,8 @@ int
 main(int argc,char *argv[])
 {
 
-    /*
-    char ca_kkkf[100] ;
-    memset( ca_kkkf,'o',99 );
-    ca_kkkf[99] ='\0';
-    see_err_log(ca_kkkf,strlen(ca_kkkf),"%s %d\n","kkkk",sizeof(ca_kkkf));
-    exit(1);
-    */
-
     int iu = 0;
+    /*
     see_shm_t shm;
     shm.size = sizeof(see_fut_mem_t)*100;
     see_shm_alloc(&shm);
@@ -121,6 +114,7 @@ main(int argc,char *argv[])
     memset(shm.addr, 'p',88);
     printf((const char *) shm.addr);
     see_shm_free(&shm);
+    */
 
     int pid = 0;
     //see_stt_blocks_init( &t_conf );
@@ -132,6 +126,8 @@ main(int argc,char *argv[])
     see_daemon(1,0) ;
     see_config_init(&t_conf);
 
+
+    /*
     stt_bars_t K;
     stt_init(&K, (char *)"stt01",t_conf.j_conf);
     stt_init(&K, (char *)"stt03",t_conf.j_conf);
@@ -141,44 +137,9 @@ main(int argc,char *argv[])
     for (x = 99;x < 199; x++) {
         printf ( "%lf\n",K.B[K.p[1]]->oo[x]) ;
     }
+    */
 
-    cJSON   *j_strategy ;
-    j_strategy = cJSON_GetObjectItem(t_conf.j_conf, "strategy");
-    if(j_strategy <=0) {
-        printf(" json error!\n ") ;
-    }
-    if(j_strategy) {
-        int num ;
-        int num2 ;
-        cJSON *j_stt;
-        cJSON *j_map;
-        cJSON *j_ttt;
-        cJSON *j_period;
-        cJSON *j_ccc;
-        int i;
-        int k;
 
-        num = cJSON_GetArraySize(j_strategy);
-        for(i = 0; i< num ; i++) {
-            j_stt = cJSON_GetArrayItem(j_strategy,i);
-            if(j_stt) {
-                printf("%s\n",j_stt->string);
-                j_ttt = cJSON_GetObjectItem(j_stt, "period");
-                num2 = cJSON_GetArraySize(j_ttt);
-                for(k=0; k<num2; k++) {
-                    j_period = cJSON_GetArrayItem(j_ttt,k);
-                    if(j_period) {
-                        printf("%s \n", j_period->valuestring) ;
-                        j_map = cJSON_GetObjectItem(t_conf.j_conf,"period_map");
-                        j_ccc = cJSON_GetObjectItem(j_map,j_period->valuestring);
-                        printf("%s: %s %d \n",j_stt->string, j_period->valuestring,j_ccc->valueint);
-                    }
-                }
-            }
-        }
-    }
-
-    exit(1);
 
     if(argc<=1) {
         printf(" ctpget.x will enter into product mode! \n");
@@ -204,9 +165,11 @@ main(int argc,char *argv[])
 
     case 0:
         pid = getpid();
-        setproctitle("%s %s [ %s ]", "future.x :", "ctpget","TA701 TA701 TA701");
-        see_shm_alloc(&shm);
+        setproctitle("%s %s", "future.x :", "waiter");
+        
 
+        /* for test B 
+        see_shm_alloc(&shm);
         while(1) {
             iu ++;
             memset(shm.addr, '\0', 100);
@@ -214,9 +177,13 @@ main(int argc,char *argv[])
             sprintf((char *)shm.addr, " this a test %d \n",iu);
             printf((const char *) shm.addr);
             sleep(1);
+            break ;
         }
+         for test E */
 
-        ctpget() ;
+
+        see_waiter(&t_conf) ;
+
         break;
 
     default:

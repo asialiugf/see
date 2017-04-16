@@ -74,6 +74,7 @@ objs: ccc/com/obj/see_errlog.o \
 	ccc/com/obj/see_zmq.o \
 	ccc/com/obj/see_testkdj.o \
 	ccc/unx/obj/see_setproctitle.o \
+	ccc/unx/obj/see_process.o \
 	ccc/unx/obj/see_shmem.o \
 	ccc/stt/obj/see_stt01.o \
 	ccc/stt/obj/see_stt02.o
@@ -96,6 +97,7 @@ CCCOBJS:= \
     ccc/com/obj/see_zmq.o \
     ccc/com/obj/see_testkdj.o \
     ccc/unx/obj/see_setproctitle.o \
+    ccc/unx/obj/see_process.o \
     ccc/unx/obj/see_shmem.o \
     ccc/stt/obj/see_stt01.o \
     ccc/stt/obj/see_stt02.o
@@ -116,6 +118,7 @@ COMOBJS:= \
 
 UNXOBJS:= \
 	ccc/unx/obj/see_setproctitle.o \
+	ccc/unx/obj/see_process.o \
 	ccc/unx/obj/see_shmem.o
 
 STTOBJS:= \
@@ -186,6 +189,9 @@ $(STTOBJ)see_stt02.o: $(STT_DEPS) $(STTSRC)see_stt02.c
 
 $(UNXOBJ)see_setproctitle.o: $(UNX_DEPS) $(UNXSRC)see_setproctitle.c
 	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(UNXOBJ)see_setproctitle.o  $(UNXSRC)see_setproctitle.c
+
+$(UNXOBJ)see_process.o: $(UNX_DEPS) $(UNXSRC)see_process.c
+	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(UNXOBJ)see_process.o  $(UNXSRC)see_process.c
 
 $(UNXOBJ)see_shmem.o: $(UNX_DEPS) $(UNXSRC)see_shmem.c
 	$(CC) -c $(CFLAGS) $(ALL_INCS) -o $(UNXOBJ)see_shmem.o  $(UNXSRC)see_shmem.c

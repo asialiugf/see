@@ -131,12 +131,12 @@ int see_config_init(see_config_t *p_conf)
             see_shm_alloc(&(p_conf->pt_fut_blks[u]->shm));
 
 
-            p_conf->pt_stt_blks[u] = (see_stt_block_t *)malloc(sizeof(see_stt_block_t)) ;
+            p_conf->pt_stt_blks[u] = (stt_kkall_t *)malloc(sizeof(stt_kkall_t)) ;
             if(p_conf->pt_stt_blks[u] == NULL) {
-                see_errlog(1000,"malloc(sizeof(see_stt_block_t) error !\n",RPT_TO_LOG,0,0) ;
+                see_errlog(1000,"malloc(sizeof(stt_kkall_t) error !\n",RPT_TO_LOG,0,0) ;
             }
             for(i=0; i<31; i++) {
-                p_conf->pt_stt_blks[u]->pt_kkall[i] = NULL ;
+                p_conf->pt_stt_blks[u]->pt_ones[i] = NULL ;
                 p_conf->pt_stt_blks[u]->list = NULL ;
             }
             /*
@@ -189,23 +189,23 @@ int see_config_init(see_config_t *p_conf)
     // cJSON_Delete(j_root);
 
     /* p_conf->pt_stt_blks[u]->list init !!
-     * pt_stt_blks[1] : TA705 { 1f : ->pt_kkall[8],
-     *                          5f : ->pt_kkall[11],
-     *                          30f: ->pt_kkall[15], }
-     * pt_stt_blks[2] : v1705 { 1f : ->pt_kkall[8],
-     *                          5f : ->pt_kkall[11],
-     *                          30f: ->pt_kkall[15], }
-     * pt_stt_blks[u] : v1705 { 1f : ->pt_kkall[node->period] }
+     * pt_stt_blks[1] : TA705 { 1f : ->pt_ones[8],
+     *                          5f : ->pt_ones[11],
+     *                          30f: ->pt_ones[15], }
+     * pt_stt_blks[2] : v1705 { 1f : ->pt_ones[8],
+     *                          5f : ->pt_ones[11],
+     *                          30f: ->pt_ones[15], }
+     * pt_stt_blks[u] : v1705 { 1f : ->pt_ones[node->period] }
     */
 
     /*
     for( u=0; u<p_conf->i_future_num; u++ )
     {
         see_node *node;
-        see_kkone_t *p_kkone ;
+        stt_kkone_t *p_kkone ;
         node = p_conf->pt_stt_blks[u]->list ;
         while( node != NULL ){
-            p_kkone = (see_kkone_t *)malloc(sizeof(see_kkone_t)) ;
+            p_kkone = (stt_kkone_t *)malloc(sizeof(stt_kkone_t)) ;
             if( p_kkone == NULL ){
                 return -1 ;
             }
@@ -219,7 +219,7 @@ int see_config_init(see_config_t *p_conf)
                 memset( p_kkone->ca_ActionDays[i],'\0',9 ) ;
                 memset( p_kkone->ca_UpdateTimes[i],'\0',9 ) ;
             }
-            p_conf->pt_stt_blks[u]->pt_kkall[node->period] = p_kkone;
+            p_conf->pt_stt_blks[u]->pt_ones[node->period] = p_kkone;
             node = node->next ;
         }
         see_stt_blk_init( p_conf,p_conf->pt_stt_blks[u],u );

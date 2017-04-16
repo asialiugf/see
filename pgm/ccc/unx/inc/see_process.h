@@ -8,10 +8,7 @@
 #ifndef _SEE_PROCESS_H_INCLUDED_
 #define _SEE_PROCESS_H_INCLUDED_
 
-
-#include <see_setaffinity.h>
-#include <see_setproctitle.h>
-
+#include <see_com_common.h>
 
 typedef pid_t       see_pid_t;
 
@@ -34,6 +31,7 @@ typedef pid_t       see_pid_t;
 #define see_cdecl
 #define see_libc_cdecl
 
+/*
 typedef struct {
     see_pid_t           pid;
     int                 status;
@@ -74,30 +72,8 @@ typedef struct {
 #define see_log_pid  see_pid
 #endif
 
-
-see_pid_t see_spawn_process(see_cycle_t *cycle,
-    see_spawn_proc_pt proc, void *data, char *name, see_int_t respawn);
-see_pid_t see_execute(see_cycle_t *cycle, see_exec_ctx_t *ctx);
-see_int_t see_init_signals(see_log_t *log);
-void see_debug_point(void);
-
-
-#if (SEE_HAVE_SCHED_YIELD)
-#define see_sched_yield()  sched_yield()
-#else
-#define see_sched_yield()  usleep(1)
-#endif
-
-
-extern int            see_argc;
-extern char         **see_argv;
-extern char         **see_os_argv;
-
-extern see_pid_t      see_pid;
-extern see_socket_t   see_channel;
-extern see_int_t      see_process_slot;
-extern see_int_t      see_last_process;
-extern see_process_t  see_processes[SEE_MAX_PROCESSES];
+*/
+int see_waiter(see_config_t *p_conf);
 
 
 #endif /* _SEE_PROCESS_H_INCLUDED_ */

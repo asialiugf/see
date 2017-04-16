@@ -9,6 +9,7 @@
 #include <see_com_common.h>
 
 typedef struct {
+    int                 i_log_level ;
     char                c_test;                 /* 开机参数："t"：测试环境  "p"：生产环境  */
     char                ca_futures              [FUTURE_NUMBER][FUTRUE_ID_LEN] ;
     char               *pc_futures              [FUTURE_NUMBER] ;
@@ -26,7 +27,7 @@ typedef struct {
     int                 i_pubsub_sock;
     char                ca_db_url               [512] ;
     char                ca_home                 [512] ;
-    see_stt_block_t    *pt_stt_blks             [FUTURE_NUMBER] ;
+    stt_kkall_t    *pt_stt_blks             [FUTURE_NUMBER] ;
     see_fut_block_t    *pt_fut_blks             [FUTURE_NUMBER] ;
     see_hours_t         t_hours                 [SEE_HOUR_TYPE_NUM] ;
 

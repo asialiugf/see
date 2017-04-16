@@ -26,7 +26,7 @@ typedef struct {
     double      ll[10000] ;             // low
     int         vv[10000] ;             // volume
     int         i_cur ;                 /* current point !!!! */
-} see_kkone_t ;
+} stt_kkone_t ;
 
 
 typedef struct node  
@@ -39,12 +39,12 @@ typedef struct node
 /* need to be init !!为每个period分配一个 klist_t !! */
 /* list for record of strategy period, 1f->5f->30f   */
 typedef struct {
-    see_kkone_t         *pt_kkall[31] ;
+    stt_kkone_t         *pt_ones[31] ;
     see_node            *list ;
-} see_stt_block_t ;
+} stt_kkall_t ;
 
-int see_stt_blk_init ( see_config_t *p_conf, see_stt_block_t *p_stt_blk, int i_idx );
-int see_kkone_init ( see_config_t *p_conf, char *pc_table, int num, see_kkone_t *p_kkone );
+int see_stt_blk_init ( see_config_t *p_conf, stt_kkall_t *p_stt_blk, int i_idx );
+int stt_kkone_init ( see_config_t *p_conf, char *pc_table, int num, stt_kkone_t *p_kkone );
 int see_trave_dir(char* path, int *p_count, char pc_files[][512]) ;
 
 #endif

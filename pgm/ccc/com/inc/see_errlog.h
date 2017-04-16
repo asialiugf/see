@@ -8,6 +8,17 @@
 
 #include <see_com_common.h>
 
+extern char ca_errmsg[] ;
+
+#define LOG_STDERR            0
+#define LOG_EMERG             1
+#define LOG_ALERT             2
+#define LOG_CRIT              3
+#define LOG_ERR               4
+#define LOG_WARN              5
+#define LOG_NOTICE            6
+#define LOG_INFO              7
+#define LOG_DEBUG             8
 
 int see_chglog(char cChgCode,char *pcChgStr);
 int see_errlog(int iErrCode,char *pcaDispMsg,char cDumpDev,char *pcaDumpAddr,long llen);
@@ -17,8 +28,6 @@ void see_mem_dump(int iFileId,char *pucaAddr,long llen);
 void see_DumpHex(int ifile,unsigned char *buf, int len) ;
 void see_DumpLine(int ifile,int addr, unsigned char *buf, int len) ;
 
-
-extern char ca_errmsg[] ;
 
 #define  LOG_CHG_LOG	'1'	/* change LOG_MODE */
 #define  LOG_CHG_MODE	'2'	/* change LOG_FILE_NAME */

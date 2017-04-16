@@ -6,7 +6,7 @@ const char ca_mysql_url[]  = "mysql://127.0.0.1/test?user=root&password=root" ;
 //static char             ca_futures          [FUTURE_NUMBER][FUTRUE_ID_LEN] ;
 //static char            *pc_futures          [FUTURE_NUMBER] ;
 
-//static see_stt_block_t *pt_stt_blocks       [FUTURE_NUMBER] ;      /* each future has a strategy block !             */
+//static stt_kkall_t *pt_stt_blocks       [FUTURE_NUMBER] ;      /* each future has a strategy block !             */
 //static see_fut_block_t     *pt_fut_blks       [FUTURE_NUMBER] ;      /* each future has a block !                      */
 //static see_hours_t      t_hours             [SEE_HOUR_TYPE_NUM] ;  /* same lines with ../../etc/tbl/see_trade_time   */
 static int              i_idx ;
@@ -19,8 +19,6 @@ char ca_errtmp[512] ;
 int
 main(int argc, char *argv[])
 {
-    int u ;
-    int i ;
     int     i_rtn =0 ;
     int     sock ;
     char    ca_UpdateTime[9];
@@ -52,14 +50,14 @@ main(int argc, char *argv[])
     }
 
 
+    /*
     see_stt_blocks_init(p_conf);
-
     for(u=0; u<p_conf->i_future_num; u++) {
         see_node *node;
-        see_kkone_t *p_kkone ;
+        stt_kkone_t *p_kkone ;
         node = p_conf->pt_stt_blks[u]->list ;
         while(node != NULL) {
-            p_kkone = p_conf->pt_stt_blks[u]->pt_kkall[node->period] ;
+            p_kkone = p_conf->pt_stt_blks[u]->pt_ones[node->period] ;
 
             printf("\n------------- %d %d ------------------\n",p_kkone->i_cur, node->period) ;
             for(i=p_kkone->i_cur; i<10000; i++) {
@@ -77,6 +75,7 @@ main(int argc, char *argv[])
             node = node->next ;
         }
     }
+    */
 
     i_rtn = pthread_create(&t_conf.p_dat, NULL, see_pthread_dat, &t_conf);
     if(i_rtn == -1) {

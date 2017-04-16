@@ -381,7 +381,7 @@ typedef struct {
     double      ll[10000] ;             // low
     int         vv[10000] ;             // volume
     int         i_cur ;                 /* current point !!!! */
-} see_kkone_t ;
+} stt_kkone_t ;
 
 
 typedef struct node {
@@ -392,22 +392,21 @@ typedef struct node {
 /* need to be init !!为每个period分配一个 klist_t !! */
 /* list for record of strategy period, 1f->5f->30f   */
 /*
-    需要处理的每个future，都会有一个see_stt_block_t。这里面维护一个 list。
-    因为真正的策略，可能会用到不同周期的K柱数据，所以，首先给每个K柱数据块（see_kkone_t）
-    分配一个指针，共31个指针：see_kkone_t         *pt_kkall[31] ;
+    需要处理的每个future，都会有一个stt_kkall_t。这里面维护一个 list。
+    因为真正的策略，可能会用到不同周期的K柱数据，所以，首先给每个K柱数据块（stt_kkone_t）
+    分配一个指针，共31个指针：stt_kkone_t         *pt_ones[31] ;
     在实际中，可能只需要 其中 1f 5f 30f 这三个同期。所以，在初始化时，
     只为这三个同期分配真正的内存块。
 
     具体是哪个周期，在配置文件中：
 */
 typedef struct {
-    see_kkone_t         *pt_kkall[31] ;
+    stt_kkone_t         *pt_ones[31] ;
+    int                  p[31];            // 有哪些周期用于计算
+    int                  i_num ;           // 有多少个周期用于计算
+    int                  idx ;             // 合约在 p_conf->pc_futures中的位置
     see_node            *list ;
-} see_stt_block_t ;
-
-
-
-
+} stt_kkall_t ;
 
 
 #define MOVE_BAR       p_bar0->o = p_bar1->o ; \

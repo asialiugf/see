@@ -2,10 +2,10 @@
 
 /*  stt_init() :
  *  K       :  bar array !
- *  pc_name :  strategy name ,defined in <etc/json/see_conf.json> such as stt01 stt02 ...
+ *  pc_sttname :  strategy name ,defined in <etc/json/see_conf.json> such as stt01 stt02 ...
  *  j_root  :  t_conf.j_conf or p_conf->j_conf !!
  */
-int stt_init(stt_bars_t *K, char *pc_name, cJSON *j_root)
+int stt_init(stt_kkall_t *K, char *pc_sttname, cJSON *j_root)
 {
     int i = 0;
     int n;
@@ -18,37 +18,33 @@ int stt_init(stt_bars_t *K, char *pc_name, cJSON *j_root)
     cJSON *j_ccc;
 
     for(i = 0; i<31; i++) {
-        K->B[i] = NULL ;
+        K->pt_ones[i] = NULL ;
     }
 
     j_strategy = cJSON_GetObjectItem(j_root, "strategy");
     if(!j_strategy) {
-       see_err_log(0,0,"json error!!!") ; 
+        see_err_log(0,0,"stt_init(): cJSON_GetObjectItem():  get strategy error!") ;
     }
-    j_stt = cJSON_GetObjectItem(j_strategy, pc_name);
+    j_stt = cJSON_GetObjectItem(j_strategy, pc_sttname);
     if(j_stt) {
-        printf("------------- %s\n",j_stt->string);
         j_ttt = cJSON_GetObjectItem(j_stt, "period");
         n = cJSON_GetArraySize(j_ttt);
+        K->i_num = n;
+        see_err_log(0,0," %s: period num: %d",j_ttt->string,n);
         for(i=0; i<n; i++) {
             j_period = cJSON_GetArrayItem(j_ttt,i);
             if(j_period) {
-                printf("----------%s \n", j_period->valuestring) ;
                 j_map = cJSON_GetObjectItem(j_root,"period_map");
                 j_ccc = cJSON_GetObjectItem(j_map,j_period->valuestring);
                 p = j_ccc->valueint ;
                 K->p[i] = p;
-                K->B[p] = malloc(sizeof(stt_bar_t));
-                K->B[p]->cur = 0;  
-                int x ;
-                for (x = 0; x<10000;x++ ){
-                    K->B[p]->oo[x] = x;
-                }
-                printf(" ------------------%s: %s %d \n",j_stt->string, j_period->valuestring,j_ccc->valueint);
+                K->pt_ones[p] = malloc(sizeof(stt_kkone_t));
+                K->pt_ones[p]->i_cur = 0;
+                see_err_log(0,0,"%s: %s %d \n",j_stt->string, j_period->valuestring,j_ccc->valueint);
             }
         }
     } else {
-        see_err_log(0,0,"json error!!!") ;
+        see_err_log(0,0,"stt_init(): cJSON_GetObjectItem():  get %s error!",pc_sttname) ;
     }
     return 0;
 }
@@ -58,16 +54,84 @@ int see_stt_load()
     return 0;
 }
 
+
+typedef struct {
+    char        ca_future       [31];
+    char        ca_sttname      [31];
+    char        ca_TradingDayB  [9] ;
+    char        ca_ActionDayB   [9] ;
+    char        ca_UpdateTimeB  [9] ;
+    char        ca_TradingDayE  [9] ;
+    char        ca_ActionDayE   [9] ;
+    char        ca_UpdateTimeE  [9] ;
+    int         n;
+
+} stt_input_t;
+
+/*
+ *  初始化
+ *  
+ */
+int stt_kkall_init(see_config_t *p_conf,char * pc_future, char *pc_sttname, stt_kkall_t *p_kkall)
+{
+    int i;
+    int k;
+    int idx;
+    int period ;
+    char                *pc_table;
+    see_fut_block_t     *fb ;
+    see_bar_block_t     *bb ;
+    stt_kkone_t         *p_kkone;
+
+    idx = see_get_future_index(p_conf->pc_futures, pc_future) ;
+    p_kkall->idx = idx ;
+    fb = p_conf->pt_fut_blks[idx] ;
+
+    stt_init(p_kkall, pc_sttname, p_conf->j_conf);
+
+    /* i_num 表示有多少个period要于用策略计算 */
+    for(k=0; k<p_kkall->i_num; k++) {
+        period = p_kkall->p[k];
+        bb = &( fb->bar_block[period] );
+        pc_table = bb->ca_table ;
+        printf ( "pc_table:%s period:%d\n",pc_table,period);
+        //table = p_conf->pt_fut_blks[idx]->bar_block[ p_kkall->p[k] ].ca_table
+
+        p_kkone = (stt_kkone_t *)malloc(sizeof(stt_kkone_t)) ;
+        if(p_kkone == NULL) {
+            return -1 ;
+        }
+        for(i=0; i<10000; i++) {
+            p_kkone->oo[i] = SEE_NULL ;
+            p_kkone->hh[i] = SEE_NULL ;
+            p_kkone->ll[i] = SEE_NULL ;
+            p_kkone->cc[i] = SEE_NULL ;
+            p_kkone->vv[i] = SEE_NULL ;
+            see_memzero(p_kkone->ca_TradingDays[i],9) ;
+            memset(p_kkone->ca_ActionDays[i],'\0',9) ;
+            memset(p_kkone->ca_UpdateTimes[i],'\0',9) ;
+        }
+        p_kkone->i_cur=0;
+        printf( "befor stt_kkone_init !!\n");
+        stt_kkone_init(p_conf, pc_table, 10000, p_kkone);
+        printf( "after stt_kkone_init !!\n");
+        p_kkall->pt_ones[period] = p_kkone ;
+    }
+    /* ? */
+    return 0;
+}
+
+/*
 int see_stt_blocks_init(see_config_t *p_conf)
 {
     int u;
     int i;
     for(u=0; u<p_conf->i_future_num; u++) {
         see_node *node;
-        see_kkone_t *p_kkone ;
+        stt_kkone_t *p_kkone ;
         node = p_conf->pt_stt_blks[u]->list ;
         while(node != NULL) {
-            p_kkone = (see_kkone_t *)malloc(sizeof(see_kkone_t)) ;
+            p_kkone = (stt_kkone_t *)malloc(sizeof(stt_kkone_t)) ;
             if(p_kkone == NULL) {
                 return -1 ;
             }
@@ -82,29 +146,32 @@ int see_stt_blocks_init(see_config_t *p_conf)
                 memset(p_kkone->ca_UpdateTimes[i],'\0',9) ;
             }
             p_kkone->i_cur=0;
-            p_conf->pt_stt_blks[u]->pt_kkall[node->period] = p_kkone;
+            p_conf->pt_stt_blks[u]->pt_ones[node->period] = p_kkone;
             node = node->next ;
         }
         see_stt_blk_init(p_conf,p_conf->pt_stt_blks[u],u);
     }
     return 0;
 }
+*/
 
 
-int see_stt_blk_init(see_config_t *p_conf, see_stt_block_t *p_stt_blk, int i_idx)
+/*
+int see_stt_blk_init(see_config_t *p_conf, stt_kkall_t *p_stt_blk, int i_idx)
 {
     see_node *node;
     node = p_stt_blk->list ;
     while(node != NULL) {
-        see_kkone_init(p_conf,
+        stt_kkone_init(p_conf,
                        p_conf->pt_fut_blks[i_idx]->bar_block[node->period].ca_table,
-                       10000, p_stt_blk->pt_kkall[node->period]);
+                       10000, p_stt_blk->pt_ones[node->period]);
         node = node->next ;
     }
     return 0 ;
 }
+*/
 
-int see_kkone_init(see_config_t *p_conf, char *pc_table, int num, see_kkone_t *p_kkone)
+int stt_kkone_init(see_config_t *p_conf, char *pc_table, int num, stt_kkone_t *p_kkone)
 {
     see_zdb_open(p_conf);
     see_zdb_get_data(p_conf,
@@ -115,7 +182,7 @@ int see_kkone_init(see_config_t *p_conf, char *pc_table, int num, see_kkone_t *p
                      NULL,
                      num,
                      p_kkone);
-    /*
+
     see_zdb_get_data(   p_conf,
                         pc_table,
                         "20161108",
@@ -124,7 +191,6 @@ int see_kkone_init(see_config_t *p_conf, char *pc_table, int num, see_kkone_t *p
                         "14:30:45",
                         num,
                         p_kkone );
-    */
 
     see_zdb_close(p_conf);
     return 0 ;
@@ -133,9 +199,9 @@ int see_kkone_init(see_config_t *p_conf, char *pc_table, int num, see_kkone_t *p
 int see_update_kkall(see_config_t *p_conf, int i_idx)
 {
     see_node            *node;
-    see_kkone_t         *kkone ;
+    stt_kkone_t         *kkone ;
     see_fut_block_t     *p_fut_blk ;
-    see_stt_block_t     *p_stt_blk ;
+    stt_kkall_t     *p_stt_blk ;
     see_bar_t           *p_bar0 ;
     see_bar_t           *p_bar1 ;
 
@@ -144,7 +210,7 @@ int see_update_kkall(see_config_t *p_conf, int i_idx)
     node =          p_stt_blk->list ;
 
     while(node != NULL) {
-        kkone   =   p_stt_blk->pt_kkall[node->period] ;
+        kkone   =   p_stt_blk->pt_ones[node->period] ;
         p_bar0  =  &p_fut_blk->bar_block[node->period].bar0 ;
         p_bar1  =  &p_fut_blk->bar_block[node->period].bar1 ;
 
@@ -187,7 +253,7 @@ int see_update_kkone( see_config_t *p_conf, int period )
 
 }
 
-int see_update_kkone ( see_kkone_t  *p_kkone, see_stt_data_t *p_stt_data )
+int see_update_kkone ( stt_kkone_t  *p_kkone, see_stt_data_t *p_stt_data )
 {
     int         i_len ;
     if ( p_stt_data->c_save == 'n' ) {

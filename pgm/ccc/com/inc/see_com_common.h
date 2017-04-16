@@ -60,6 +60,7 @@ typedef char          CA_FUTURES    [FUTURE_NUMBER][FUTRUE_ID_LEN] ;        // å
 #include <see_strategy.h>
 //#include <../../unx/inc/see_setproctitle.h>
 #include <see_setproctitle.h>
+#include <see_process.h>
 
 // extern see_hours_t t_hours[SEE_HOUR_TYPE_NUM] ;
 

@@ -68,6 +68,7 @@ CCCOBJ:= \
      ccc/com/obj/see_zmq.o \
      ccc/com/obj/see_future.o \
 	 ccc/unx/obj/see_setproctitle.o \
+	 ccc/unx/obj/see_process.o \
 	 ccc/unx/obj/see_shmem.o
 
 TSTOBJS = $(MDSOBJ)see_sndtst.o \

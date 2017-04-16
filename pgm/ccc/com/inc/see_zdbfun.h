@@ -20,7 +20,7 @@ int see_zdb_get_data(   see_config_t   *p_conf,
                         char           *pc_updatetime_s,
                         char           *pc_updatetime_e,
                         int             num,
-                        see_kkone_t    *p_kkone );
+                        stt_kkone_t    *p_kkone );
 
 
 #endif
