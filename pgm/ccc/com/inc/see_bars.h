@@ -311,8 +311,9 @@ typedef struct {
     char                c_save ;                    /* 's' 表示 save  'n' 表示 不需要save */
     int                 i_bar_type ;                // 1 2 3 5 10 15   这个值可以用来计算 新来的tick是不是在同一个K
     char                c_bar_type ;                // S F H D W M J Y  BAR_SECOND BAR_MINUTE ...
-    char                ca_table[128] ;                 /* database table name */
-    char                ca_home[512] ;              /* for txt ohlc saving */
+    char                ca_table[128];                 /* database table name */
+    char                ca_home[512];              /* for txt ohlc saving */
+    char                ca_file[512];
 } see_bar_block_t ;                                 // 每个period有一个bar_block
 
 typedef struct  {
