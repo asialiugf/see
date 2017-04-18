@@ -147,17 +147,46 @@ see_signal_handler(int signo)
     //see_set_errno(err);
 }
 
+
+/*
+ * see_waiter() 实现两个功能
+ * 1、 从ZMQ等待指令
+ * 2、 根据指令 fork 一个 策略进程 进程进程
+ */
 int see_waiter(see_config_t *p_conf)
 {
+    int i_rtn=0;
     int pid = 0;
+    /*
+    while(1) {
+        printf("%d\n",p_conf->i_log_level) ;
+        sleep(2) ;
+    }
+    */
+    if(1) {
+        see_err_log(0,0,"<IN> see_waiter() !");
+    }
+
     while(1) {
         //see_zmq_sub();
         char pc_future[] = "TA705" ;
         char pc_sttname[] = "stt02" ;
+        char buf[128] ;
+
+        while(1) {
+            printf("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n");
+            see_memzero(buf,128);
+            i_rtn = see_zmq_sub_recv(p_conf->v_sub_sock,buf,128,0) ;
+            if(i_rtn <=0) {
+                see_err_log(0,0," waiter: see_zmq_pub_recv error, errno: %d \n",errno) ;
+            }
+            printf("%s\n",buf);
+            //sleep(1);
+        }
+
         /*
           get  char * pc_future, char *pc_stt_name from see_zmq_sub() !!!
         */
-
         pid = fork();
         switch(pid) {
         case -1:
@@ -166,17 +195,13 @@ int see_waiter(see_config_t *p_conf)
         case 0:
             pid = getpid();
             setproctitle("%s %s [%s %s]", "future.x :", "sttrun",pc_future,pc_sttname);
+            gp_conf->v_pub_sock = see_zmq_pub_init(gp_conf->ca_zmq_pub_url);
+            gp_conf->v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url);
             see_sttrun(p_conf,pc_future, pc_sttname) ;
-
             break;
 
         default:
-            printf( " main of waiter !! \n" );
-            /*
-            while(1) {
-                sleep(1000);
-            }
-            */
+            printf(" main of waiter !! \n");
             break;
         }
         sleep(100) ;
@@ -189,7 +214,7 @@ static int see_sttrun(see_config_t *p_conf,char * pc_future, char *pc_sttname)
     stt_kkall_t K;
     stt_kkall_init(p_conf, pc_future, pc_sttname, &K);
     //stt_run() ;
-    while(1){
+    while(1) {
         int k;
         k =1;
         see_err_log(0,0,"%d",k);

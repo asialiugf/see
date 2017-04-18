@@ -246,7 +246,7 @@ int see_block_init(see_fut_block_t * p_block, char * pc_future, see_hours_t t_ho
     fclose(pf_future_time);
     /*  ------  初始化 这个期货合约的 每天的交易时间段 ------ */
 
-    see_errlog(1000,"fut_block init end ",RPT_TO_LOG,0,0);
+    see_err_log(0,0,"<OUT> see_block_init!");
     return SEE_OK ;
 }
 

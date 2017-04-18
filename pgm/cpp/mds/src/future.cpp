@@ -8,9 +8,13 @@
 #include "MdSpi.h"
 
 using namespace std;
-//see_config_t         gt_conf ;
-//see_config_t        *gp_conf ;
-//see_shm_t            gt_shm ;
+/*
+ * 下面的全局变量定义在 see_config.c 中
+ * see_config_t         gt_conf ;
+ * see_config_t        *gp_conf ;
+ * 下面的全局变量定义在 see_shmem.c 中
+ * see_shm_t            gt_shm ;
+*/
 
 static see_inline void see_write_stderr(const char *text);
 static see_inline ssize_t see_write_fd(see_fd_t fd, void *buf, size_t n);
@@ -31,7 +35,7 @@ main(int argc,char *argv[])
     gt_shm.size = sizeof(see_config_t);
     see_shm_alloc(&gt_shm);
     gp_conf = (see_config_t *)gt_shm.addr;
-    //see_shm_free(&shm);
+    //see_shm_free(&gt_shm);
 
     see_config_init(gp_conf);
 
@@ -60,28 +64,19 @@ main(int argc,char *argv[])
     case 0:
         pid = getpid();
         setproctitle("%s %s", "future.x :", "Waiter");
-        
-
-        /* for test B 
-        see_shm_alloc(&shm);
-        while(1) {
-            iu ++;
-            memset(shm.addr, '\0', 100);
-            memset(shm.addr, 'l',88);
-            sprintf((char *)shm.addr, " this a test %d \n",iu);
-            printf((const char *) shm.addr);
-            sleep(1);
-            break ;
-        }
-         for test E */
-
-
+        gp_conf->v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url);
         see_waiter(gp_conf) ;
 
         break;
 
     default:
         break;
+    }
+    int uo = 0;
+    while(1) {
+        gp_conf->i_log_level = uo;
+        uo++ ;
+        sleep(1);
     }
     see_ctpget();
 

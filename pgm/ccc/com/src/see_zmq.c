@@ -22,6 +22,30 @@ void * see_zmq_pub_init(char * pc_url)
     return pub_socket ;
 }
 
+void * see_zmq_sub_init(char * pc_url)
+{
+    int hwm = 11024;
+
+    void *ctx = zmq_ctx_new();
+    assert(ctx);
+    int rc;
+
+    printf("%s\n",pc_url);
+    // Set up connect socket
+    void *sub_socket = zmq_socket(ctx, ZMQ_SUB);
+    assert(sub_socket);
+    rc = zmq_setsockopt(sub_socket, ZMQ_RCVHWM, &hwm, sizeof(hwm));
+    assert(rc == 0);
+    rc = zmq_connect(sub_socket, pc_url);
+    //rc = zmq_connect(sub_socket, "tcp://localhost:9022");
+    assert(rc == 0);
+    rc = zmq_setsockopt(sub_socket, ZMQ_SUBSCRIBE, 0, 0);
+    assert(rc == 0);
+
+    sleep(1);
+    return sub_socket;
+}
+
 int see_zmq_pub_send(void * sock, char * pc_msg)
 {
     int rc = 0;
@@ -33,7 +57,7 @@ int see_zmq_pub_send(void * sock, char * pc_msg)
         这样是为了让rose-dewdrop 能够根据订阅的  "TA705" 来处理.
         注：
             这里的 "TA705" 需要修改，根据需要来输入。
-   */
+    */
     rc = zmq_send(sock, "TA705", 5, ZMQ_SNDMORE);
     rc = zmq_send(sock, pc_msg, len, ZMQ_DONTWAIT);
     if(rc!=len) {
@@ -44,4 +68,27 @@ int see_zmq_pub_send(void * sock, char * pc_msg)
         printf("%d ----------------\n",rc);
     }
     return len;
+}
+
+int see_zmq_sub_recv(void *sub_socket, void *buf, size_t len, int flags)
+{
+    int rc=0;
+    char buff[256] ;
+    while(1) {
+        memset(buff,'\0',256);
+        int more;
+        size_t more_size = sizeof(more);
+        do {
+            rc = zmq_recv(sub_socket, buff,256,0);
+            printf("%s %d\n", buff,rc);
+            //printf("zmq_recv: %s\n", zmq_strerror(errno));
+            rc = zmq_getsockopt(sub_socket, ZMQ_RCVMORE, &more, &more_size);
+            if(rc!=0) {
+                see_errlog(1000," zmq_getsockopt error !!",RPT_TO_LOG,0,0);
+            }
+            //printf("%s %d\n", buff,rc);
+            //sleep(1);
+        } while(more);
+        //sleep(1);
+    }
 }

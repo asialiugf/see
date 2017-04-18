@@ -11,8 +11,8 @@ const char ca_mysql_url[]  = "mysql://127.0.0.1/test?user=root&password=root" ;
 //static see_hours_t      t_hours             [SEE_HOUR_TYPE_NUM] ;  /* same lines with ../../etc/tbl/see_trade_time   */
 static int              i_idx ;
 
-see_config_t            t_conf ;
-see_config_t            *p_conf ;
+//see_config_t            t_conf ;
+//see_config_t            *p_conf ;
 
 char ca_errtmp[512] ;
 
@@ -30,24 +30,33 @@ main(int argc, char *argv[])
     signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
     see_daemon(1,0) ;
-    p_conf = &t_conf ;
+
     /*
         see_config_init()必须在 see_daemon()之后。
     */
-    see_config_init(p_conf);
+    gt_shm.size = sizeof(see_config_t);
+    see_shm_alloc(&gt_shm);
+    gp_conf = (see_config_t *)gt_shm.addr;
+    //see_shm_free(&gt_shm);
+
+    see_config_init(gp_conf);
 
     if(argc<=1) {
-        printf(" ctpget.x will enter into product mode! \n");
-        t_conf.c_test = 'p';
+        printf(" future.x will enter into product mode! \n");
+        gp_conf->c_test = 'p';
     } else {
         if(memcmp(argv[1],"-t",2)==0) {
-            printf(" ctpget.x will enter into test mode! \n");
-            t_conf.c_test = 't';
+            printf(" future.x will enter into test mode! \n");
+            gp_conf->c_test = 't';
         }
         if(memcmp(argv[1],"-p",2)==0) {
-            t_conf.c_test = 'p';
+            gp_conf->c_test = 'p';
         }
     }
+
+
+
+
 
 
     /*
@@ -77,12 +86,12 @@ main(int argc, char *argv[])
     }
     */
 
-    i_rtn = pthread_create(&t_conf.p_dat, NULL, see_pthread_dat, &t_conf);
+    i_rtn = pthread_create(&gp_conf->p_dat, NULL, see_pthread_dat, gp_conf);
     if(i_rtn == -1) {
         printf("create thread tcp recv_thread failed errno= %d/n", errno);
         return -1;
     }
-    //pthread_create(&t_conf.p_bar, NULL, see_pthread_bar, &t_conf);
+    //pthread_create(&gp_conf->p_bar, NULL, see_pthread_bar, gp_conf);
     //sleep(1) ;
 
     if(argc<=1) {
@@ -99,21 +108,11 @@ main(int argc, char *argv[])
     //see_stt04_init() ;
 
 
-    /*
-      $rrr.x 0
-      参数0 表示 从nanomsg取得tick bin数据进行处理。
-      一般情况，是由ctpget.x发送 tick bin 数据过来。
-
-      2017-03-24
-      ctpget.x 已经具备处理bar的功能，并且可以写入文件到 dat/rcv_dat/..下
-      所以目前可以不需要使用 rrr.x 0 来接收 ctpget.x 传来的数据。
-
-    */
     if(memcmp(argv[1],"0",1)==0) {
         printf("\n === Get tick data from nanomsg !!!\n") ;
 
         //  sock = see_pubsub_client( ca_pubsub_url, "iostest" ) ;
-        sock = see_pair_client(t_conf.ca_nn_pubsub_url) ;
+        sock = see_pair_client(gp_conf->ca_nn_pubsub_url) ;
 
         while(1) {                                                        //  接收数据 并进行处理
             nn_recv(sock, &buf, NN_MSG, 0);                       // 如果没有数据，进程会等在这里，这时
@@ -123,7 +122,7 @@ main(int argc, char *argv[])
 
             tick = (struct CThostFtdcDepthMarketDataField *)buf ;
 
-            i_idx = see_get_future_index(t_conf.pc_futures, tick->InstrumentID) ;     //i_idx 合约所在的数组下标
+            i_idx = see_get_future_index(gp_conf->pc_futures, tick->InstrumentID) ;     //i_idx 合约所在的数组下标
             if(i_idx == SEE_ERROR) {
                 see_errlog(1000,(char *) "see_handle_bars() -> see_get_future_index()  error!!",RPT_TO_LOG,0,0) ;
                 sprintf(ca_errmsg,"future %s is not in pc_futures: tick->InstrumentID: %s",tick->InstrumentID,tick->InstrumentID) ;
@@ -135,7 +134,7 @@ main(int argc, char *argv[])
             see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
             printf(" tick_data.BidVolume5 %d\n",tick->BidVolume5);
 
-            //see_handle_bars( t_conf.pt_fut_blks[i_idx], tick ) ;             // calc_bar_block & save_bar(save k value)
+            //see_handle_bars( gp_conf->pt_fut_blks[i_idx], tick ) ;             // calc_bar_block & save_bar(save k value)
             //see_update_kk( pt_fut_blks[i_idx], pt_stt_blocks[i_idx] ) ;
             nn_freemsg(buf);
 
@@ -180,7 +179,6 @@ main(int argc, char *argv[])
         static char ca_tick_file[512] ;
         FILE *pf ;
         FILE *pf_tick_file ;
-//    struct CThostFtdcDepthMarketDataField * t_data ;
         struct CThostFtdcDepthMarketDataField tick_data ;
 
         pf = fopen(ca_tick_file_list,"r");
@@ -214,7 +212,7 @@ main(int argc, char *argv[])
                 tick_data.BidVolume5 = i_count ;
                 //see_disp_tick(buf) ;
 
-                i_idx = see_get_future_index(t_conf.pc_futures,tick_data.InstrumentID) ;   //i_idx 合约所在的数组下标
+                i_idx = see_get_future_index(gp_conf->pc_futures,tick_data.InstrumentID) ;   //i_idx 合约所在的数组下标
                 if(i_idx == SEE_ERROR) {
                     see_errlog(1000,(char *) "see_handle_bars() -> see_get_future_index()  error!!",RPT_TO_LOG,0,0) ;
                     sprintf(ca_errmsg,"future %s is not in pc_futures: tick_data: %s",tick_data.InstrumentID,tick_data.InstrumentID) ;
@@ -222,8 +220,9 @@ main(int argc, char *argv[])
                     continue ;
                 }
 
-                see_handle_bars(t_conf.pt_fut_blks[i_idx], &tick_data) ;               // calc_bar_block & save_bar(save k value)
-                see_update_kkall(p_conf, i_idx) ;
+                see_err_log(0,0," enter into see_handle_bars !");
+                see_handle_bars(gp_conf->pt_fut_blks[i_idx], &tick_data) ;               // calc_bar_block & save_bar(save k value)
+                //see_update_kkall(p_conf, i_idx) ;
 
             }
             fclose(pf_tick_file);
@@ -236,12 +235,8 @@ main(int argc, char *argv[])
     Total_time = (double)(t_finish-t_start) / CLOCKS_PER_SEC;
 
     gettimeofday(&end,NULL);
-    memset(ca_errmsg,'\0',100);
-    sprintf(ca_errmsg,"==== calc-time =========: sec:%lu usec:%lu \n",end.tv_sec-start.tv_sec,end.tv_usec-start.tv_usec) ;
-    see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
-
-    sprintf(ca_errmsg,"==== calc-time =========: clock sec: %f\n",Total_time) ;
-    see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0) ;
+    see_err_log(0,0,"==== calc-time =========: sec:%lu usec:%lu \n",end.tv_sec-start.tv_sec,end.tv_usec-start.tv_usec);
+    see_err_log(0,0,"==== calc-time =========: clock sec: %f\n",Total_time);
 
     sleep(36000);
     return SEE_OK;

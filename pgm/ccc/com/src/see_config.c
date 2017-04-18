@@ -3,6 +3,8 @@
 see_config_t         gt_conf;
 see_config_t        *gp_conf;
 
+void test_reset_hwm();
+
 int see_config_init(see_config_t *p_conf)
 {
     int     i_rtn ;
@@ -56,21 +58,23 @@ int see_config_init(see_config_t *p_conf)
     //p_conf->i_topy_sock = see_pair_server(p_conf->ca_nn_topy_url) ;
 
     /* zmq_pub : to python rose */
-    j_temp = cJSON_GetObjectItem(j_item, "zmq_pubsub_url");
-    memcpy(p_conf->ca_zmq_pubsub_url, j_temp->valuestring, strlen(j_temp->valuestring));
-    p_conf->v_sock = see_zmq_pub_init(p_conf->ca_zmq_pubsub_url);
+    see_memzero(p_conf->ca_zmq_pub_url,512);
+    see_memzero(p_conf->ca_zmq_sub_url,512);
+    j_temp = cJSON_GetObjectItem(j_item, "zmq_pub_url");
+    memcpy(p_conf->ca_zmq_pub_url, j_temp->valuestring, strlen(j_temp->valuestring));
+    j_temp = cJSON_GetObjectItem(j_item, "zmq_sub_url");
+    memcpy(p_conf->ca_zmq_sub_url, j_temp->valuestring, strlen(j_temp->valuestring));
 
-    /* for test begin */
-    int rc = 0;
-    for(i = 0; i<=1 ; i++) {
-        printf("ddddddddddddd: %d\n",i);
-        rc = zmq_send(p_conf->v_sock, "kkkk", 4, ZMQ_DONTWAIT);
-        if(rc !=4) {
-            printf(" zmq_send kkkk 4 err!!!!!!!!!\n");
-        }
-        sleep(1);
-    }
-    /* for test end */
+
+    //void *vv = see_zmq_sub_init(p_conf->ca_zmq_sub_url);
+    //char mybuf[256];
+    //see_zmq_sub_recv(vv,mybuf,256,0);
+
+    p_conf->v_pub_sock = see_zmq_pub_init(p_conf->ca_zmq_pub_url);
+    p_conf->v_sub_sock = see_zmq_sub_init(p_conf->ca_zmq_sub_url);
+
+    //see_zmq_sub_recv(p_conf->v_sub_sock,mybuf,256,0);
+
 
     /* 这里其实是 pipeline sock !! */
     j_temp = cJSON_GetObjectItem(j_item, "pubsub_url");
@@ -118,12 +122,13 @@ int see_config_init(see_config_t *p_conf)
 
 
             /*
-                下面这句，是为每个 future block 的 v_sock赋值。v_sock是指 zmq
-                前面 see_zmq_pub_init() 会产生 v_sock值。
-                目前，所有的future block  的 v_sock 的值是一样的。
-                在 see_bars.c 的 see_send_bar() 会 使用到 v_sock !
+                下面这句，是为每个 future block 的 v_pub_sock赋值。v_pub_sock是指 zmq
+                前面 see_zmq_pub_init() 会产生 v_pub_sock值。
+                目前，所有的future block  的 v_pub_sock 的值是一样的。
+                在 see_bars.c 的 see_send_bar() 会 使用到 v_pub_sock !
             */
-            p_conf->pt_fut_blks[u]->v_sock = p_conf->v_sock ; // for zmq pub
+            p_conf->pt_fut_blks[u]->v_pub_sock = p_conf->v_pub_sock ; // for zmq pub
+            p_conf->pt_fut_blks[u]->v_sub_sock = p_conf->v_sub_sock ; // for zmq pub
 
 
             /*

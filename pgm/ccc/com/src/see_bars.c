@@ -1255,7 +1255,7 @@ int see_send_bar(see_fut_block_t *p_block,char *pc_msg)
     if(i_size <=0) {
         return -1;
     }
-    i_rtn = see_zmq_pub_send(p_block->v_sock,pc_msg);
+    i_rtn = see_zmq_pub_send(p_block->v_pub_sock,pc_msg);
     if(i_rtn != i_size) {
         see_errlog(1000,"see_send_bar: send error !!",RPT_TO_LOG,0,0);
     }

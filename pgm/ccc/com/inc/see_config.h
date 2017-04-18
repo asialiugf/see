@@ -20,8 +20,10 @@ typedef struct {
     int                 i_pair_sock;
     char                ca_nn_topy_url          [512] ;
     int                 i_topy_sock;
-    char                ca_zmq_pubsub_url       [512] ;
-    void               *v_sock;
+    char                ca_zmq_pub_url       [512] ;
+    char                ca_zmq_sub_url       [512] ;
+    void               *v_pub_sock;
+    void               *v_sub_sock;
 
     char                ca_nn_pubsub_url        [512] ;
     int                 i_pubsub_sock;

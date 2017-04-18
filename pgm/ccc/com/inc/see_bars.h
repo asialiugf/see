@@ -318,7 +318,8 @@ typedef struct {
 
 typedef struct  {
     int                 i_sock;                         // 用于记录 send to python rose 的sock!!
-    void   *            v_sock;                         // 用于记录 zmq pub v_sock !!
+    void   *            v_pub_sock;                         // 用于记录 zmq pub v_sock !!
+    void   *            v_sub_sock;                         // 用于记录 zmq pub v_sock !!
     char                InstrumentID[31];
     char                ca_home[512];                   // 用于记录"/home/rabbit/see/dat/rcv_dat/au" 需要初始化
     int                 i_hour_type ;                   // 每个品种的交易时间类型不一样，有的到23:00结束，有的到 01:00

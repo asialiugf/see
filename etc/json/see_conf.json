@@ -3,7 +3,8 @@
         "talk":"pair",
         "pair_url"  :"ipc:///tmp/heaven_pair.ipc",
         "topy_url"  :"ipc:///tmp/to_py_pair.ipc",
-        "zmq_pubsub_url"  :"tcp://localhost:9021",
+        "zmq_pub_url"  :"tcp://localhost:9021",
+        "zmq_sub_url"  :"tcp://localhost:9022",
         "pubsub_url":"ipc:///tmp/heaven_pubsub.ipc"
     },
     "database":{
