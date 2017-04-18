@@ -9,10 +9,6 @@
 extern "C"
 {
 #include <see_com_common.h>
-    double hh[10000] ;
-    double ll[10000] ;
-    double cc[10000] ;
-    double oo[10000] ;
 }
 
 int test = 0 ;
