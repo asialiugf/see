@@ -9,6 +9,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
+see_shm_t            gt_shm;
+
 int see_shm_alloc(see_shm_t *shm)
 {
     int  id;

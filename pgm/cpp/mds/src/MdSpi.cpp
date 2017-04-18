@@ -2,7 +2,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <MdSpi.h>
-#include <AAextern.h>
+#include <future.h>
 
 //int i_sock;
 int i_tick_len = sizeof(CThostFtdcDepthMarketDataField) ;
@@ -33,7 +33,7 @@ void CMdSpi::OnFrontConnected()
 {
 
     cerr << "OnFrontConnected() "  << endl;
-    //i_sock = see_pipeline_server(t_conf.ca_nn_pubsub_url);             // become a nanomsg pub server !!
+    //i_sock = see_pipeline_server(gp_conf->ca_nn_pubsub_url);             // become a nanomsg pub server !!
     ReqUserLogin1();                                             // user login !!!  用户登录请求
 }
 
@@ -74,7 +74,7 @@ void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 void CMdSpi::SubscribeMarketData1()
 {
     int i_rtn;
-    i_rtn = pUserApi1->SubscribeMarketData(t_conf.pc_futures, iInstrumentID);      // 请求订阅行情 !!
+    i_rtn = pUserApi1->SubscribeMarketData(gp_conf->pc_futures, iInstrumentID);      // 请求订阅行情 !!
     if(i_rtn != 0) {
         memset(ca_errmsg,'\0',100);
         sprintf(ca_errmsg,"ubscribeMarketData error :%d\n", i_rtn);
@@ -115,12 +115,12 @@ void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *buf)
     }
     */
 
-    i_idx = see_get_future_index(t_conf.pc_futures,buf->InstrumentID);   //i_idx 合约所在的数组下标
+    i_idx = see_get_future_index(gp_conf->pc_futures,buf->InstrumentID);   //i_idx 合约所在的数组下标
     if(i_idx == SEE_ERROR) {
         sprintf(ca_errmsg,"future %s is not in pc_futures : %s",buf->InstrumentID,buf->InstrumentID);
         see_errlog(1000,ca_errmsg,RPT_TO_LOG,0,0);
     }
-    see_handle_bars(t_conf.pt_fut_blks[i_idx], buf);
+    see_handle_bars(gp_conf->pt_fut_blks[i_idx], buf);
 }
 
 void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *buf, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

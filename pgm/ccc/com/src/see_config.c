@@ -1,5 +1,7 @@
 #include <see_com_common.h>
 
+see_config_t         gt_conf;
+see_config_t        *gp_conf;
 
 int see_config_init(see_config_t *p_conf)
 {

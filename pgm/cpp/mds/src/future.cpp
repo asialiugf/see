@@ -3,156 +3,54 @@
 #include <pthread.h>
 #include <unistd.h>
 #include "ThostFtdcMdApi.h"
-//#include <AAextern.h>
+#include <future.h>
+#include <see_ctpget.h>
 #include "MdSpi.h"
 
-extern "C"
-{
-#include <see_com_common.h>
-}
-
-int test = 0 ;
-
-/*
-*   FUTURE_NUMBER ：表示有多少个期货。
-*   pc_futures 是指针数组，经过  i_rtn = see_futures_init(pc_futures,ca_futures) ;
-*   进行初始化，see_futures_init 会从../../etc/tbl/see_future_table文件里读出有哪些期货，
-*   并将这些期货初始化到 ca_futures和pc_futures中
-*/
-
 using namespace std;
-/*   globle parameters !!!  */
-see_config_t        t_conf ;
-
-char ca_errmsg[256] ;
-char ca_jsonfile[] = "../../etc/json/see_brokers.json" ;
-
-CThostFtdcMdApi* pUserApi1;                             // UserApi对象
-
-char FRONT_ADDR4[] = "tcp://116.228.246.81:41213";		// 前置地址  招商期货
-TThostFtdcBrokerIDType	    BROKER_ID       = "8070";			// 经纪公司代码 招商期货
-TThostFtdcInvestorIDType    INVESTOR_ID     = "********";		// 投资者代码
-TThostFtdcPasswordType      PASSWORD        = "******";		    // 用户密码
-
-int     iInstrumentID = 3;									// 行情订阅数量
-int     iRequestID = 1;                                     // 请求编号
-
-cJSON   *json ;
-cJSON   *broker ;
-cJSON   *ip ;
-
-
-
-#define nginx_version      1011006
-#define FUTURE_VERSION      "1.11.6"
-#define FUTURE_VER          "nginx/" FUTURE_VERSION
-#define FUTURE_VER_BUILD    FUTURE_VER "( 1000 )"
-#define SEE_LINEFEED             "\x0a"
-#define SEE_LINEFEED_SIZE        1
-
-
-typedef int see_fd_t;
-#define see_stderr               STDERR_FILENO
-#define see_strlen(s)       strlen((const char *) s)
-#define see_inline      inline
+//see_config_t         gt_conf ;
+//see_config_t        *gp_conf ;
+//see_shm_t            gt_shm ;
 
 static see_inline void see_write_stderr(const char *text);
 static see_inline ssize_t see_write_fd(see_fd_t fd, void *buf, size_t n);
 static void see_show_version();
 
-int ctpget()
-{
-    int i_rtn;
-    i_rtn = pthread_create(&t_conf.p_dat, NULL, see_pthread_dat, &t_conf);
-    if(i_rtn == -1) {
-        printf("create thread (save data to database !) failed erron= %d/n", errno);
-        return -1;
-    }
-    //pthread_create(&t_conf.p_bar, NULL, see_pthread_bar, &t_conf);
-    //sleep(1) ;
-
-
-    iInstrumentID = 100;
-    pUserApi1 = CThostFtdcMdApi::CreateFtdcMdApi("1.con");          // 创建UserApi
-    CThostFtdcMdSpi* pUserSpi1 = new CMdSpi();                      // 创建UserSpi  可以创建多个
-
-
-    pUserApi1->RegisterSpi(pUserSpi1);                              // 注册事件类
-    pUserApi1->RegisterFront(FRONT_ADDR4);                          // connect
-
-    pUserApi1->Init();
-    cout << "after Init() !" << endl;
-
-    //pUserApi1->SubscribeMarketData(pc_futures, iInstrumentID);
-    //cout << "  pUserApi1->SubscribeMarketData !!!" << endl ;
-
-    pthread_t pthID = pthread_self();
-    cerr << "================main 02 =============================  pthId:" << pthID << endl;
-
-    pUserApi1->Join();
-    cout << "after Join() !" << endl;
-
-    pthID = pthread_self();
-    cerr << "03 pthId:" << pthID << endl;
-    return 0;
-}
 
 int
 main(int argc,char *argv[])
 {
-
-    int iu = 0;
-    /*
-    see_shm_t shm;
-    shm.size = sizeof(see_fut_mem_t)*100;
-    see_shm_alloc(&shm);
-    memset(shm.addr, '\0', 100);
-    memset(shm.addr, 'p',88);
-    printf((const char *) shm.addr);
-    see_shm_free(&shm);
-    */
-
     int pid = 0;
-    //see_stt_blocks_init( &t_conf );
     see_show_version();
 
     see_signal_init();                 // 需要详细考虑
     signal(SIGHUP, SIG_IGN);
     signal(SIGPIPE, SIG_IGN);
     see_daemon(1,0) ;
-    see_config_init(&t_conf);
 
+    gt_shm.size = sizeof(see_config_t);
+    see_shm_alloc(&gt_shm);
+    gp_conf = (see_config_t *)gt_shm.addr;
+    //see_shm_free(&shm);
 
-    /*
-    stt_bars_t K;
-    stt_init(&K, (char *)"stt01",t_conf.j_conf);
-    stt_init(&K, (char *)"stt03",t_conf.j_conf);
-    stt_init(&K, (char *)"stt02",t_conf.j_conf);
-    
-    int x;
-    for (x = 99;x < 199; x++) {
-        printf ( "%lf\n",K.B[K.p[1]]->oo[x]) ;
-    }
-    */
-
-
+    see_config_init(gp_conf);
 
     if(argc<=1) {
-        printf(" ctpget.x will enter into product mode! \n");
-        t_conf.c_test = 'p';
+        printf(" future.x will enter into product mode! \n");
+        gp_conf->c_test = 'p';
     } else {
         if(memcmp(argv[1],"-t",2)==0) {
-            printf(" ctpget.x will enter into test mode! \n");
-            t_conf.c_test = 't';
+            printf(" future.x will enter into test mode! \n");
+            gp_conf->c_test = 't';
         }
         if(memcmp(argv[1],"-p",2)==0) {
-            t_conf.c_test = 'p';
+            gp_conf->c_test = 'p';
         }
     }
 
     pid = getpid();
     setproctitle_init(argc, argv, environ);
-    setproctitle("%s %s", "future.x :", "master");
+    setproctitle("%s %s", "future.x :", "Master");
 
     pid = fork();
     switch(pid) {
@@ -161,7 +59,7 @@ main(int argc,char *argv[])
 
     case 0:
         pid = getpid();
-        setproctitle("%s %s", "future.x :", "waiter");
+        setproctitle("%s %s", "future.x :", "Waiter");
         
 
         /* for test B 
@@ -178,16 +76,14 @@ main(int argc,char *argv[])
          for test E */
 
 
-        see_waiter(&t_conf) ;
+        see_waiter(gp_conf) ;
 
         break;
 
     default:
-        while(1) {
-            sleep(100);
-        }
         break;
     }
+    see_ctpget();
 
 } /* end of main() */
 

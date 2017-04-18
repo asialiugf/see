@@ -54,4 +54,7 @@ typedef struct {
 int see_config_init( see_config_t *p_conf );
 int see_get_index( see_config_t *p_conf, char *pc_future );
 
+extern see_config_t         gt_conf;
+extern see_config_t        *gp_conf;
+
 #endif

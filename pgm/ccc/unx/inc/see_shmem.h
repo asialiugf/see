@@ -17,6 +17,7 @@ typedef struct {
     size_t       size;
 } see_shm_t;
 
+extern see_shm_t            gt_shm;
 
 int see_shm_alloc(see_shm_t *shm);
 void see_shm_free(see_shm_t *shm);

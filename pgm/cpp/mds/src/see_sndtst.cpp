@@ -3,18 +3,11 @@
 #include <iostream>
 #include <string.h>
 #include "ThostFtdcMdApi.h"
+#include <future.h>
 #include "MdSpi.h"
 #include <pthread.h>
 #include <unistd.h>
 
-extern "C"
-{
-    #include <see_com_common.h>
-    double hh[10000] ;
-    double ll[10000] ;
-    double cc[10000] ;
-    double oo[10000] ;
-}
 char ca_errmsg[512] ;
 
 /* =========== testing ================== */
@@ -42,8 +35,8 @@ int iInstrumentID = 3;									// 行情订阅数量
 int iRequestID = 1;                                     // 请求编号
 
 //static int              i_idx ;
-see_config_t            t_conf ;
-see_config_t            *p_conf ;
+//see_config_t            gt_conf ;
+//see_config_t            *gp_conf ;
 
 int
 main(int argc,char *argv[])
@@ -71,12 +64,12 @@ tick.bin文件放在 ../../dat/tst_dat/ 目录下。
     FILE *pf_tick_file ;
     CThostFtdcDepthMarketDataField * market_data ;
     CThostFtdcDepthMarketDataField tick_data ;
-    p_conf = &t_conf ;
-    see_config_init( p_conf );
-    //see_stt_blocks_init( p_conf );
+    gp_conf = &gt_conf ;
+    see_config_init( gp_conf );
+    //see_stt_blocks_init( gp_conf );
 
-    //pub_sock = see_pubsub_server( t_conf.ca_nn_pubsub_url );
-    pub_sock = see_pair_server( t_conf.ca_nn_pubsub_url );   
+    //pub_sock = see_pubsub_server( gt_conf.ca_nn_pubsub_url );
+    pub_sock = see_pair_server( gt_conf.ca_nn_pubsub_url );   
 
     sleep(2) ;
     pf = fopen(ca_tick_file_list,"r");

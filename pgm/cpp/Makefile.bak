@@ -78,7 +78,6 @@ CTPOBJS = $(MDSOBJ)MdSpi.o \
 		  $(MDSOBJ)see_ctpget.o
 
 FUTOBJS = $(MDSOBJ)MdSpi.o \
-		  $(MDSOBJ)see_ctpget.o \
 		  $(MDSOBJ)future.o
 
 #all: \
@@ -87,7 +86,12 @@ FUTOBJS = $(MDSOBJ)MdSpi.o \
 
 all: \
 	$(BINEXE)future.x \
+	$(BINEXE)ctpget.x \
 	$(BINEXE)sss.x
+
+$(BINEXE)ctpget.x: $(CTPOBJS) \
+					$(COMOBJS)
+		$(CC) -o $(BINEXE)ctpget.x $(CTPOBJS) $(CCCOBJ) $(CTPLIBS) -lzdb -lnanomsg -lerrlog -lcjson -lpthread -lzmq
 
 $(BINEXE)future.x: $(FUTOBJS) \
 					$(COMOBJS)

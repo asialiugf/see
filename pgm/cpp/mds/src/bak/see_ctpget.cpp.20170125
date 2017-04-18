@@ -30,7 +30,7 @@ char                ca_futures     [FUTURE_NUMBER][FUTRUE_ID_LEN] ;
 char               *pc_futures     [FUTURE_NUMBER];                     // 行情订阅列表
 see_block_t        *pt_blocks      [FUTURE_NUMBER];                     // 每个future有一个block !
 see_hours_t         t_hours        [SEE_HOUR_TYPE_NUM] ;                // 和../../etc/tbl/see_trade_time 里面的行数一致！
-see_config_t        t_conf ;
+see_config_t        gt_conf ;
 
 /*   globle parameters !!!  */
 
@@ -72,7 +72,7 @@ main(int argc,char *argv[])
     char 
     see_signal_init() ;
 
-    see_config_init( &t_conf );
+    see_config_init( &gt_conf );
  
 //    see_daemon(1,0) ;
    /*
