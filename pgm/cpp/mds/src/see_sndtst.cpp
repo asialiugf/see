@@ -65,7 +65,7 @@ tick.bin文件放在 ../../dat/tst_dat/ 目录下。
     CThostFtdcDepthMarketDataField * market_data ;
     CThostFtdcDepthMarketDataField tick_data ;
     gp_conf = &gt_conf ;
-    see_config_init( gp_conf );
+    see_config_init();
     //see_stt_blocks_init( gp_conf );
 
     //pub_sock = see_pubsub_server( gt_conf.ca_nn_pubsub_url );

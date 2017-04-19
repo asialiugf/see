@@ -77,3 +77,30 @@ int see_ctpget()
     cerr << "03 pthId:" << pthID << endl;
     return 0;
 }
+
+int see_fork_ctpget() {
+    int pid;
+    int i = 0;
+    char ca_futures[1024];
+    pid = fork();
+    switch(pid) {
+    case -1:
+        return -1;
+
+    case 0:
+        pid = getpid();
+        see_memzero(ca_futures,1024); 
+        for(i=0;i<gp_conf->i_future_num;i++){
+             strcat(ca_futures,gp_conf->ca_futures[i]) ;
+        }
+        
+        setproctitle("%s %s [%s]", "future.x :", "ctpget",ca_futures);
+        see_ctpget() ;
+
+        break;
+
+    default:
+        break;
+    }
+    return 0;
+}

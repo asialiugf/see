@@ -2,8 +2,8 @@
 
 const char          ca_mysql_url[]  = "mysql://127.0.0.1/test?user=root&password=123ok" ;
 char                ca_files[200][512];
-see_config_t        t_conf ;
-see_config_t        *p_conf ;
+//see_config_t        t_conf ;
+//see_config_t        *gp_conf ;
 char                ca_dirs[53][256] = \
         {"/home/rabbit/see/dat/rcv_dat/a",
         "/home/rabbit/see/dat/rcv_dat/ag",
@@ -70,42 +70,41 @@ main(int iArgCnt, char *pcaArgVec[])
     char                    ca_filename[512];
 
 
-    p_conf = &t_conf ;
-    see_config_init( p_conf );
-    see_zdb_open( p_conf );
+    see_config_init();
+    see_zdb_open( gp_conf );
 
         /*
         volatile see_node *node;
-        for ( i=0;i<p_conf->i_future_num;i++ ){
+        for ( i=0;i<gp_conf->i_future_num;i++ ){
             memset(ca_state,'\0',512) ;
             memset(ca_filename,'\0',512) ;
-            node = p_conf->pt_stt_blks[i]->list ;
+            node = gp_conf->pt_stt_blks[i]->list ;
             while( node != NULL ){
-                // p_conf->pt_fut_blks[i].bar_block[node->period].ca_table ;
-                printf(p_conf->pt_fut_blks[i]->bar_block[node->period].ca_table) ;
+                // gp_conf->pt_fut_blks[i].bar_block[node->period].ca_table ;
+                printf(gp_conf->pt_fut_blks[i]->bar_block[node->period].ca_table) ;
                 printf("\n");
-                //memcpy(ca_filename,"%s/%s",p_conf->pt_fut_blks[i].bar_block[node->period].ca_home
+                //memcpy(ca_filename,"%s/%s",gp_conf->pt_fut_blks[i].bar_block[node->period].ca_home
 
-                see_trave_dir(p_conf->pt_fut_blks[i]->bar_block[node->period].ca_home,&i_num, ca_files) ;
-                see_zdb_create_table( p_conf, p_conf->pt_fut_blks[i]->bar_block[node->period].ca_table );
+                see_trave_dir(gp_conf->pt_fut_blks[i]->bar_block[node->period].ca_home,&i_num, ca_files) ;
+                see_zdb_create_table( gp_conf, gp_conf->pt_fut_blks[i]->bar_block[node->period].ca_table );
                 for( j=0;j<i_num;j++ ){
-                    see_zdb_insert_file( p_conf, ca_files[j], p_conf->pt_fut_blks[i]->bar_block[node->period].ca_table );
+                    see_zdb_insert_file( gp_conf, ca_files[j], gp_conf->pt_fut_blks[i]->bar_block[node->period].ca_table );
                 }
                 node = node->next ;
             }
         }
         */
 
-        for( i=0;i<p_conf->i_future_num;i++ ){
+        for( i=0;i<gp_conf->i_future_num;i++ ){
             memset(ca_state,'\0',512) ;
             memset(ca_filename,'\0',512) ;
-            int len2 = strlen( p_conf->pt_fut_blks[i]->InstrumentID );
+            int len2 = strlen( gp_conf->pt_fut_blks[i]->InstrumentID );
             for( j=0;j<31;j++ ){
-                //printf( p_conf->pt_fut_blks[i]->bar_block[j].ca_home ) ;
+                //printf( gp_conf->pt_fut_blks[i]->bar_block[j].ca_home ) ;
                 //printf( "\n\n\n") ;
-                int len1 = strlen( p_conf->pt_fut_blks[i]->bar_block[j].ca_home );
-                see_trave_dir(p_conf->pt_fut_blks[i]->bar_block[j].ca_home,&i_num, ca_files) ;
-                see_zdb_create_table( p_conf, p_conf->pt_fut_blks[i]->bar_block[j].ca_table );
+                int len1 = strlen( gp_conf->pt_fut_blks[i]->bar_block[j].ca_home );
+                see_trave_dir(gp_conf->pt_fut_blks[i]->bar_block[j].ca_home,&i_num, ca_files) ;
+                see_zdb_create_table( gp_conf, gp_conf->pt_fut_blks[i]->bar_block[j].ca_table );
                 /*
                 for( k=0;k<i_num;k++ ){
                     printf( ca_files[k] ) ;
@@ -119,8 +118,8 @@ main(int iArgCnt, char *pcaArgVec[])
                     printf( &ca_files[k][len1+1] ) ;
                     printf( "\n") ;
                     */
-                    if( memcmp( (char*)&ca_files[k][len1+1], (char*)(p_conf->pt_fut_blks[i]->InstrumentID), len2 )==0 ){
-                        see_zdb_insert_file( p_conf, ca_files[k], p_conf->pt_fut_blks[i]->bar_block[j].ca_table );
+                    if( memcmp( (char*)&ca_files[k][len1+1], (char*)(gp_conf->pt_fut_blks[i]->InstrumentID), len2 )==0 ){
+                        see_zdb_insert_file( gp_conf, ca_files[k], gp_conf->pt_fut_blks[i]->bar_block[j].ca_table );
                         nn++ ;
                     }
                     if( nn >=2 ){
@@ -130,7 +129,7 @@ main(int iArgCnt, char *pcaArgVec[])
             }
         }
 
-    see_zdb_close( p_conf );
+    see_zdb_close( gp_conf );
 
     return 0;
 }

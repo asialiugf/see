@@ -205,6 +205,31 @@ int see_waiter(see_config_t *p_conf)
     return 0;
 }
 
+int see_fork_waiter(){
+    int pid;
+    pid = fork();
+    switch(pid) {
+    case -1:
+        return -1;
+
+    case 0:
+        pid = getpid();
+        setproctitle("%s %s", "future.x :", "waiter");
+        /*
+         *  see_waiter() 功能
+         *  1、 从ZMQ里等命令
+         *  2、 生成新的进程 进行 策略计算
+        */
+        see_waiter(gp_conf) ;
+
+        break;
+
+    default:
+        break;
+    }
+    return 0;
+}
+
 static int see_sttrun(see_config_t *p_conf,char * pc_future, char *pc_sttname)
 {
     stt_kkall_t K;

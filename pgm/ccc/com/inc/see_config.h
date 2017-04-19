@@ -22,14 +22,14 @@ typedef struct {
     int                 i_topy_sock;
     char                ca_zmq_pub_url       [512] ;
     char                ca_zmq_sub_url       [512] ;
-    void               *v_pub_sock;
-    void               *v_sub_sock;
+    void               *v_pub_sock;                 /* ZMQ的socket，必须在各自的进程中初始化 */
+    void               *v_sub_sock;                 /* ZMQ的socket，必须在各自的进程中初始化 */
 
     char                ca_nn_pubsub_url        [512] ;
     int                 i_pubsub_sock;
     char                ca_db_url               [512] ;
     char                ca_home                 [512] ;
-    stt_kkall_t    *pt_stt_blks             [FUTURE_NUMBER] ;
+    stt_kkall_t        *pt_stt_blks             [FUTURE_NUMBER] ;
     see_fut_block_t    *pt_fut_blks             [FUTURE_NUMBER] ;
     see_hours_t         t_hours                 [SEE_HOUR_TYPE_NUM] ;
 
@@ -43,8 +43,8 @@ typedef struct {
     pthread_mutex_t     mutex_dat ;
     pthread_mutex_t     mutex_bar ;
 
-    see_pthread_bar_arg_t  t_bar_arg ; 
-    see_pthread_dat_arg_t  t_dat_arg ; 
+    //see_pthread_bar_arg_t  t_bar_arg ; 
+    //see_pthread_dat_arg_t  t_dat_arg ; 
 
     URL_T                   z_url ;
     ConnectionPool_T        z_pool ;
@@ -53,7 +53,8 @@ typedef struct {
 
 } see_config_t ;
 
-int see_config_init( see_config_t *p_conf );
+//int see_config_init( see_config_t *p_conf );
+int see_config_init();
 int see_get_index( see_config_t *p_conf, char *pc_future );
 
 extern see_config_t         gt_conf;

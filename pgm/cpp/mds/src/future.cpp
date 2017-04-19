@@ -32,12 +32,12 @@ main(int argc,char *argv[])
     signal(SIGPIPE, SIG_IGN);
     see_daemon(1,0) ;
 
-    gt_shm.size = sizeof(see_config_t);
-    see_shm_alloc(&gt_shm);
-    gp_conf = (see_config_t *)gt_shm.addr;
+    //gt_shm.size = sizeof(see_config_t);
+    //see_shm_alloc(&gt_shm);
+    //gp_conf = (see_config_t *)gt_shm.addr;
     //see_shm_free(&gt_shm);
 
-    see_config_init(gp_conf);
+    see_config_init();
 
     if(argc<=1) {
         printf(" future.x will enter into product mode! \n");
@@ -54,31 +54,13 @@ main(int argc,char *argv[])
 
     pid = getpid();
     setproctitle_init(argc, argv, environ);
-    setproctitle("%s %s", "future.x :", "waster");
+    setproctitle("%s %s", "future.x :", "master");
 
-    pid = fork();
-    switch(pid) {
-    case -1:
-        return -1;
-
-    case 0:
-        pid = getpid();
-        setproctitle("%s %s", "future.x :", "waiter");
-        //gp_conf->v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,(char*)"waiter");
-        see_waiter(gp_conf) ;
-
-        break;
-
-    default:
-        break;
-    }
-    int uo = 0;
-    while(1) {
-        gp_conf->i_log_level = uo;
-        uo++ ;
-        sleep(1);
-    }
-    see_ctpget();
+    see_fork_waiter();
+    see_fork_ctpget();
+    printf ( "main process end !!\n" );
+    //see_
+    sleep(100);
 
 } /* end of main() */
 

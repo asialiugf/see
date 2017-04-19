@@ -34,9 +34,9 @@ main(int argc, char *argv[])
     /*
         see_config_init()必须在 see_daemon()之后。
     */
-    gt_shm.size = sizeof(see_config_t);
-    see_shm_alloc(&gt_shm);
-    gp_conf = (see_config_t *)gt_shm.addr;
+    //gt_shm.size = sizeof(see_config_t);
+    //see_shm_alloc(&gt_shm);
+    //gp_conf = (see_config_t *)gt_shm.addr;
     //see_shm_free(&gt_shm);
 
     see_config_init(gp_conf);

@@ -5,17 +5,23 @@ see_config_t        *gp_conf;
 
 void test_reset_hwm();
 
-int see_config_init(see_config_t *p_conf)
+//int see_config_init(see_config_t *p_conf)
+int see_config_init()
 {
     int     i_rtn ;
     int     i ;
     int     u ;
+    see_config_t * p_conf;
     cJSON   *j_root ;
     cJSON   *j_item ;
     cJSON   *j_temp ;
     cJSON   *j_period ;
     char    ca_conf_json[] = "../../etc/json/see_conf.json" ;
     
+    gt_shm.size = sizeof(see_config_t);
+    see_shm_alloc(&gt_shm);
+    gp_conf = (see_config_t *)gt_shm.addr;
+    p_conf = gp_conf;
 
     p_conf-> i_future_num = 0;
     memset(p_conf->ca_nn_pair_url,'\0',512);

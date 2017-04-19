@@ -74,6 +74,7 @@ typedef struct {
 
 */
 int see_waiter(see_config_t *p_conf);
+int see_fork_waiter();
 
 
 #endif /* _SEE_PROCESS_H_INCLUDED_ */
