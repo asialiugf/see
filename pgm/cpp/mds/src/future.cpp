@@ -5,6 +5,7 @@
 #include "ThostFtdcMdApi.h"
 #include <future.h>
 #include <see_ctpget.h>
+#include <see_master.h>
 #include "MdSpi.h"
 
 using namespace std;
@@ -32,11 +33,6 @@ main(int argc,char *argv[])
     signal(SIGPIPE, SIG_IGN);
     see_daemon(1,0) ;
 
-    //gt_shm.size = sizeof(see_config_t);
-    //see_shm_alloc(&gt_shm);
-    //gp_conf = (see_config_t *)gt_shm.addr;
-    //see_shm_free(&gt_shm);
-
     see_config_init();
 
     if(argc<=1) {
@@ -58,12 +54,10 @@ main(int argc,char *argv[])
 
     see_fork_waiter();
     see_fork_ctpget();
-    printf ( "main process end !!\n" );
-    //see_
-    sleep(100);
+
+    see_master_cycle();
 
 } /* end of main() */
-
 
 
 

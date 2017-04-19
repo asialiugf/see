@@ -4,6 +4,7 @@ CCFLAGS := -g -Wall -O3 -pthread
 
 ALLINC = -I ccc/com/inc \
 		 -I ccc/unx/inc \
+		 -I cpp/pro/inc \
 		-I /usr/local/include/nanomsg \
 		-I /usr/local/include/zdb \
 		-I /usr/local/include/ta-lib \
@@ -43,6 +44,10 @@ MDSINC:= cpp/mds/inc/
 MDSOBJ:= cpp/mds/obj/
 MDSSRC:= cpp/mds/src/
 
+PROINC:= cpp/pro/inc/
+PROOBJ:= cpp/pro/obj/
+PROSRC:= cpp/pro/src/
+
 TDSINC:= ./tds/inc/
 TDSOBJ:= ./tds/obj/
 TDSSRC:= ./tds/src/
@@ -79,6 +84,7 @@ CTPOBJS = $(MDSOBJ)MdSpi.o \
 
 FUTOBJS = $(MDSOBJ)MdSpi.o \
 		  $(MDSOBJ)see_ctpget.o \
+		  $(PROOBJ)see_master.o \
 		  $(MDSOBJ)future.o
 
 #all: \
@@ -112,3 +118,8 @@ $(MDSOBJ)see_sndtst.o: $(MDSSRC)see_sndtst.cpp
 $(MDSOBJ)MdSpi.o: $(MDSSRC)MdSpi.cpp
 		$(CC) $(CCFLAGS) $(ALLINC) -I$(MDSINC) -c $(MDSSRC)MdSpi.cpp
 		mv MdSpi.o $(MDSOBJ)
+
+$(PROOBJ)see_master.o: $(PROSRC)see_master.cpp
+		$(CC) $(CCFLAGS) $(ALLINC) -I$(PROINC) -c $(PROSRC)see_master.cpp
+		mv see_master.o $(PROOBJ)
+

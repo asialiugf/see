@@ -168,20 +168,19 @@ int see_waiter(see_config_t *p_conf)
         char pc_future[] = "TA705" ;
         char pc_sttname[] = "stt02" ;
         char buf[128] ;
+        char * cmd;
 
-        while(1) {
         /*
           get  char * pc_future, char *pc_stt_name from see_zmq_sub() !!!
         */
-            printf("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n");
-            see_memzero(buf,128);
-            i_rtn = see_zmq_sub_recv(p_conf->v_sub_sock,buf,128,0) ;
-            if(i_rtn <=0) {
-                see_err_log(0,0," waiter: see_zmq_pub_recv error, errno: %d \n",errno) ;
-            }
-            printf("%s\n",buf);
-            //sleep(1);
+        printf("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n");
+        see_memzero(buf,128);
+        i_rtn = see_zmq_sub_recv(p_conf->v_sub_sock,buf,128,0) ;
+        if(i_rtn <=0) {
+            see_err_log(0,0," waiter: see_zmq_pub_recv error, errno: %d \n",errno) ;
         }
+        printf("%s\n",buf);
+        cmd = &buf[6];
 
         pid = fork();
         switch(pid) {
@@ -190,22 +189,26 @@ int see_waiter(see_config_t *p_conf)
 
         case 0:
             pid = getpid();
-            setproctitle("%s %s [%s %s]", "future.x :", "sttrun",pc_future,pc_sttname);
-            gp_conf->v_pub_sock = see_zmq_pub_init(gp_conf->ca_zmq_pub_url);
-            gp_conf->v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,"TA705");
-            see_sttrun(p_conf,pc_future, pc_sttname) ;
+            setproctitle("%s %s [%s %s %s]", "future.x :", "sttrun",pc_sttname,pc_future,cmd);
+            while(1) {
+                // 这里有问题, v_pub_sock v_sub_sock 不同的进程 最好分开
+                //gp_conf->v_pub_sock = see_zmq_pub_init(gp_conf->ca_zmq_pub_url);
+                //gp_conf->v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,"TA705");
+                see_sttrun(p_conf,pc_future, pc_sttname) ;
+                sleep(1);
+            }
             break;
 
         default:
             printf(" main of waiter !! \n");
             break;
         }
-        sleep(100) ;
     }
     return 0;
 }
 
-int see_fork_waiter(){
+int see_fork_waiter()
+{
     int pid;
     pid = fork();
     switch(pid) {
@@ -232,14 +235,14 @@ int see_fork_waiter(){
 
 static int see_sttrun(see_config_t *p_conf,char * pc_future, char *pc_sttname)
 {
-    stt_kkall_t K;
-    stt_kkall_init(p_conf, pc_future, pc_sttname, &K);
+    //stt_kkall_t K;
+    //stt_kkall_init(p_conf, pc_future, pc_sttname, &K);
     //stt_run() ;
     while(1) {
         int k;
         k =1;
         see_err_log(0,0,"%d",k);
-        sleep(100);
+        sleep(1);
     }
     return 0;
 }
