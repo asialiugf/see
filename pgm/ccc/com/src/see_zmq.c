@@ -22,15 +22,13 @@ void * see_zmq_pub_init(char * pc_url)
     return pub_socket ;
 }
 
-void * see_zmq_sub_init(char * pc_url)
+void * see_zmq_sub_init(char * pc_url, char *topic)
 {
-    int hwm = 11024;
-
-    void *ctx = zmq_ctx_new();
-    assert(ctx);
     int rc;
+    int hwm = 11024;
+    void *ctx = zmq_ctx_new();
 
-    printf("%s\n",pc_url);
+    //printf("%s\n",pc_url);
     // Set up connect socket
     void *sub_socket = zmq_socket(ctx, ZMQ_SUB);
     assert(sub_socket);
@@ -39,7 +37,7 @@ void * see_zmq_sub_init(char * pc_url)
     rc = zmq_connect(sub_socket, pc_url);
     //rc = zmq_connect(sub_socket, "tcp://localhost:9022");
     assert(rc == 0);
-    rc = zmq_setsockopt(sub_socket, ZMQ_SUBSCRIBE, 0, 0);
+    rc = zmq_setsockopt(sub_socket, ZMQ_SUBSCRIBE, topic, strlen(topic));
     assert(rc == 0);
 
     sleep(1);
@@ -72,23 +70,32 @@ int see_zmq_pub_send(void * sock, char * pc_msg)
 
 int see_zmq_sub_recv(void *sub_socket, void *buf, size_t len, int flags)
 {
-    int rc=0;
-    char buff[256] ;
-    while(1) {
-        memset(buff,'\0',256);
-        int more;
-        size_t more_size = sizeof(more);
-        do {
-            rc = zmq_recv(sub_socket, buff,256,0);
-            printf("%s %d\n", buff,rc);
-            //printf("zmq_recv: %s\n", zmq_strerror(errno));
-            rc = zmq_getsockopt(sub_socket, ZMQ_RCVMORE, &more, &more_size);
-            if(rc!=0) {
-                see_errlog(1000," zmq_getsockopt error !!",RPT_TO_LOG,0,0);
+    int     rc=0;
+    int     more;
+    int     idx     = 0;
+    int     l       = (int)len;
+    char    *bf     = (char *)buf;
+    void    *b;
+    size_t  more_size = sizeof(more);
+
+    b = malloc(len);
+    see_memzero(buf,len);
+    do {
+        see_memzero(b,l);
+        rc = zmq_recv(sub_socket, b,len,flags);
+        if(rc>0 && idx<l) {
+            if ( idx+rc >=l ) {
+                rc = l-idx ;
             }
-            //printf("%s %d\n", buff,rc);
-            //sleep(1);
-        } while(more);
-        //sleep(1);
-    }
+            memcpy(bf+idx,b,rc);
+            memset( bf+l-1,'\0',1);
+            idx = idx+rc;
+        }
+        rc = zmq_getsockopt(sub_socket, ZMQ_RCVMORE, &more, &more_size);
+        if(rc!=0) {
+            see_errlog(1000," zmq_getsockopt error !!",RPT_TO_LOG,0,0);
+        }
+    } while(more);
+    free(b);
+    return 0;
 }

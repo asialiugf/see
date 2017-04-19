@@ -54,7 +54,7 @@ main(int argc,char *argv[])
 
     pid = getpid();
     setproctitle_init(argc, argv, environ);
-    setproctitle("%s %s", "future.x :", "Master");
+    setproctitle("%s %s", "future.x :", "waster");
 
     pid = fork();
     switch(pid) {
@@ -63,8 +63,8 @@ main(int argc,char *argv[])
 
     case 0:
         pid = getpid();
-        setproctitle("%s %s", "future.x :", "Waiter");
-        gp_conf->v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url);
+        setproctitle("%s %s", "future.x :", "waiter");
+        //gp_conf->v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,(char*)"waiter");
         see_waiter(gp_conf) ;
 
         break;
