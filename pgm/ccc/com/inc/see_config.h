@@ -9,6 +9,11 @@
 #include <see_com_common.h>
 
 typedef struct {
+    void               *v_pub_sock;                 /* ZMQ的socket，必须在各自的进程中初始化 */
+    void               *v_sub_sock;                 /* ZMQ的socket，必须在各自的进程中初始化 */
+} see_child_t;
+
+typedef struct {
     int                 i_log_level ;
     char                c_test;                 /* 开机参数："t"：测试环境  "p"：生产环境  */
     char                ca_futures              [FUTURE_NUMBER][FUTRUE_ID_LEN] ;
@@ -43,8 +48,8 @@ typedef struct {
     pthread_mutex_t     mutex_dat ;
     pthread_mutex_t     mutex_bar ;
 
-    //see_pthread_bar_arg_t  t_bar_arg ; 
-    //see_pthread_dat_arg_t  t_dat_arg ; 
+    //see_pthread_bar_arg_t  t_bar_arg ;
+    //see_pthread_dat_arg_t  t_dat_arg ;
 
     URL_T                   z_url ;
     ConnectionPool_T        z_pool ;
@@ -55,7 +60,7 @@ typedef struct {
 
 //int see_config_init( see_config_t *p_conf );
 int see_config_init();
-int see_get_index( see_config_t *p_conf, char *pc_future );
+int see_get_index(see_config_t *p_conf, char *pc_future);
 
 extern see_config_t         gt_conf;
 extern see_config_t        *gp_conf;

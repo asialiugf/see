@@ -391,6 +391,17 @@ typedef struct node {
     struct node    *next;
 } see_node ;
 
+
+typedef struct {
+    char           ca_future[31];
+    char           ca_sttname[31];
+    char           ca_actionday_s[9];
+    char           ca_actionday_e[9];
+    char           ca_updatetime_s[9];
+    char           ca_updatetime_e[9];
+    int            num;
+} stt_command_t;
+
 /* need to be init !!为每个period分配一个 klist_t !! */
 /* list for record of strategy period, 1f->5f->30f   */
 /*

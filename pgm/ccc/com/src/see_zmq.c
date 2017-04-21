@@ -78,24 +78,42 @@ int see_zmq_sub_recv(void *sub_socket, void *buf, size_t len, int flags)
     void    *b;
     size_t  more_size = sizeof(more);
 
+    printf( "in see_zmq_sub_recv !!!!!!!!!!!!!!!!!!!!-----------------\n");
     b = malloc(len);
     see_memzero(buf,len);
     do {
         see_memzero(b,l);
-        rc = zmq_recv(sub_socket, b,len,flags);
+
+        for(;;) {
+            rc = zmq_recv(sub_socket, b,len,0);
+            if(rc<=0) {
+                if(errno == EINTR) {
+                    continue;
+                } else {
+                    see_err_log(0,0,"see_zmq_sub_recv(): zmq_recv error!! errno: %d  %s",see_errno,zmq_strerror(errno));
+                    sleep(1);
+                }
+            } else {
+                break;
+            }
+        }
+
         if(rc>0 && idx<l) {
-            if ( idx+rc >=l ) {
+            if(idx+rc >=l) {
                 rc = l-idx ;
             }
             memcpy(bf+idx,b,rc);
-            memset( bf+l-1,'\0',1);
+            memset(bf+l-1,'\0',1);
             idx = idx+rc;
         }
         rc = zmq_getsockopt(sub_socket, ZMQ_RCVMORE, &more, &more_size);
         if(rc!=0) {
             see_errlog(1000," zmq_getsockopt error !!",RPT_TO_LOG,0,0);
+            return -1;
         }
     } while(more);
+    printf("see_zmq: %s\n",(char*)buf);
     free(b);
+    printf( "out!! see_zmq_sub_recv !!!!!!!!!!!!!!!!!!!!-----------------\n");
     return 0;
 }

@@ -73,7 +73,7 @@ typedef struct {
 #endif
 
 */
-int see_waiter(see_config_t *p_conf);
+int see_waiter();
 int see_fork_waiter();
 
 

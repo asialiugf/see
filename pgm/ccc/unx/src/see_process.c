@@ -8,6 +8,8 @@
 
 //static void see_execute_proc(void *data);
 static void see_signal_handler(int signo);
+int see_parser_cmd(stt_command_t *cmd,char *buf);
+int see_fork_sttrun(char * pc_future, char *pc_sttname);
 //static void see_process_get_status(void);
 //static void see_unlock_mutexes(see_pid_t pid);
 
@@ -30,7 +32,7 @@ int see_terminate;
 //#define SEE_CHANGEBIN_SIGNAL 1
 #define SEE_PROCESS_MASTER 1
 
-static int see_sttrun(see_config_t *p_conf,char * pc_future, char *pc_sttname);
+static int see_sttrun(char * pc_future, char *pc_sttname);
 
 typedef struct {
     int     signo;
@@ -153,63 +155,145 @@ see_signal_handler(int signo)
  * 1、 从ZMQ等待指令
  * 2、 根据指令 fork 一个 策略进程 进程进程
  */
-int see_waiter(see_config_t *p_conf)
+int see_waiter()
 {
-    int i_rtn=0;
+    int rc=0;
     int pid = 0;
+    char buf[256] ;
+    stt_command_t cmd;
 
     if(1) {
         see_err_log(0,0,"<IN> see_waiter() !");
     }
 
-    gp_conf->v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,"waiter");
+    //see_signal_init();
+    struct sigaction action;
+    action.sa_handler = SIG_IGN;
+    sigemptyset(&action.sa_mask);
+    sigaction(SIGCHLD, &action, NULL);
+
+    pid = getpid();
+    see_child_t  waiter_conf;
+    waiter_conf.v_pub_sock = see_zmq_pub_init(gp_conf->ca_zmq_pub_url);
+    waiter_conf.v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,"waiter");
+
     while(1) {
-        //see_zmq_sub();
-        char pc_future[] = "TA705" ;
-        char pc_sttname[] = "stt02" ;
-        char buf[128] ;
-        char * cmd;
+        printf("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo pid: %d \n",pid);
+        see_memzero(&cmd,sizeof(stt_command_t));
+        see_memzero(buf,256);
 
-        /*
-          get  char * pc_future, char *pc_stt_name from see_zmq_sub() !!!
-        */
-        printf("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n");
-        see_memzero(buf,128);
-        i_rtn = see_zmq_sub_recv(p_conf->v_sub_sock,buf,128,0) ;
-        if(i_rtn <=0) {
-            see_err_log(0,0," waiter: see_zmq_pub_recv error, errno: %d \n",errno) ;
+        printf(" kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk\n");
+        /* 这里还要接收 关闭 stt进程的信息 */
+        rc = see_zmq_sub_recv(waiter_conf.v_sub_sock,buf,256,0) ;
+        printf(" out see_zmq_sub_recv!!!!!!!!!!!!!!!!!!!!\n");
+        if(rc <0) {
+            see_err_log(0,0," see_waiter: see_zmq_pub_recv error, errno: %d \n",errno) ;
+            printf(" zmq err!!\n");
+            sleep(1);
+            continue;
         }
-        printf("%s\n",buf);
-        cmd = &buf[6];
-
-        pid = fork();
-        switch(pid) {
-        case -1:
-            return -1;
-
-        case 0:
-            pid = getpid();
-            setproctitle("%s %s [%s %s %s]", "future.x :", "sttrun",pc_sttname,pc_future,cmd);
-            while(1) {
-                // 这里有问题, v_pub_sock v_sub_sock 不同的进程 最好分开
-                //gp_conf->v_pub_sock = see_zmq_pub_init(gp_conf->ca_zmq_pub_url);
-                //gp_conf->v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,"TA705");
-                see_sttrun(p_conf,pc_future, pc_sttname) ;
-                sleep(1);
-            }
-            break;
-
-        default:
-            printf(" main of waiter !! \n");
-            break;
+        printf("new: %s\n",buf);
+        printf("new2: %s\n",&buf[6]);
+        rc = see_parser_cmd(&cmd,&buf[6]);
+        if(rc!=0) {
+            see_err_log(0,0," see_waiter(): see_parser_cmd() error, buf is: %s",&buf[6]);
+            printf(" parser error \n");
+            sleep(1);
+            continue;
         }
+        printf("%s %s %s %s %s %s %d\n",cmd.ca_future,
+               cmd.ca_sttname,
+               cmd.ca_actionday_s,
+               cmd.ca_actionday_e,
+               cmd.ca_updatetime_s,
+               cmd.ca_updatetime_e,
+               cmd.num);
+        printf("tttttttttttttttttttt\n");
+        sleep(1);
+        see_fork_sttrun(cmd.ca_future,cmd.ca_sttname);
     }
     return 0;
+}
+
+int see_parser_cmd(stt_command_t *cmd,char *buf)
+{
+    int rc=0;
+    /*
+    char           ca_future[31];
+    char           ca_sttname[31];
+    char           ca_actionday_s[9];
+    char           ca_actionday_e[9];
+    char           ca_updatetime_s[9];
+    char           ca_updatetime_e[9];
+    int            num;
+    */
+    cJSON *json;
+    cJSON *jtmp;
+    cJSON *jdat;
+
+    json = cJSON_Parse(buf);
+    if(json) {
+        jdat = cJSON_GetObjectItem(json, "data");
+        if(jdat) {
+            jtmp = cJSON_GetObjectItem(jdat, "future");
+            if(jtmp == NULL) {
+                rc = -1;
+            }
+            memcpy(cmd->ca_future, jtmp->valuestring, strlen(jtmp->valuestring));
+            printf("json: ca_future: %s\n",cmd->ca_future);
+
+            jtmp = cJSON_GetObjectItem(jdat, "sttname");
+            if(jtmp == NULL) {
+                return -1;
+            }
+            memcpy(cmd->ca_sttname, jtmp->valuestring, strlen(jtmp->valuestring));
+
+            jtmp = cJSON_GetObjectItem(jdat, "actionday_s");
+            if(jtmp == NULL) {
+                //(char *)cmd->ca_actionday_s = NULL;
+            }
+            memcpy(cmd->ca_actionday_s, jtmp->valuestring, strlen(jtmp->valuestring));
+
+            jtmp = cJSON_GetObjectItem(jdat, "actionday_e");
+            if(jtmp == NULL) {
+                //(char *)cmd->ca_actionday_e = NULL;
+            }
+            memcpy(cmd->ca_actionday_e, jtmp->valuestring, strlen(jtmp->valuestring));
+
+            jtmp = cJSON_GetObjectItem(jdat, "updatetime_s");
+            if(jtmp == NULL) {
+                //(char *)cmd->ca_updatetime_s = NULL;
+            }
+            memcpy(cmd->ca_updatetime_s, jtmp->valuestring, strlen(jtmp->valuestring));
+
+            jtmp = cJSON_GetObjectItem(jdat, "updatetime_e");
+            if(jtmp == NULL) {
+                //(char *)cmd->ca_updatetime_e = NULL;
+            }
+            memcpy(cmd->ca_updatetime_e, jtmp->valuestring, strlen(jtmp->valuestring));
+
+            jtmp = cJSON_GetObjectItem(jdat, "number");
+            if(jtmp == NULL) {
+                cmd->num = 10000;
+            }
+            cmd->num = jtmp->valueint;
+        } else {
+            see_err_log(0,0," see_parser_cmd(): error! no \"data\", buf is : %s ",buf);
+            rc = -1;
+        }
+        cJSON_Delete(json);
+        rc =0;
+    } else {
+        see_err_log(0,0," see_parser_cmd(): cJSON_Parse(buf) error! buf is : %s ",buf);
+        rc = -1;
+    }
+    return rc;
 }
 
 int see_fork_waiter()
 {
     int pid;
+
     pid = fork();
     switch(pid) {
     case -1:
@@ -220,11 +304,10 @@ int see_fork_waiter()
         setproctitle("%s %s", "future.x :", "waiter");
         /*
          *  see_waiter() 功能
-         *  1、 从ZMQ里等命令
+        *  1、 从ZMQ里等命令
          *  2、 生成新的进程 进行 策略计算
         */
-        see_waiter(gp_conf) ;
-
+        see_waiter() ;
         break;
 
     default:
@@ -233,16 +316,47 @@ int see_fork_waiter()
     return 0;
 }
 
-static int see_sttrun(see_config_t *p_conf,char * pc_future, char *pc_sttname)
+static int see_sttrun(char * pc_future, char *pc_sttname)
 {
+    int rc;
+    see_child_t  sttrun_conf;
+    sttrun_conf.v_pub_sock = see_zmq_pub_init(gp_conf->ca_zmq_pub_url);
+    sttrun_conf.v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,"waiter");
+
     //stt_kkall_t K;
     //stt_kkall_init(p_conf, pc_future, pc_sttname, &K);
     //stt_run() ;
+    int i_size;
+    i_size = strlen(pc_future);
+    if(i_size <=0) {
+        return -1;
+    }
     while(1) {
-        int k;
-        k =1;
-        see_err_log(0,0,"%d",k);
+        rc = see_zmq_pub_send(sttrun_conf.v_pub_sock,pc_future);
+        if(rc != i_size) {
+            see_errlog(1000,"see_send_bar: send error !!",RPT_TO_LOG,0,0);
+        }
         sleep(1);
+    }
+    return 0;
+}
+
+int see_fork_sttrun(char * pc_future, char *pc_sttname)
+{
+    int pid;
+    pid = fork();
+    switch(pid) {
+    case -1:
+        return -1;
+
+    case 0:
+        pid = getpid();
+        setproctitle("%s %s [%s:%s]", "future.x :", "sttrun",pc_future,pc_sttname);
+        see_sttrun(pc_future, pc_sttname) ;
+        break;
+
+    default:
+        break;
     }
     return 0;
 }
