@@ -58,7 +58,8 @@ void test_reset_hwm ()
     }
     assert (rc == 0);
 
-    sleep(5);
+
+    sleep(2);
 
 /*
 
@@ -91,10 +92,12 @@ void test_reset_hwm ()
         char ca_kkk[256] ;
         sprintf(ca_kkk,"number:   %d", send_count);
         len = strlen(ca_kkk);
-        rc = zmq_send (pub_socket, "TA703", 5, ZMQ_SNDMORE);
+        //rc = zmq_send (pub_socket, "TA703", 5, ZMQ_SNDMORE);
+        rc = zmq_send (pub_socket, "TA703", 5, ZMQ_DONTWAIT);
         rc = zmq_send (pub_socket, ca_kkk, len, ZMQ_DONTWAIT);
         sleep(1);
-        rc = zmq_send (pub_socket, "TA705", 5, ZMQ_SNDMORE);
+        //rc = zmq_send (pub_socket, "TA705", 5, ZMQ_SNDMORE);
+        rc = zmq_send (pub_socket, "TA705", 5, ZMQ_DONTWAIT);
         rc = zmq_send (pub_socket, ca_kkk, len, ZMQ_DONTWAIT);
         printf("%s\n",ca_kkk) ;
         sleep(1);

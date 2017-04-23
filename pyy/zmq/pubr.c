@@ -28,7 +28,7 @@
 */
 
 #include "zmq.h"
-#include <string.h> 
+#include <string.h>
 #include <unistd.h>
 #include <assert.h>
 #include <time.h>
@@ -36,59 +36,67 @@
 #define SETTLE_TIME 300
 
 // with hwm 11024: send 9999 msg, receive 9999, send 1100, receive 1100
-void test_reset_hwm ()
+void test_reset_hwm()
 {
     //int first_count = 1;
     //int second_count = 1100;
     int hwm = 11024;
 
-    void *ctx = zmq_ctx_new ();
-    assert (ctx);
+    void *ctx = zmq_ctx_new();
+    assert(ctx);
     int rc;
 
     // Set up connect socket
-    void *sub_socket = zmq_socket (ctx, ZMQ_SUB);
-    assert (sub_socket);
-    rc = zmq_setsockopt (sub_socket, ZMQ_RCVHWM, &hwm, sizeof (hwm));
-    assert (rc == 0);
+    void *sub_socket = zmq_socket(ctx, ZMQ_SUB);
+    assert(sub_socket);
+    rc = zmq_setsockopt(sub_socket, ZMQ_RCVHWM, &hwm, sizeof(hwm));
+    assert(rc == 0);
     //rc = zmq_connect (sub_socket, "tcp://localhost:1234");
-    rc = zmq_connect (sub_socket, "tcp://localhost:9022");
-    assert (rc == 0);
-    rc = zmq_setsockopt( sub_socket, ZMQ_SUBSCRIBE, 0, 0);
-    assert (rc == 0);
+    rc = zmq_connect(sub_socket, "tcp://localhost:9022");
+    assert(rc == 0);
+    rc = zmq_setsockopt(sub_socket, ZMQ_SUBSCRIBE, 0, 0);
+    assert(rc == 0);
 
     sleep(1);
     // Now receive all sent messages
     char buff[256] ;
-    int ret=0 ;
+    //int ret=0 ;
     //int recv_count = 0;
-    while (1)
-    {
-        memset( buff,'\0',256 );
+    while(1) {
+        memset(buff,'\0',256);
         //ret = zmq_recv (sub_socket, &buff, 256, ZMQ_DONTWAIT) ;
-        ret = zmq_recv (sub_socket, &buff, 256, 0) ;
-        if ( ret < 0 ) {
-            printf ("error in zmq_connect: %s\n", zmq_strerror (errno));  
+        /*
+        ret = zmq_recv(sub_socket, &buff, 256, 0) ;
+        if(ret < 0) {
+            printf("error in zmq_connect: %s\n", zmq_strerror(errno));
             sleep(1);
             continue;
-       }
-        printf("%s\n", buff);  
+        }
+        */
+
+        int more;
+        size_t more_size = sizeof(more);
+        do {
+            rc = zmq_recv(sub_socket, &buff,256,0);
+            rc = zmq_getsockopt(sub_socket, ZMQ_RCVMORE, &more, &more_size);
+            printf("%s\n", buff);
+        } while(more);
         //sleep(1);
     }
-    usleep (SETTLE_TIME);
+    usleep(SETTLE_TIME);
 
     // Clean up
-    rc = zmq_close (sub_socket);
-    assert (rc == 0);
+    rc = zmq_close(sub_socket);
+    assert(rc == 0);
 
-    rc = zmq_ctx_term (ctx);
-    assert (rc == 0);
+    rc = zmq_ctx_term(ctx);
+    assert(rc == 0);
 }
 
-int main (void)
+int main(void)
 {
     // hwm should apply to the messages that have already been received
-    test_reset_hwm ();
+    test_reset_hwm();
 
     return 0;
 }

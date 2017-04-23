@@ -1,0 +1,8 @@
+cc -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -I /usr/local/include/zmq -o test_pub.o  test_pub.c
+cc -pipe -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -lzmq -o test_pub.x test_pub.o
+cc -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -I /usr/local/include/zmq -o pubs.o  pubs.c
+cc -pipe -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -lzmq -o pubs.x pubs.o
+cc -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -I /usr/local/include/zmq -o pubr.o  pubr.c
+cc -pipe -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -lzmq -o pubr.x pubr.o
+cc -c -pipe  -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -I /usr/local/include/zmq -o test_hwm_pubsub.o  test_hwm_pubsub.c
+cc -pipe -O -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -g -pthread -lzmq -o test_hwm_pubsub.x test_hwm_pubsub.o

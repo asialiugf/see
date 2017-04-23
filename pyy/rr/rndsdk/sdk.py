@@ -22,10 +22,15 @@ class Operation(object):
         channel = sp[0]
         ret = {
             'topic': topic,
-            'data': body
+            'data': body,
         }
         ret = json.dumps(ret, ensure_ascii=False)
-        self.push_c.send_multipart([channel, ret])
+        #ret = json.dumps(body,ensure_ascii=False)
+        test = json.dumps(body, ensure_ascii=False)
+        print "body:",body
+        print("ret:",ret)
+        #self.push_c.send_multipart([channel, ret])
+        self.push_c.send_multipart([channel, test])
 
     def __del__(self):
         if self.push_c:

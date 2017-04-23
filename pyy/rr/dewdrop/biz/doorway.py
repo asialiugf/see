@@ -171,6 +171,8 @@ class PushWs(tornado.websocket.WebSocketHandler):
                 self.messager = Messager(self.send)
             elif op == 'pong':
                 pass
+            elif op == 'strategy':
+                pass
         except Exception as e:
             app_log.exception(e)
 

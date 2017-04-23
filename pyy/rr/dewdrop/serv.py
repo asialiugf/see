@@ -51,7 +51,7 @@ class Hubber(object):
         # 这里会收到从ihq发过来的信息。
         # 通过tcp://localhost:9022 zmq
         # 这里能收到所有的信息，没有过滤。
-        app_log.info('MESSAGE:%s', frame)
+        app_log.info('------------------MESSAGE:%s', frame)
         # TODO case:写缓存满,先使用nowait方式写,如果捕获Again异常,把内容压入一个deque中,使用on_write来写
         # inproc_pub 送到内部的Q中
         self._inproc_pub.send_multipart(frame)

@@ -5,6 +5,7 @@ git add testc
 git add testpy
 git add html
 git add gg
+git add pyy
 git add README.md
 git rm -r pgm/ccc/com/obj/
 git rm -r pgm/cpp/mds/obj/
