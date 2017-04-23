@@ -8,6 +8,6 @@ git add gg
 git add README.md
 git rm -r pgm/ccc/com/obj/
 git rm -r pgm/cpp/mds/obj/
-git rm -f pyy/rr/dewdrop/var/app.log
+git rm -f pyy/rr/dewdrop/var/*
 git commit -m "modified"
 git push
