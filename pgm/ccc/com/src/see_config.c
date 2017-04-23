@@ -76,7 +76,7 @@ int see_config_init()
     //char mybuf[256];
     //see_zmq_sub_recv(vv,mybuf,256,0);
 
-    p_conf->v_pub_sock = see_zmq_pub_init(p_conf->ca_zmq_pub_url);
+    //p_conf->v_pub_sock = see_zmq_pub_init(p_conf->ca_zmq_pub_url);
     //p_conf->v_sub_sock = see_zmq_sub_init(p_conf->ca_zmq_sub_url);
 
     //see_zmq_sub_recv(p_conf->v_sub_sock,mybuf,256,0);
@@ -133,8 +133,8 @@ int see_config_init()
                 目前，所有的future block  的 v_pub_sock 的值是一样的。
                 在 see_bars.c 的 see_send_bar() 会 使用到 v_pub_sock !
             */
-            p_conf->pt_fut_blks[u]->v_pub_sock = p_conf->v_pub_sock ; // for zmq pub
-            //p_conf->pt_fut_blks[u]->v_sub_sock = p_conf->v_sub_sock ; // for zmq pub
+            //p_conf->pt_fut_blks[u]->v_pub_sock = p_conf->v_pub_sock ; // for zmq pub
+            p_conf->pt_fut_blks[u]->v_sub_sock = p_conf->v_sub_sock ; // for zmq pub
 
 
             /*

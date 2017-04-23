@@ -29,6 +29,7 @@ typedef struct {
     char                ca_zmq_sub_url       [512] ;
     void               *v_pub_sock;                 /* ZMQ的socket，必须在各自的进程中初始化 */
     void               *v_sub_sock;                 /* ZMQ的socket，必须在各自的进程中初始化 */
+    see_zmq_ctxsock_t   t_ctxsock ;
 
     char                ca_nn_pubsub_url        [512] ;
     int                 i_pubsub_sock;

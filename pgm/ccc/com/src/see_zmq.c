@@ -3,11 +3,13 @@
 int hwm = 11024;
 char ca_msg[1024];
 
-void * see_zmq_pub_init(char * pc_url)
+
+int see_zmq_pub_init(char * pc_url, see_zmq_ctxsock_t *ctxsock)
 {
     int rc=0;
     void *ctx = zmq_ctx_new();
     void *pub_socket = zmq_socket(ctx, ZMQ_PUB);
+    printf("<IN> see_zmq_pub_init %s\n",pc_url);
     rc = zmq_setsockopt(pub_socket, ZMQ_SNDHWM, &hwm, sizeof(hwm));
     if(rc!=0) {
         see_errlog(1000," zmq_setsockopt error !!",RPT_TO_LOG,0,0);
@@ -19,29 +21,62 @@ void * see_zmq_pub_init(char * pc_url)
     }
     assert(rc == 0);
     sleep(2);
-    return pub_socket ;
+    printf("<OUT> see_zmq_pub_init %s\n",pc_url);
+    //return pub_socket ;
+    ctxsock->ctx = ctx;
+    ctxsock->sock = pub_socket ;
+    return 0;
 }
 
-void * see_zmq_sub_init(char * pc_url, char *topic)
+int see_zmq_sub_init(char * pc_url, see_zmq_ctxsock_t *ctxsock, char *topic)
 {
     int rc;
     int hwm = 11024;
     void *ctx = zmq_ctx_new();
 
-    //printf("%s\n",pc_url);
+    printf("<IN> see_zmq_sub_init %s\n",pc_url);
     // Set up connect socket
     void *sub_socket = zmq_socket(ctx, ZMQ_SUB);
     assert(sub_socket);
     rc = zmq_setsockopt(sub_socket, ZMQ_RCVHWM, &hwm, sizeof(hwm));
     assert(rc == 0);
+    if(rc !=0) {
+        printf("see_zmq_sub_init zmq_setsockopt error !!");
+    }
     rc = zmq_connect(sub_socket, pc_url);
     //rc = zmq_connect(sub_socket, "tcp://localhost:9022");
+    if(rc !=0) {
+        printf("see_zmq_sub_init zmq_connect error !!");
+    }
     assert(rc == 0);
     rc = zmq_setsockopt(sub_socket, ZMQ_SUBSCRIBE, topic, strlen(topic));
+    if(rc !=0) {
+        printf("see_zmq_sub_init zmq_setsockopt error !!");
+    }
     assert(rc == 0);
 
     sleep(1);
-    return sub_socket;
+    printf("<OUT> see_zmq_sub_init %s\n",pc_url);
+    //return sub_socket;
+    ctxsock->ctx = ctx;
+    ctxsock->sock = sub_socket;
+    return 0;
+}
+
+int see_zmq_pub_close(see_zmq_ctxsock_t *ctxsock)
+{
+    int rc=0 ;
+    rc = zmq_close(ctxsock->sock);
+    rc = zmq_ctx_term(ctxsock->ctx);
+    return rc;
+}
+
+int see_zmq_sub_close(see_zmq_ctxsock_t *ctxsock)
+{
+    int rc=0 ;
+    rc = zmq_close(ctxsock->sock);
+    rc = zmq_ctx_term(ctxsock->ctx);
+    return rc;
 }
 
 int see_zmq_pub_send(void * sock, char * pc_msg)
@@ -78,16 +113,16 @@ int see_zmq_sub_recv(void *sub_socket, void *buf, size_t len, int flags)
     void    *b;
     size_t  more_size = sizeof(more);
 
-    printf( "in see_zmq_sub_recv !!!!!!!!!!!!!!!!!!!!-----------------\n");
+    printf("in see_zmq_sub_recv !!!!!!!!!!!!!!!!!!!!-----------------\n");
     b = malloc(len);
     see_memzero(buf,len);
     do {
         see_memzero(b,l);
-
         for(;;) {
             rc = zmq_recv(sub_socket, b,len,0);
             if(rc<=0) {
                 if(errno == EINTR) {
+                    printf("\n------------------- EINTR --------------------\n");
                     continue;
                 } else {
                     see_err_log(0,0,"see_zmq_sub_recv(): zmq_recv error!! errno: %d  %s",see_errno,zmq_strerror(errno));
@@ -112,8 +147,8 @@ int see_zmq_sub_recv(void *sub_socket, void *buf, size_t len, int flags)
             return -1;
         }
     } while(more);
-    printf("see_zmq: %s\n",(char*)buf);
     free(b);
-    printf( "out!! see_zmq_sub_recv !!!!!!!!!!!!!!!!!!!!-----------------\n");
-    return 0;
+    see_err_log(0,0,"<OUT> see_zmq_sub_recv() %s",(char *)buf);
+    rc = strlen(bf);
+    return rc;
 }

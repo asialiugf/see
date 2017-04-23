@@ -129,6 +129,8 @@ static void see_signal_handler(int i_signal_no)
             break;
         //case SIGUNUSED:
         //    break;
+        default:
+            see_err_log(0,0,"signal %d orccured !!", i_signal_no);
     }
  
 //    exit(i_signal_no);

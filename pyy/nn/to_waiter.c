@@ -14,17 +14,19 @@ char ca_tmp[1024] ;
 
 int mysend(int sock, int i)
 {
-    printf("SENDING %s : %d \n", ca_msg, i);
     memset(ca_tmp, '\0', 1024) ;
     //sprintf(ca_tmp,"\"topic\":\"sub\"");
     //sprintf(ca_tmp,"{\"topic\":\"sub\",\"future\":\"TA701\"}");
     sprintf(ca_tmp, "topic:sub,{future:TA703,sttname:stt02}");
     int sz_n = strlen(ca_tmp);
     nn_send(sock, ca_tmp, sz_n, NN_DONTWAIT);
+    printf("SENDING %s : %d \n", ca_msg, i);
     usleep(1000000);
+/*
     sprintf(ca_tmp, "topic:sub,future:TA705");
     nn_send(sock, ca_tmp, sz_n, NN_DONTWAIT);
     usleep(1000000);
+*/
     return 1;
 }
 

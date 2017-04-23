@@ -64,7 +64,7 @@ def test2(op):
                 #time.sleep(1)
                 #op.send( "TA705",message )
                 #op.send( "TA709",message )
-                op.send( "waiter",cmd )
+                #op.send( "waiter",cmd )
                 op.send( "test01",cmd )
                 op.send( "test02",cmd )
                 print ( 'test!!!!!!!!!!!!!!!!!!!!!!!!!!!' )

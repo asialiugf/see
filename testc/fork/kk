@@ -2,3 +2,4 @@ gcc -o fork fork.c
 gcc -o signal.x signal.c -lm
 gcc -lpthread -o thread thread.c
 gcc -o chgname.x changename.c
+g++ fork1.c -o fork1.x

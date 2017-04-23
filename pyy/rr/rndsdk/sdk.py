@@ -27,8 +27,8 @@ class Operation(object):
         ret = json.dumps(ret, ensure_ascii=False)
         #ret = json.dumps(body,ensure_ascii=False)
         test = json.dumps(body, ensure_ascii=False)
-        print "body:",body
-        print("ret:",ret)
+        #print "body:",body
+        #print("ret:",ret)
         #self.push_c.send_multipart([channel, ret])
         self.push_c.send_multipart([channel, test])
 
