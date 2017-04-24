@@ -14,6 +14,8 @@ typedef struct {
 } see_child_t;
 
 typedef struct {
+    int                 send_on;                /* send to sttrun   */
+    int                 stt_on;                 /* sttrun in ctpget */
     int                 i_log_level ;
     char                c_test;                 /* 开机参数："t"：测试环境  "p"：生产环境  */
     char                ca_futures              [FUTURE_NUMBER][FUTRUE_ID_LEN] ;
@@ -27,9 +29,11 @@ typedef struct {
     int                 i_topy_sock;
     char                ca_zmq_pub_url       [512] ;
     char                ca_zmq_sub_url       [512] ;
+    see_zmq_ctxsock_t   pub_ctxsock ;               /* ctpget 进程 使用 */
+    see_zmq_ctxsock_t   sub_ctxsock ;               /* ctpget 进程 使用 */
     void               *v_pub_sock;                 /* ZMQ的socket，必须在各自的进程中初始化 */
     void               *v_sub_sock;                 /* ZMQ的socket，必须在各自的进程中初始化 */
-    see_zmq_ctxsock_t   t_ctxsock ;
+
 
     char                ca_nn_pubsub_url        [512] ;
     int                 i_pubsub_sock;

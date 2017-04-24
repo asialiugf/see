@@ -98,7 +98,7 @@ int see_zmq_pub_send(void * sock, char * pc_msg)
         sprintf(ca_msg,"%s -- errno : %d  rc: %d ", pc_msg,errno,rc) ;
         see_errlog(1000,ca_msg,RPT_TO_LOG,0,0);
         see_errlog(1000," zmq_send error !!",RPT_TO_LOG,0,0);
-        printf("%d ----------------\n",rc);
+        //printf("%d ----------------\n",rc);
     }
     return len;
 }
