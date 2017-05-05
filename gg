@@ -1,5 +1,5 @@
-git rm -r pgm/ccc/com/obj/*
-git rm -r pgm/cpp/mds/obj/*
+git rm -r pgm/ccc/com/obj/*.o
+git rm -r pgm/cpp/mds/obj/*.o
 git rm -f pyy/rr/dewdrop/var/*
 git rm -f pyy/rr/rose/var/*
 git add etc
