@@ -14,14 +14,13 @@
         }
     },
     "futures":{
-        "TA705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
-        "TA701":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt02", "auto_trade":"no","period":["1f","5f","30f"] },
+        "TA709":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "cs1705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
-        "p1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "p1709": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "l1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "v1705": {  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "pp1705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
-        "al1703":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
+        "al1709":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "ni1705":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "cu1702":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },
         "au1706":{  "bar_in_get":"yes", "stt_in_get":"yes", "stt_name":"stt01", "auto_trade":"no","period":["1f","5f","30f"] },

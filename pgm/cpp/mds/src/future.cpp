@@ -34,6 +34,10 @@ main(int argc,char *argv[])
     see_daemon(1,0) ;
 
     see_config_init();
+    gp_conf->send_on = -1;
+    gp_conf->stt_on = -1;
+
+    printf( "main:::: p_conf->i_future_num: %d\n",gp_conf->i_future_num );
 
     if(argc<=1) {
         printf(" future.x will enter into product mode! \n");
@@ -52,8 +56,9 @@ main(int argc,char *argv[])
     setproctitle_init(argc, argv, environ);
     setproctitle("%s %s", "future.x :", "master");
 
-    see_fork_waiter();
+    //see_ctpget();
     see_fork_ctpget();
+    see_fork_waiter();
 
     see_master_cycle();
 

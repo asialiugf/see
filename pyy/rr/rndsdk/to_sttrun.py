@@ -96,6 +96,7 @@ def test2(op):
 
 
 if __name__ == "__main__":
+    #pub to ihq.py!!! from localhost:9021
     op = Operation('localhost:9021')
     # test1(op)
     test2(op)

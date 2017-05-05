@@ -9,7 +9,7 @@
 //static void see_execute_proc(void *data);
 static void see_signal_handler(int signo);
 int see_parser_cmd(stt_command_t *cmd,char *buf);
-int see_fork_sttrun(char * pc_future, char *pc_sttname,see_child_t *waiter_conf);
+int see_fork_sttrun(char * pc_future, char *pc_sttname);
 //static void see_process_get_status(void);
 //static void see_unlock_mutexes(see_pid_t pid);
 
@@ -175,17 +175,12 @@ int see_waiter()
     */
 
     pid = getpid();
-    see_child_t  waiter_conf;
     see_zmq_ctxsock_t sub_ctxsock;
-    //waiter_conf.v_pub_sock = see_zmq_pub_init(gp_conf->ca_zmq_pub_url);
-    //waiter_conf.v_sub_sock = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,"waiter");
-    //rc = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,&sub_ctxsock,"waiter");
-
 
 
     while(1) {
         rc = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,&sub_ctxsock,"waiter");
-        printf("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo pid: %d \n",pid);
+        printf("\noooooooooooooooooooooooooooooooooooooooooooooooooooooooooo pid: %d \n",pid);
         see_memzero(&cmd,sizeof(stt_command_t));
         see_memzero(buf,256);
 
@@ -214,8 +209,9 @@ int see_waiter()
                cmd.ca_updatetime_e,
                cmd.num);
         printf("tttttttttttttttttttt\n");
+
         see_zmq_sub_close(&sub_ctxsock);
-        see_fork_sttrun(cmd.ca_future,cmd.ca_sttname,&waiter_conf);
+        see_fork_sttrun(cmd.ca_future,cmd.ca_sttname);
     }
     return 0;
 }
@@ -321,7 +317,7 @@ int see_fork_waiter()
     return 0;
 }
 
-static int see_sttrun(char * pc_future, char *pc_sttname)
+static int see_sttrun(char *pc_future, char *pc_sttname)
 {
     int rc=0;
     char buf[256];
@@ -375,7 +371,7 @@ static int see_sttrun(char * pc_future, char *pc_sttname)
     return 0;
 }
 
-int see_fork_sttrun(char * pc_future, char *pc_sttname, see_child_t *waiter_conf)
+int see_fork_sttrun(char * pc_future, char *pc_sttname)
 {
     int pid;
     int i = 0;
@@ -386,8 +382,6 @@ int see_fork_sttrun(char * pc_future, char *pc_sttname, see_child_t *waiter_conf
         return -1;
 
     case 0:
-        //zmq_close(waiter_conf->v_pub_sock);
-        //zmq_close(waiter_conf->v_sub_sock);
 
         for(i = 0; i < sysconf(_SC_OPEN_MAX); i++) {
             if(i != STDIN_FILENO && i != STDOUT_FILENO && i != STDERR_FILENO)
