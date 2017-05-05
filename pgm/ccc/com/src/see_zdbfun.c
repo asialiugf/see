@@ -11,6 +11,10 @@ int see_zdb_open(see_config_t *p_conf)
     ConnectionPool_setInitialConnections(p_conf->z_pool,20);              // 设置初始化连接数目
     ConnectionPool_start(p_conf->z_pool);                                 // 开启线程池
     p_conf->z_con  = ConnectionPool_getConnection(p_conf->z_pool);                  // 从线程池中取出连接（活动连接数＋1）
+    if( p_conf->z_con == NULL ) {
+        see_err_log(0,0,"ConnectionPool_getConnection() error!!");
+        return -1;
+    }
     return 0;
 }
 
@@ -21,10 +25,15 @@ int see_get_connection()
 
 int see_zdb_close(see_config_t *p_conf)
 {
+    see_err_log(0,0,"befor Connection_close()");
     Connection_close(p_conf->z_con);
+    see_err_log(0,0,"befor ConnectionPool_stop()");
     ConnectionPool_stop(p_conf->z_pool);
+    see_err_log(0,0,"befor ConnectionPool_free()");
     ConnectionPool_free(&p_conf->z_pool);
+    see_err_log(0,0,"befor URL_free()");
     URL_free(&p_conf->z_url);
+    see_err_log(0,0,"after URL_free()");
     return 0;
 }
 

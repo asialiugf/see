@@ -1385,33 +1385,31 @@ void *see_pthread_dat(void *data)
         */
         pthread_cond_timedwait(&p_conf->cond_bar, &p_conf->mutex_bar, &outtime);
 
-
         see_zdb_open(p_conf);
-
 
         for(i=0; i<p_conf->i_future_num; i++) {
             memset(ca_state,'\0',512);
             memset(ca_filename,'\0',512);
             int len2 = strlen(p_conf->pt_fut_blks[i]->InstrumentID);
             for(j=0; j<31; j++) {
-                //printf( p_conf->pt_fut_blks[i]->bar_block[j].ca_home );
-                //printf( "\n\n\n");
+                printf( p_conf->pt_fut_blks[i]->bar_block[j].ca_home );
+                printf( "\n\n\n");
                 int len1 = strlen(p_conf->pt_fut_blks[i]->bar_block[j].ca_home);
                 see_trave_dir(p_conf->pt_fut_blks[i]->bar_block[j].ca_home,&i_num, ca_files);
                 see_zdb_create_table(p_conf, p_conf->pt_fut_blks[i]->bar_block[j].ca_table);
-                /*
+                
                 for( k=0;k<i_num;k++ ){
                     printf( ca_files[k] );
                     printf( "----------\n");
-                }*/
+                }
                 int nn = 0;
                 for(k=0; k<i_num; k++) {
-                    /*
+                    
                     printf( ca_files[k] );
                     printf( "\n");
                     printf( &ca_files[k][len1+1] );
                     printf( "\n");
-                    */
+                    
                     if(memcmp((char*)&ca_files[k][len1+1], (char*)(p_conf->pt_fut_blks[i]->InstrumentID), len2)==0) {
                         see_zdb_insert_file(p_conf, ca_files[k], p_conf->pt_fut_blks[i]->bar_block[j].ca_table);
                         nn++;
@@ -1424,6 +1422,7 @@ void *see_pthread_dat(void *data)
         }
 
         see_zdb_close(p_conf);
+
         pthread_mutex_unlock(&p_conf->mutex_bar);
     }
     return NULL;

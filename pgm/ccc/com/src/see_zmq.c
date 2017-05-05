@@ -119,6 +119,7 @@ int see_zmq_sub_recv(void *sub_socket, void *buf, size_t len, int flags)
     do {
         see_memzero(b,l);
         for(;;) {
+            printf( "\n===for(;;)!===\n" );
             rc = zmq_recv(sub_socket, b,len,0);
             if(rc<=0) {
                 if(errno == EINTR) {

@@ -180,7 +180,7 @@ int see_waiter()
 
     while(1) {
         rc = see_zmq_sub_init(gp_conf->ca_zmq_sub_url,&sub_ctxsock,"waiter");
-        printf("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo pid: %d \n",pid);
+        printf("\noooooooooooooooooooooooooooooooooooooooooooooooooooooooooo pid: %d \n",pid);
         see_memzero(&cmd,sizeof(stt_command_t));
         see_memzero(buf,256);
 

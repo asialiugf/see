@@ -36,12 +36,20 @@ cJSON   *ip ;
 int see_ctpget()
 {
     int i_rtn;
-    i_rtn = pthread_create(&gt_conf.p_dat, NULL, see_pthread_dat, &gt_conf);
+
+    pthread_mutex_init(&gp_conf->mutex_dat, NULL);
+    pthread_mutex_init(&gp_conf->mutex_bar, NULL);
+    pthread_cond_init(&gp_conf->cond_dat, NULL);
+    pthread_cond_init(&gp_conf->cond_bar, NULL);
+
+    printf( "see_ctpget:::: p_conf->i_future_num: %d\n",gp_conf->i_future_num );
+
+    i_rtn = pthread_create(&gp_conf->p_dat, NULL, see_pthread_dat, gp_conf);
     if(i_rtn == -1) {
         see_err_log(0,0,"see_ctpget(): pthread_create() error!  errno=%d\n",errno);
         return -1;
     }
-    //pthread_create(&gt_conf.p_bar, NULL, see_pthread_bar, &gt_conf);
+    //pthread_create(&gp_conf->p_bar, NULL, see_pthread_bar, &gp_conf);
     //sleep(1) ;
 
 

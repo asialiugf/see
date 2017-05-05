@@ -37,6 +37,8 @@ main(int argc,char *argv[])
     gp_conf->send_on = -1;
     gp_conf->stt_on = -1;
 
+    printf( "main:::: p_conf->i_future_num: %d\n",gp_conf->i_future_num );
+
     if(argc<=1) {
         printf(" future.x will enter into product mode! \n");
         gp_conf->c_test = 'p';
@@ -54,6 +56,7 @@ main(int argc,char *argv[])
     setproctitle_init(argc, argv, environ);
     setproctitle("%s %s", "future.x :", "master");
 
+    //see_ctpget();
     see_fork_ctpget();
     see_fork_waiter();
 

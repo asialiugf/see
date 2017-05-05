@@ -1,6 +1,6 @@
 #include <see_com_common.h>
 
-see_config_t         gt_conf;
+//see_config_t         gt_conf;
 see_config_t        *gp_conf;
 
 void test_reset_hwm();
@@ -34,10 +34,12 @@ int see_config_init()
         p_conf->pt_fut_blks[i] = NULL;
     }
 
+    /*
     pthread_mutex_init(&p_conf->mutex_dat, NULL);
     pthread_mutex_init(&p_conf->mutex_bar, NULL);
     pthread_cond_init(&p_conf->cond_dat, NULL);
     pthread_cond_init(&p_conf->cond_bar, NULL);
+    */
 
     /* p_conf->t_hours init !!!!!!!!!!!  */
     see_trading_hours_init(&p_conf->t_hours[0]) ;
@@ -101,6 +103,8 @@ int see_config_init()
         printf(" see_config_init() get futures error !!  \n ");
     }
     p_conf->i_future_num = cJSON_GetArraySize(j_item);
+
+    printf( "config:::::p_conf->i_future_num: %d\n",p_conf->i_future_num );
     if(p_conf->i_future_num <=0) {
         exit(-1) ;
     }
