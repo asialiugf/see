@@ -1,3 +1,8 @@
+rm ~/see/pgm/ccc/com/obj/*.o
+rm ~/see/pgm/cpp/mds/obj/*.o
+rm ~/see/pyy/rr/dewdrop/var/*
+rm ~/see/pyy/rr/rose/var/*
+
 git add etc
 git add pgm
 git add resource
@@ -7,9 +12,5 @@ git add html
 git add gg
 git add pyy
 git add README.md
-git rm -r pgm/ccc/com/obj/
-git rm -r pgm/cpp/mds/obj/
-git rm -f pyy/rr/dewdrop/var/*
-git rm -f pyy/rr/rose/var/*
 git commit -m "modified"
 git push
