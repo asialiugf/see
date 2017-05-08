@@ -36,8 +36,10 @@ main(int argc,char *argv[])
     see_config_init();
     gp_conf->send_on = -1;
     gp_conf->stt_on = -1;
+    gp_conf->i_save_tick_only = -1;
 
-    printf( "main:::: p_conf->i_future_num: %d\n",gp_conf->i_future_num );
+
+    printf("main:::: p_conf->i_future_num: %d\n",gp_conf->i_future_num);
 
     if(argc<=1) {
         printf(" future.x will enter into product mode! \n");
@@ -50,6 +52,9 @@ main(int argc,char *argv[])
         if(memcmp(argv[1],"-p",2)==0) {
             gp_conf->c_test = 'p';
         }
+        if(memcmp(argv[1],"-s",2)==0) {
+            gp_conf->i_save_tick_only = 1;
+        }
     }
 
     pid = getpid();
@@ -58,7 +63,10 @@ main(int argc,char *argv[])
 
     //see_ctpget();
     see_fork_ctpget();
-    see_fork_waiter();
+
+    if(gp_conf->i_save_tick_only != 1) {
+        see_fork_waiter();
+    }
 
     see_master_cycle();
 

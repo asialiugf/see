@@ -279,9 +279,13 @@ see_handle_bars(see_fut_block_t *p_block, struct CThostFtdcDepthMarketDataField 
     memcpy(ca_UpdateTime,tick->UpdateTime,8);
     / -----------------------  异常处理 ------------------------- */
 
-    for(period=0; period<=30; period++) {
-        see_calc_bar_block(p_block, tick, period);                   // 计算K柱 .
-        see_save_bar(p_block, tick, period);                         // 保存文件.
+    if(gp_conf->i_save_tick_only != 1) {
+        for(period=0; period<=30; period++) {
+            see_calc_bar_block(p_block, tick, period);                   // 计算K柱 .
+            see_save_bar(p_block, tick, period);                         // 保存文件.
+        }
+    } else {
+        see_save_bar(p_block, tick, BAR_TICK);
     }
     /*
     if(gp_conf->send_on) {
@@ -967,6 +971,7 @@ int see_save_bar(see_fut_block_t *p_block,
                  struct CThostFtdcDepthMarketDataField *tick, int period)
 {
     see_bar_t       *p_bar0;
+    see_tick_t      new_tick;
     char            ca_year[5] = "\0\0\0";
     char            ca_month[7] = "\0\0\0";
     char            ca_filename[512];
@@ -1002,6 +1007,24 @@ int see_save_bar(see_fut_block_t *p_block,
         char ca_UpdateMillisec[100];
 
         char ca_errtmp[1024];
+
+
+        /*
+         * 记录收到tick的时间
+        */
+        see_memzero(&new_tick,sizeof(see_tick_t));
+        memcpy(&new_tick,tick,sizeof(struct CThostFtdcDepthMarketDataField));
+        struct timeval tv;
+        gettimeofday(&tv,NULL);
+        new_tick.rcv_msec = tv.tv_usec/1000 ;
+        struct tm *t;
+        time_t tt;
+        time(&tt);
+        t=localtime(&tt);
+        sprintf(new_tick.rcv_date,"%4d%02d%02d",t->tm_year+1900,t->tm_mon+1,t->tm_mday);
+        sprintf(new_tick.rcv_time,"%02d:%02d:%02d",t->tm_hour,t->tm_min,t->tm_sec);
+        new_tick.rcv_week = t->tm_wday;
+
 
         ii = tick->Volume;
         if(ii < 10000000 && ii > -10000000) {
@@ -1100,7 +1123,6 @@ int see_save_bar(see_fut_block_t *p_block,
         }
 
 
-
         ii = tick->UpdateMillisec;
         if(ii < 10000000 && ii > -10000000) {
             memset(ca_UpdateMillisec,'\0',100);
@@ -1110,11 +1132,15 @@ int see_save_bar(see_fut_block_t *p_block,
         }
 
         memset(ca_errtmp,'\0',1024);
-        sprintf(ca_errtmp,"%s %s %s %s %s ",tick->InstrumentID,
+        sprintf(ca_errtmp,"%s %s %s %s %s - %s %s %d %d -",tick->InstrumentID,
                 tick->TradingDay,
                 tick->ActionDay,
                 tick->UpdateTime,
-                ca_UpdateMillisec);
+                ca_UpdateMillisec,
+                new_tick.rcv_date,
+                new_tick.rcv_time,
+                new_tick.rcv_msec,
+                new_tick.rcv_week);
 
         sprintf(ca_msg,"%s H:%s L:%s LastP:%s B1:%s BV1:%s A1:%s AV1:%s V:%s\n",
                 ca_errtmp,
@@ -1122,9 +1148,11 @@ int see_save_bar(see_fut_block_t *p_block,
                 ca_BidPrice1,ca_BidVolume1,ca_AskPrice1,ca_AskVolume1,
                 ca_Volume);
         see_save_line(ca_filename,ca_msg);
-        see_save_bin(ca_tickname,(char *)tick,sizeof(struct CThostFtdcDepthMarketDataField));
+
+        see_save_bin(ca_tickname,(char *)&new_tick,sizeof(see_tick_t));
         return 0;
     } /* tick data saving */
+
 
     p_bar0 =  &p_block->bar_block[period].bar0;
     memcpy(ca_year,p_bar0->TradingDay,4);
@@ -1392,24 +1420,24 @@ void *see_pthread_dat(void *data)
             memset(ca_filename,'\0',512);
             int len2 = strlen(p_conf->pt_fut_blks[i]->InstrumentID);
             for(j=0; j<31; j++) {
-                printf( p_conf->pt_fut_blks[i]->bar_block[j].ca_home );
-                printf( "\n\n\n");
+                printf(p_conf->pt_fut_blks[i]->bar_block[j].ca_home);
+                printf("\n\n\n");
                 int len1 = strlen(p_conf->pt_fut_blks[i]->bar_block[j].ca_home);
                 see_trave_dir(p_conf->pt_fut_blks[i]->bar_block[j].ca_home,&i_num, ca_files);
                 see_zdb_create_table(p_conf, p_conf->pt_fut_blks[i]->bar_block[j].ca_table);
-                
-                for( k=0;k<i_num;k++ ){
-                    printf( ca_files[k] );
-                    printf( "----------\n");
+
+                for(k=0; k<i_num; k++) {
+                    printf(ca_files[k]);
+                    printf("----------\n");
                 }
                 int nn = 0;
                 for(k=0; k<i_num; k++) {
-                    
-                    printf( ca_files[k] );
-                    printf( "\n");
-                    printf( &ca_files[k][len1+1] );
-                    printf( "\n");
-                    
+
+                    printf(ca_files[k]);
+                    printf("\n");
+                    printf(&ca_files[k][len1+1]);
+                    printf("\n");
+
                     if(memcmp((char*)&ca_files[k][len1+1], (char*)(p_conf->pt_fut_blks[i]->InstrumentID), len2)==0) {
                         see_zdb_insert_file(p_conf, ca_files[k], p_conf->pt_fut_blks[i]->bar_block[j].ca_table);
                         nn++;

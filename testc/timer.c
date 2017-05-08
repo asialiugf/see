@@ -28,6 +28,8 @@ int main()
     printf("millisecond:%ld\n",tv.tv_sec*1000 + tv.tv_usec/1000);  //毫秒
     printf("microsecond:%ld\n",tv.tv_sec*1000000 + tv.tv_usec);  //微秒
 
+    printf("millisecond:%d\n",tv.tv_usec/1000);  //毫秒
+
 
     struct tm *t;
     time_t tt;

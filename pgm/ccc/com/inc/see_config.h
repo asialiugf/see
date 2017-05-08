@@ -16,6 +16,7 @@ typedef struct {
 typedef struct {
     int                 send_on;                /* send to sttrun   */
     int                 stt_on;                 /* sttrun in ctpget */
+    int                 i_save_tick_only;       /* */
     int                 i_log_level ;
     char                c_test;                 /* 开机参数："t"：测试环境  "p"：生产环境  */
     char                ca_futures              [FUTURE_NUMBER][FUTRUE_ID_LEN] ;

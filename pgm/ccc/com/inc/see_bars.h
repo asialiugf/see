@@ -50,6 +50,13 @@
 #define  BAR_1Y_LEN   2
 #define  BAR_TICK_LEN 0
 
+typedef struct {
+    struct CThostFtdcDepthMarketDataField   rcv_tick;
+    TThostFtdcDateType                      rcv_date;
+    TThostFtdcTimeType                      rcv_time;
+    TThostFtdcMillisecType                  rcv_msec;
+    int                                     rcv_week;
+} see_tick_t;
 
 typedef struct {
     double  o ;             // open
