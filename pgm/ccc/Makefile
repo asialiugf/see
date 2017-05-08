@@ -126,7 +126,7 @@ STTOBJS:= \
 	ccc/stt/obj/see_stt02.o
 
 $(BINEXE)rrr.x: $(CCCOBJS)
-	$(CC) $(CFLAGS) -o $(BINEXE)rrr.x $(COMOBJS) $(UNXOBJS) $(STTOBJS) ccc/com/obj/see_recieve.o -lzdb -lnanomsg -lta_lib -lerrlog -lcjson -lzmq -lsee_talib
+	$(CC) $(CFLAGS) -o $(BINEXE)rrr.x $(COMOBJS) $(UNXOBJS) $(STTOBJS) ccc/com/obj/see_recieve.o -lzdb -lnanomsg -lerrlog -lcjson -lzmq -lsee_talib
 
 $(BINEXE)kdj.x: $(objs)
 	$(CC) $(CFLAGS) -o $(BINEXE)kdj.x $(COMOBJS) $(UNXOBJS) \

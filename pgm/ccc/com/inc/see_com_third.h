@@ -18,7 +18,7 @@
 /*
  *  see include files
  */
-#include <errlog.h>
+//#include <errlog.h>
 #include <see_talib.h>
 
 /*

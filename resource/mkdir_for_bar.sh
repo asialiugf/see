@@ -9,6 +9,13 @@ if [ "$kk" != "#" ]; then
     echo $kk
 fi
 
+mkdir $HOME/see/dat
+mkdir $HOME/see/dat/ctp_dat
+mkdir $HOME/see/dat/rcv_dat
+mkdir $HOME/see/dat/tst_dat
+
+mkdir $HOME/see/bin
+mkdir $HOME/see/bin/exe
 
 awk '{print $1}' $HOME/see/etc/tbl/see_future_time | while read kk
 do
