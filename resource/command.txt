@@ -3,6 +3,9 @@
 
  find ./ -name "*.c" | xargs grep "ngx_signal_t" 
 
+(2)去掉相邻的重复行
+$ sort test.txt | uniq
+
 
 make -f ccc/Makefile
 make[1]: Entering directory `/home/rabbit/see/pgm'

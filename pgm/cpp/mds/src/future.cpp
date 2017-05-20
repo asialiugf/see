@@ -61,7 +61,6 @@ main(int argc,char *argv[])
     setproctitle_init(argc, argv, environ);
     setproctitle("%s %s", "future.x :", "master");
 
-    //see_ctpget();
     see_fork_ctpget();
 
     if(gp_conf->i_save_tick_only != 1) {
