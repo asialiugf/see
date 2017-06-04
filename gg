@@ -11,6 +11,7 @@ git add testpy
 git add html
 git add gg
 git add pyy
+git add stt
 git add README.md
 git commit -m "modified"
 git push
