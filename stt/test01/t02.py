@@ -1,7 +1,7 @@
 from gmsdk import md
 
 ret = md.init("13601380996",
-              "Test518918ok",
+              "it@iZ23psatkqsZ",
               2,
               "SHFE.RU1709.bar.60")
 
@@ -12,7 +12,7 @@ ticks = md.get_ticks("SHSE.600000,SZSE.000001",
 print(ticks)
 
 ret = md.init("13601380996",
-              "Test518918ok",
+              "it@iZ23psatkqsZ",
               4,
               "SHFE.ru1709.tick")
 

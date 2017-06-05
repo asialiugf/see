@@ -21,8 +21,8 @@ class MyStrategy(StrategyBase):
 
 if __name__ == '__main__':
     mystrategy = MyStrategy(
-        username='demo@myquant.cn',
-        password='123456',
+        username='13601380996',
+        password='it@iZ23psatkqsZ',
         strategy_id='strategy_1',
         subscribe_symbols='SHSE.600000.bar.daily',
         mode=4,

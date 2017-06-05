@@ -130,7 +130,7 @@ def drawPic(df, code, name):
 def makePicture(code, name):
     #df = ts.get_hist_data(code, start=begin_time, end=end_time)
     #df = ts.get_hist_data('600848')
-    ret = md.init("13601380996","Test518918ok")
+    ret = md.init("13601380996","it@iZ23psatkqsZ")
     df = tt.get_bars("SHFE.ru1709", 3600*4,  "2017-02-01 09:00:00", "2017-06-02 23:00:00")
     print("kkkkkkkkkkkkkkkkkkkkkkkkkkkk!!!")
     print("df:",df)

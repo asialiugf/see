@@ -8,10 +8,10 @@ class MyStrategy(StrategyBase):
     def __init__(self, *args, **kwargs):
         super(MyStrategy, self).__init__(*args, **kwargs)
         self.oc = True
-
+    
     def on_login(self):
         print('logged in')
-
+    
     def on_error(self, err_code, msg):
         # print('get error: %s - %s' % (err_code, msg))
         pass
@@ -23,7 +23,7 @@ class MyStrategy(StrategyBase):
             (tick.exchange, tick.sec_id, tick.last_price))
         print(tick)
         print(time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))
-
+    
     def on_bar(self, bar):
         print(bar_to_dict(bar))
         if self.oc:
@@ -32,6 +32,8 @@ class MyStrategy(StrategyBase):
             self.close_long(bar.exchange, bar.sec_id, 0, 100)
         self.oc = not self.oc
 
+
+
 if __name__ == '__main__':
     ret = MyStrategy(
         username='13601380996',
@@ -39,6 +41,6 @@ if __name__ == '__main__':
         strategy_id='strategy_2',
         #subscribe_symbols='SHFE.ru1709.bar.15',
         subscribe_symbols='SHFE.ru1709.tick',
-        mode=3
+        mode=2
     ).run()
     print(('exit code: ', ret))

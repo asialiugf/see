@@ -1,0 +1,29 @@
+from gmsdk import md
+ret = md.init("13601380996", 
+              "it@iZ23psatkqsZ", 
+              2, 
+              "SHSE.600000.bar.60,SZSE.000001.bar.30")
+
+ret = md.init("13601380996",
+              "it@iZ23psatkqsZ",
+              2,
+              "SHFE.RU1709.bar.60")
+
+
+ret = md.init("13601380996",
+              "it@iZ23psatkqsZ")
+
+
+ticks = md.get_ticks("SHSE.600000,SZSE.000001",
+                     "2017-06-01 09:30:00", 
+                     "2017-06-01 09:31:00")
+
+bars = md.get_bars("SHSE.600000,SZSE.000001", 60,  "2017-06-01 09:30:00", "2017-06-01 10:31:00")
+bars = md.get_bars("SHFE.ru1709", 60,  "2017-06-01 09:30:00", "2017-06-01 10:31:00")
+bars = md.get_bars("SHFE.ru1709", 5,  "2017-06-01 09:30:00", "2017-06-01 10:31:00")
+bars = md.get_bars("SHFE.ru1709", 15,  "2017-06-01 09:30:00", "2017-06-01 10:31:00")
+
+
+ticks = md.get_ticks("SHFE.ru1709",
+                     "2017-06-01 09:30:00",
+                     "2017-06-01 09:31:00")
