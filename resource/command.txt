@@ -93,3 +93,8 @@ Git鼓励大量使用分支：
 删除分支：git branch -d <name>
 
 #====================
+
+文件加解密：
+ openssl enc -des-ede3-cbc -in mm.tar -out mm.bin -k 12345678 -e -a
+ openssl enc -des-ede3-cbc -in mm.bin -out mm.tar -k 12345678 -d -a
+#====================

@@ -13,5 +13,6 @@ git add gg
 git add pyy
 git add stt
 git add README.md
+git add mq4
 git commit -m "modified"
 git push
