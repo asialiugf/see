@@ -35,7 +35,7 @@ extern bool   MM =FALSE;               // MM - money management
 extern double TakeProfit = 100.0;      // points to take profit (average price plus/minus this value)
 bool UseEquityStop = FALSE;            // Use equity stop
 double TotalEquityRisk = 20.0;         // Max allowed equity risk (trades will close at this level)
-bool UseTrailingStop = FALSE;          // Use traling stop
+bool UseTrailingStop = FALSE;          // Use traling stop  移动止损
 double TrailStart = 100.0;             // Trailing start
 double TrailStop = 10.0;               //Trailing stop
 double slip = 5.0;                     // Slippage
@@ -49,7 +49,7 @@ int OnScreenDelay = 0;
 double LotExponent_Hilo;
 int lotdecimal_Hilo, ord_Hilo;
 double TakeProfit_Hilo;                 // тейк профит 获得利润
-extern int MaxTrades_Hilo = 10;         // максимально количество одновременно открытых ордеров 同时打开订单的最大数量
+extern int MaxTrades = 10;         // максимально количество одновременно открытых ордеров 同时打开订单的最大数量
 bool UseEquityStop_Hilo;                // использовать риск в процентах 使用风险百分比
 double TotalEquityRisk_Hilo;            // риск в процентах от депозита 风险保证金的百分比
 //=====================================================
@@ -70,7 +70,8 @@ double AveragePrice_Hilo, SellLimit_Hilo, BuyLimit_Hilo ;
 double LastBuyPrice_Hilo, LastSellPrice_Hilo, Spread_Hilo;
 bool flag_Hilo;
 string EAName_Hilo = "Ilan_HiLo_RSI";
-int timeprev_Hilo = 0, expiration_Hilo;
+int timeprev_Hilo = 0;
+int expiration_Hilo;
 int NumOfTrades_Hilo = 0;
 double iLots_Hilo;
 int cnt_Hilo = 0, total_Hilo;
@@ -90,7 +91,7 @@ int lotdecimal_15, ord_15;
 double TakeProfit_15;
 bool UseEquityStop_15;                   // использовать риск в процентах
 double TotalEquityRisk_15;               // риск в процентах от депозита
-extern int MaxTrades_15 = 10;
+//extern int MaxTrades = 10;
 extern int OpenNewTF_15 = 60;            //When should 1.5 activate. Default is every 60 minutes, unless trades are already running
 extern int TimeFrameCloseValue = 0; //What time fram to use for comparing close value. 1=M1, 2=M5, 3=M15, 4=M30, 5=H1, 6=H4, 7=D1, 8=W1, 9=MN1, 0=Current chart
 int gi_unused_88_15;
@@ -142,7 +143,7 @@ double LotExponent_16;
 double Lots_16;
 int lotdecimal_16, ord_16;
 double TakeProfit_16;
-extern int MaxTrades_16 = 10;
+//extern int MaxTrades = 10;
 bool UseEquityStop_16;                    // использовать риск в процентах 使用风险百分比
 double TotalEquityRisk_16;                // риск в процентах от депозита 风险保证金的百分比
 int OpenNewTF_16 = 1;
@@ -206,7 +207,7 @@ color col = ForestGreen;
 datetime lastcheck;
 int  begin, end, max, current;
 //-------------------------------------------------------- Loop Speed variables
-
+//==============================
 int init()
 {
     Spread_Hilo = MarketInfo(Symbol(), MODE_SPREAD) * Point;
@@ -216,8 +217,8 @@ int init()
         return (ERR_COMMON_ERROR);
     }
     return (0);
-}
-
+}// end init
+//==============================
 int deinit()
 {
     ObjectDelete("Lable");
@@ -230,8 +231,10 @@ int deinit()
     return (0);
 }
 //========================================================================
+//========================================================================
 int start()
 {
+
     begin=GetTickCount();                     // 用于统计 运行一次start()所需要的时间
     int counted_bars=IndicatorCounted();      // 没有用到！
     if(Lots > MaxLots) Lots = MaxLots;        //ограничение лотов  很多限制
@@ -248,9 +251,9 @@ int start()
                     + "Acc number        " + AccountNumber()+ "\n"
                     + "Acc currency  :   " + AccountCurrency()   + "\n"
                     + "_______________________________" + "\n"
-                    + "Open trades Ilan_Hilo: " + CountTrades_Hilo() + "\n"
-                    + "Open trades Ilan_1.5 : " + CountTrades_15() + "\n"
-                    + "Open trades Ilan_1.6 : " + CountTrades_16() + "\n"
+                    + "Open trades Ilan_Hilo: " + CountTrades(g_magic_hilo) + "\n"
+                    + "Open trades Ilan_1.5 : " + CountTrades(g_magic_15) + "\n"
+                    + "Open trades Ilan_1.6 : " + CountTrades(g_magic_16) + "\n"
                     + "Total trades         : " + OrdersTotal() + "\n"
                     + "Total lots           : " + DoubleToStr(CountTotalLots(), 2) + "\n"
                     + "_______________________________" + "\n"
@@ -352,11 +355,11 @@ int start()
     bool     UseTrailingStop_Hilo = UseTrailingStop;
     double   TrailStart_Hilo = TrailStart;
     double   TrailStop_Hilo = TrailStop;
-    //double    PipStep_Hilo = PipStep;//30
-    double   slip_Hilo = slip;        // проскальзывание
+    //double    PipStep_Hilo = PipStep;   //30
+    double   slip_Hilo = slip;            // проскальзывание
 
     //=========
-    ord_Hilo = CountTrades_Hilo();         //有多少单
+    ord_Hilo = CountTrades(g_magic_hilo);         //有多少单
     if(Turbo) {
         if(ord_Hilo == 1) PipStep_Hilo = PipStep/3;        // 50/3*1
         if(ord_Hilo == 2) PipStep_Hilo = PipStep/3*2;      // 50/3*2
@@ -369,9 +372,9 @@ int start()
     }
 
 
-    //=======================
-    if(MM==true) {      //内存管理
-        if(MathCeil(AccountBalance()) < 2000) {         // MM = если депо меньше 2000, то лот = Lots (0.01), иначе- % от депо
+    //=======================内存管理
+    if(MM==true) {
+        if(MathCeil(AccountBalance()) < 2000) {       // MM = если депо меньше 2000, то лот = Lots (0.01), иначе- % от депо
             Lots_Hilo = Lots;
         } else {
             Lots_Hilo = 0.00001 * MathCeil(AccountBalance());
@@ -380,6 +383,7 @@ int start()
         Lots_Hilo = Lots;
     }
 
+    //======================移动止损
     if(UseTrailingStop_Hilo) TrailingAlls_Hilo(TrailStart_Hilo, TrailStop_Hilo, AveragePrice_Hilo);
     if(UseTimeOut_Hilo) {
         if(TimeCurrent() >= expiration_Hilo) {
@@ -391,6 +395,8 @@ int start()
     if(timeprev_Hilo == Time[0]) return (0);
     timeprev_Hilo = Time[0];
     double CurrentPairProfit_Hilo = CalculateProfit_Hilo();
+
+    //=======================使用风险百分比
     if(UseEquityStop_Hilo) {
         if(CurrentPairProfit_Hilo < 0.0 && MathAbs(CurrentPairProfit_Hilo) > TotalEquityRisk_Hilo / 100.0 * AccountEquityHigh_Hilo()) {
             CloseThisSymbolAll_Hilo();
@@ -399,10 +405,11 @@ int start()
         }
     }
 
-    total_Hilo = CountTrades_Hilo();
+    total_Hilo = CountTrades(g_magic_hilo);
     if(total_Hilo == 0) flag_Hilo = FALSE;
-    for(cnt_Hilo = OrdersTotal() - 1; cnt_Hilo >= 0; cnt_Hilo--) {
-        OrderSelect(cnt_Hilo, SELECT_BY_POS, MODE_TRADES);
+
+    for(i = OrdersTotal() - 1; i >= 0; i--) {
+        OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
         if(OrderSymbol() != Symbol() || OrderMagicNumber() != g_magic_hilo) continue;
         if(OrderSymbol() == Symbol() && OrderMagicNumber() == g_magic_hilo) {
             if(OrderType() == OP_BUY) {
@@ -410,8 +417,6 @@ int start()
                 ShortTrade_Hilo = FALSE;
                 break;
             }
-        }
-        if(OrderSymbol() == Symbol() && OrderMagicNumber() == g_magic_hilo) {
             if(OrderType() == OP_SELL) {
                 LongTrade_Hilo = FALSE;
                 ShortTrade_Hilo = TRUE;
@@ -420,7 +425,7 @@ int start()
         }
     }
 
-    if(total_Hilo > 0 && total_Hilo < MaxTrades_Hilo) {
+    if(total_Hilo > 0 && total_Hilo < MaxTrades) {
         RefreshRates();
         LastBuyPrice_Hilo = FindLastBuyPrice(g_magic_hilo);
         LastSellPrice_Hilo = FindLastSellPrice(g_magic_hilo);
@@ -476,12 +481,10 @@ int start()
             iLots_Hilo = NormalizeDouble(Lots_Hilo * MathPow(LotExponent_Hilo, NumOfTrades_Hilo), lotdecimal_Hilo);
 
             //=============ограничения на работу утром понедельника и вечер пятницы========================//
-
             //if(
             //    (CloseFriday==true&&DayOfWeek()==5&&TimeCurrent()>=StrToTime(CloseFridayHour+":00"))
             //  ||(OpenMondey ==true&&DayOfWeek()==1&&TimeCurrent()<=StrToTime(OpenMondeyHour +":00"))
             //  ) return(0);
-
             //=============================================================================================//
 
             if(NewCycle && NewCycleHiLo) {
@@ -516,14 +519,14 @@ int start()
             TradeNow_Hilo = FALSE;
         }
     }
-    total_Hilo = CountTrades_Hilo();
+    total_Hilo = CountTrades(g_magic_hilo);
     AveragePrice_Hilo = 0;
     double Count_Hilo = 0;
 
     //--------------------   COUNT -----------------------------
 
-    for(cnt_Hilo = OrdersTotal() - 1; cnt_Hilo >= 0; cnt_Hilo--) {
-        OrderSelect(cnt_Hilo, SELECT_BY_POS, MODE_TRADES);
+    for(i = OrdersTotal() - 1; i >= 0; i--) {
+        OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
         if(OrderSymbol() != Symbol() || OrderMagicNumber() != g_magic_hilo) continue;
         if(OrderSymbol() == Symbol() && OrderMagicNumber() == g_magic_hilo) {
             if(OrderType() == OP_BUY || OrderType() == OP_SELL) {
@@ -535,8 +538,8 @@ int start()
 
     if(total_Hilo > 0) AveragePrice_Hilo = NormalizeDouble(AveragePrice_Hilo / Count_Hilo, Digits);
     if(NewOrdersPlaced_Hilo) {
-        for(cnt_Hilo = OrdersTotal() - 1; cnt_Hilo >= 0; cnt_Hilo--) {
-            OrderSelect(cnt_Hilo, SELECT_BY_POS, MODE_TRADES);
+        for(i = OrdersTotal() - 1; i >= 0; i--) {
+            OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
             if(OrderSymbol() != Symbol() || OrderMagicNumber() != g_magic_hilo) continue;
             if(OrderSymbol() == Symbol() && OrderMagicNumber() == g_magic_hilo) {
                 if(OrderType() == OP_BUY) {
@@ -545,8 +548,6 @@ int start()
                     Stopper_Hilo = AveragePrice_Hilo - Stoploss_Hilo * Point;
                     flag_Hilo = TRUE;
                 }
-            }
-            if(OrderSymbol() == Symbol() && OrderMagicNumber() == g_magic_hilo) {
                 if(OrderType() == OP_SELL) {
                     PriceTarget_Hilo = AveragePrice_Hilo - TakeProfit_Hilo * Point;
                     SellTarget_Hilo = PriceTarget_Hilo;
@@ -560,11 +561,10 @@ int start()
     //----------------------------------------------------------------------------------
     if(NewOrdersPlaced_Hilo) {
         if(flag_Hilo == TRUE) {
-            for(cnt_Hilo = OrdersTotal() - 1; cnt_Hilo >= 0; cnt_Hilo--) {
-                OrderSelect(cnt_Hilo, SELECT_BY_POS, MODE_TRADES);
+            for(i = OrdersTotal() - 1; i >= 0; i--) {
+                OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
                 if(OrderSymbol() != Symbol() || OrderMagicNumber() != g_magic_hilo) continue;
                 if(OrderSymbol() == Symbol() && OrderMagicNumber() == g_magic_hilo) // OrderModify(OrderTicket(), AveragePrice_Hilo, OrderStopLoss(), PriceTarget_Hilo, 0, Yellow);
-                    //===
                     int NumberOfTries_Hilo = 10;
                 for(int i = 0; i < NumberOfTries_Hilo; i++) {
                     bool res=OrderModify(OrderTicket(), AveragePrice_Hilo, OrderStopLoss(), PriceTarget_Hilo, 0, Yellow);
@@ -597,7 +597,6 @@ int start()
     //double PipStep_15 = PipStep;//30
     double   slip_15 = slip;                      // проскальзывание
 
-
     //=================
     int _TimeFrameCloseValue = 0;
     if(TimeFrameCloseValue == 1) _TimeFrameCloseValue =PERIOD_M1;
@@ -613,7 +612,7 @@ int start()
 
 
     //=========
-    ord_15 = CountTrades_15();
+    ord_15 = CountTrades(g_magic_15);
     if(Turbo) {
         if(ord_15 == 1) PipStep_15 = PipStep/3;
         if(ord_15 == 2) PipStep_15 = PipStep/3*2;
@@ -663,7 +662,7 @@ int start()
             }
         }
 
-        gi_304_15 = CountTrades_15();
+        gi_304_15 = CountTrades(g_magic_15);
         if(gi_304_15 == 0) gi_268_15 = FALSE;
         for(i = OrdersTotal() - 1; i >= 0; i--) {
             OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
@@ -684,7 +683,7 @@ int start()
             }
         }
 
-        if(gi_304_15 > 0 && gi_304_15 < MaxTrades_15) {
+        if(gi_304_15 > 0 && gi_304_15 < MaxTrades) {
             RefreshRates();
             gd_236_15 = FindLastBuyPrice(g_magic_15);
             gd_244_15 = FindLastSellPrice(g_magic_15);
@@ -779,7 +778,7 @@ int start()
     }// end  ---  if(time_15!=iTime(NULL,OpenNewTF_15,0)){
 
 
-    gi_304_15 = CountTrades_15();
+    gi_304_15 = CountTrades(g_magic_15);
     g_price_212_15 = 0;
     double ld_24_15 = 0;
 
@@ -860,7 +859,7 @@ int start()
     double   slip_16 = slip;                      // проскальзывание
 
     //=========
-    ord_16 = CountTrades_16();
+    ord_16 = CountTrades(g_magic_16);
     if(Turbo) {
         if(ord_16 == 1) PipStep_16 = PipStep/3;
         if(ord_16 == 2) PipStep_16 = PipStep/3*2;
@@ -885,7 +884,6 @@ int start()
     } else Lots_16 = Lots;
 
     //=============ограничения на работу утром понедельника и вечер пятницы========================//
-
     //if(
     //    (CloseFriday==true&&DayOfWeek()==5&&TimeCurrent()>=StrToTime(CloseFridayHour+":00"))
     //  ||(OpenMondey ==true&&DayOfWeek()==1&&TimeCurrent()<=StrToTime(OpenMondeyHour+ ":00"))
@@ -910,7 +908,7 @@ int start()
                 gi_332_16 = FALSE;
             }
         }
-        gi_304_16 = CountTrades_16();
+        gi_304_16 = CountTrades(g_magic_16);
 
         Print("这里会执行吗这里会执行吗这里会执行吗?");
 
@@ -935,7 +933,7 @@ int start()
             }
         }// end  - for
 
-        if(gi_304_16 > 0 && gi_304_16 < MaxTrades_16) {
+        if(gi_304_16 > 0 && gi_304_16 < MaxTrades) {
             RefreshRates();
             gd_236_16 = FindLastBuyPrice(g_magic_16);
             gd_244_16 = FindLastSellPrice(g_magic_16);
@@ -1031,7 +1029,7 @@ int start()
         time_16=iTime(NULL,OpenNewTF_16,0);
     }//  end  if(time_16!=iTime(NULL,OpenNewTF_16,0)){
 
-    gi_304_16 = CountTrades_16();
+    gi_304_16 = CountTrades(g_magic_16);
     g_price_212_16 = 0;
     double ld_24_16 = 0;
     for(i = OrdersTotal() - 1; i >= 0; i--) {
@@ -1115,20 +1113,21 @@ int start()
     return (0);
 }
 
-//=============================
-int CountTrades_Hilo()
+//============================= 计算下单数量
+int CountTrades(int magic_number)
 {
-    int count_Hilo = 0;
-    Print("tttttttttttttttttttttt:",OrdersTotal());
-    for(int trade_Hilo = OrdersTotal() - 1; trade_Hilo >= 0; trade_Hilo--) {
-        OrderSelect(trade_Hilo, SELECT_BY_POS, MODE_TRADES);
-        Print("OrderSymbol,Symbol:    ",OrderSymbol(),"   ",Symbol(),"OrderMagicNumber:   ",OrderMagicNumber());
-        if(OrderSymbol() != Symbol() || OrderMagicNumber() != g_magic_hilo) continue;
-        if(OrderSymbol() == Symbol() && OrderMagicNumber() == g_magic_hilo) {
-            if(OrderType() == OP_SELL || OrderType() == OP_BUY) count_Hilo++;
+    int count = 0;
+    int i = 0;
+    Print("tttttttttttttttttttttt: ",OrdersTotal());
+    for(i = OrdersTotal() - 1; i >= 0; i--) {
+        OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
+        Print("OrderSymbol,Symbol:    ",OrderSymbol(),"   ",Symbol(),"  OrderMagicNumber:   ",OrderMagicNumber());
+        if(OrderSymbol() != Symbol() || OrderMagicNumber() != magic_number) continue;
+        if(OrderSymbol() == Symbol() && OrderMagicNumber() == magic_number) {
+            if(OrderType() == OP_SELL || OrderType() == OP_BUY) count++;
         }
     }
-    return (count_Hilo);
+    return (count);
 }
 
 //=============================
@@ -1252,7 +1251,7 @@ void TrailingAlls_Hilo(int pType_Hilo, int stop_Hilo, double AvgPrice_Hilo)
 //=============================
 double AccountEquityHigh_Hilo()
 {
-    if(CountTrades_Hilo() == 0) AccountEquityHighAmt_Hilo = AccountEquity();
+    if(CountTrades(g_magic_hilo) == 0) AccountEquityHighAmt_Hilo = AccountEquity();
     if(AccountEquityHighAmt_Hilo < PrevEquity_Hilo) AccountEquityHighAmt_Hilo = PrevEquity_Hilo;
     else AccountEquityHighAmt_Hilo = AccountEquity();
     PrevEquity_Hilo = AccountEquity();
@@ -1262,63 +1261,51 @@ double AccountEquityHigh_Hilo()
 //=============================
 double FindLastBuyPrice(int i_magic_number)
 {
-    double   oldorderopenprice_Hilo;
-    int      oldticketnumber_Hilo;
-    double   unused_Hilo = 0;
-    int      ticketnumber_Hilo = 0;
+    double   old_order_open_price;
+    int      old_ticket_number;
+    double   tmp_price = 0;
+    int      ticket_number = 0;
     for(int i = OrdersTotal() - 1; i >= 0; i--) {
         OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
         if(OrderSymbol() != Symbol() || OrderMagicNumber() != i_magic_number) continue;
         if(OrderSymbol() == Symbol() && OrderMagicNumber() == i_magic_number && OrderType() == OP_BUY) {
-            oldticketnumber_Hilo = OrderTicket();
-            if(oldticketnumber_Hilo > ticketnumber_Hilo) {
-                oldorderopenprice_Hilo = OrderOpenPrice();
-                unused_Hilo = oldorderopenprice_Hilo;
-                ticketnumber_Hilo = oldticketnumber_Hilo;
+            old_ticket_number = OrderTicket();
+            if(old_ticket_number > ticket_number) {
+                old_order_open_price = OrderOpenPrice();
+                tmp_price = old_order_open_price;
+                ticket_number = old_ticket_number;
             }
         }
     }
-    return (oldorderopenprice_Hilo);
+    return (old_order_open_price);
 }
 
 //=============================
 double FindLastSellPrice(int i_magic_number)
 {
-    double   oldorderopenprice_Hilo;
-    int      oldticketnumber_Hilo;
-    double   unused_Hilo = 0;
-    int      ticketnumber_Hilo = 0;
+    double   old_order_open_price;
+    int      old_ticket_number;
+    double   tmp_price = 0;
+    int      ticket_number = 0;
     for(int i = OrdersTotal() - 1; i >= 0; i--) {
         OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
         if(OrderSymbol() != Symbol() || OrderMagicNumber() != i_magic_number) continue;
         if(OrderSymbol() == Symbol() && OrderMagicNumber() == i_magic_number && OrderType() == OP_SELL) {
-            oldticketnumber_Hilo = OrderTicket();
-            if(oldticketnumber_Hilo > ticketnumber_Hilo) {
-                oldorderopenprice_Hilo = OrderOpenPrice();
-                unused_Hilo = oldorderopenprice_Hilo;
-                ticketnumber_Hilo = oldticketnumber_Hilo;
+            old_ticket_number = OrderTicket();
+            if(old_ticket_number > ticket_number) {
+                old_order_open_price = OrderOpenPrice();
+                tmp_price = old_order_open_price;
+                ticket_number = old_ticket_number;
             }
         }
     }
-    return (oldorderopenprice_Hilo);
+    return (old_order_open_price);
 }
 
 //==========================================================================
 //                   пользовательские ф-ции 1.5_1.6                       //
 //==========================================================================
 
-int CountTrades_15()
-{
-    int iRc = 0;
-    Print("15151515151515151515tttttttttttttttttttttt:",OrdersTotal());
-    for(int i = OrdersTotal() - 1; i >= 0; i--) {
-        OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
-        if(OrderSymbol() != Symbol() || OrderMagicNumber() != g_magic_15) continue;
-        if(OrderSymbol() == Symbol() && OrderMagicNumber() == g_magic_15)
-            if(OrderType() == OP_SELL || OrderType() == OP_BUY) iRc++;
-    }
-    return (iRc);
-}
 
 
 void CloseThisSymbolAll_15()
@@ -1410,7 +1397,7 @@ void TrailingAlls_15(int ai_0_15, int ai_4_15, double a_price_8_15)
 
 double AccountEquityHigh_15()
 {
-    if(CountTrades_15() == 0) gd_336_15 = AccountEquity();
+    if(CountTrades(g_magic_15) == 0) gd_336_15 = AccountEquity();
     if(gd_336_15 < gd_344_15) gd_336_15 = gd_344_15;
     else gd_336_15 = AccountEquity();
     gd_344_15 = AccountEquity();
@@ -1418,20 +1405,7 @@ double AccountEquityHigh_15()
 }
 
 
-//============================================================//
-//======================CountTrades_16========================//
-//============================================================//
-int CountTrades_16()
-{
-    int iRc = 0;
-    for(int i = OrdersTotal() - 1; i >= 0; i--) {
-        OrderSelect(i, SELECT_BY_POS, MODE_TRADES);
-        if(OrderSymbol() != Symbol() || OrderMagicNumber() != g_magic_16) continue;
-        if(OrderSymbol() == Symbol() && OrderMagicNumber() == g_magic_16)
-            if(OrderType() == OP_SELL || OrderType() == OP_BUY) iRc++;
-    }
-    return (iRc);
-}
+
 
 void CloseThisSymbolAll_16()
 {
@@ -1533,7 +1507,7 @@ double CountTotalLots()
 
 double AccountEquityHigh_16()
 {
-    if(CountTrades_16() == 0) gd_336_16 = AccountEquity();
+    if(CountTrades(g_magic_16) == 0) gd_336_16 = AccountEquity();
     if(gd_336_16 < gd_344_16) gd_336_16 = gd_344_16;
     else gd_336_16 = AccountEquity();
     gd_344_16 = AccountEquity();
