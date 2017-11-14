@@ -1,0 +1,48 @@
+What's New in MQL4
+MQL4的升级：
+
+Starting from build 600, MQL4 programming language has been completely revised reaching the level of MQL5 - now you can develop trading robots in MQL4/5 using the unified MetaEditor development environment, single style, libraries and debugging tools.
+从600版本开始，MQL4已经被完善到几乎和MQL5一样强大，你可以在统一的编辑器中，用MQL4或者MQL5开发你的交易神器了，新版本的MQL4将使用MQL5一样的开发环境，代码风格，以及强大的调试工具。
+
+MQL4 is popular among automated system developers due to the ease of learning and a huge amount of code generated for many years of using MetaTrader 4 terminal. However, the language also has some drawbacks arising from its main advantage - a simple programming language does not allow development of complex systems and hinders porting of debugged libraries from high-level languages. Therefore, we decided to implement in it the maximum possible amount of MQL5 language functions and features fully preserving MQL4 functionality. In other words, all powerful MQL5 functions, including ООP and the native code compiler, will become available in MQL4.
+由于容易学习，和多年MT4平台的大量代码积累，MQL4在自动化交易系统开发者中流行起来。当然正是因为他的一些主要优势同样给MQL4带来了部分缺点，一个简单的编程语言将无法实现过于复杂的系统，同时也无法实现像其他高级语言那样调试。因此，我们决定在保留MQL4的一些优点的前提下，将MQL5的特性在MQL4上实现。换句话说，包括面向对象，本地编译(应该可以防止反编译)等MQL5才拥有的强大功能，将被整合到新版MQL4中。
+
+To achieve this, we have developed a unified compiler that automatically supports both MQL4 and MQL5 languages. MetaEditor will also become a unified application both for MetaTrader 4 and MetaTrader 5 platforms. Thus, it will be possible to compile both MQL4 and MQL5 from any version. MQL5 Storage also becomes available for work.
+为了达到该目的，我们实现了一个统一的编译器，将自动的适配MQL4和MQL5。MetaEditor也同时能够支持MQL4和MQL5的开发。因此，以后在任何一个版本中，你都可以同时编译MQL4和MQL5。MQL5的存储格式也可以使用了。
+
+Protection of MQL4 applications rises to MQL5 level. New EX4/EX5 files are provided with a serious and completely revised protection. This means that the Market of secure EX4 applications also becomes available to MetaTrader 4.
+对MQL4应用程序的保护措施将和MQL5一样。新版的EX4/EX5文件，会有非常严格和完善的保护机制。这也意味着在MT4平台上将形成EX4的加密市场。
+
+Besides, MQL4 now features new graphical objects and new functions for working with charts. MQL5 Standard Library is to be ported to MQL4 providing developers with new possibilities in creating their own graphical interfaces and trading libraries. Now, you can create full-fledged applications in MetaTrader 4 using the resources.
+此外，MQL4将提供新的图形对象，以及新的操作图表的功能。MQL5标准库也将被移植到MQL4中，从而给开发者提供了创建自己的图形界面和交易库的能力。现在，你可以利用这些强大的资源来开放你的“圣杯”了。
+
+
+Changes in MQL4 Language
+新版MQL4的一些改变
+
+Added new char, short, long, uchar, ushort, uint, ulong and double data types. This will allow transferring codes from other C++ like languages. Data of various types is processed at different rates. Integer data is the fastest one to be processed. A special co-processor is used to handle the double-precision data. However, due to the complexity of the internal representation of floating-point data, it is processed slower than integer one. Typecasting has also been implemented.
+添加了新的数据类型：char,short,long,uchar,ushort,uint,ulong和double。这样你可以从其他类C++的代码转换代码。不同的数据类型将有不同的处理速率。整数类型数据的处理速度将最快。会有一个特殊的协处理器来处理双精度数据。但是由于浮点数的复杂性，这样类型的数据处理将比整数要慢。类型转换也已经完成。
+
+Strings are now presented in Unicode format, though they were in ANSI format (single byte ones) before. That should be considered if the program uses DLLs and passes string variables to them.
+字符串类型由之前的ANSI格式修改为Unicode格式。如果你使用DLL库，同时要传人string类型数据，就需要仔细琢磨一下了。
+
+Predefined Volume variable is now of long type. The time series for accessing the volumes also consist of long type arrays. It is recommended to use explicit casting of data having this type to the target type in old MQL4 programs to avoid type overflow error.
+预处理类型现在也改为long型。time系列的数据使用long型的数组。我们建议使用精确的类型转换处理久的MQL4程序中相关的数据类型，以避免出现数据溢出的问题。
+
+Structures and classes, object pointers, void type and this key word allowing an object to receive a reference to itself have been added. All object-oriented programming standards are supported:
+
+?Encapsulation and Extensibility of Types
+
+?Inheritance
+
+?Polymorphism
+
+?Overload
+
+?Virtual functions
+结构体和类，对象指针，void已经可以提供指向对象本身的this指针都已经添加到新版MQL4中。以下列出来的面向对象编程标准都已经支持：
+ 类型的封装性和可扩展型
+ 继承
+ 多态
+ 重写
+ 虚函数

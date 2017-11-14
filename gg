@@ -3,6 +3,7 @@ rm ~/see/pgm/cpp/mds/obj/*.o
 rm ~/see/pyy/rr/dewdrop/var/*
 rm ~/see/pyy/rr/rose/var/*
 
+git add vimrc
 git add etc
 git add pgm
 git add resource

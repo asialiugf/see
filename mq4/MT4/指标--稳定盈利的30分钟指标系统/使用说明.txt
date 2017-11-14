@@ -1,0 +1,19 @@
+只能用于30M图表
+
+均线1：【5 】【  expodential 】 【close】 yellow
+
+均线2：【75】【linear weighted】【low】 red
+
+均线3：【85】【linear weighted】【low】  red
+
+
+
+交易法则： 黄线上穿两条红线，macd为红柱，做多，cci低于100时平仓！
+
+                   黄线下穿两条红线，macd为绿柱，做空，cci高于100时平仓！
+
+                   止损：50点，碰止损的机会很小，避开非农等重要经济数据公布前后建仓！
+
+
+1。将experts和templates文件夹复制到mt4根目录下
+2。在30M图表窗口中，右键->模板，选择 tt

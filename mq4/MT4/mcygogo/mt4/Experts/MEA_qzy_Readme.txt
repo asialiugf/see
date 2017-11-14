@@ -1,0 +1,16 @@
+gPipsDiff = 100;    加仓点位间隔
+gSlippage = 3;      允许滑点数，下单时使用
+gTotalOrders = 50;  允许的最多订单数，包括多空
+gDefaultLots = 0.01;默认下单量 
+gFOProfit  = 0.0;   第一个单盈利多少后止损
+gFO_SL_S = 0.0      第一个单开始设置止损的点位，大于0时，gFOProfit失效
+gFO_SL_P = 0.0      第一个单设置止损的点位
+gSO_SL_S = 0.0      第二个单开始设置止损的点位
+gSO_SL_P = 0.0      第二个单设置止损的点位
+gSL_345 = 0.6;      3，4，5个单止损设置位
+gSL_678 = 0.65;     6，7，8个单止损设置位
+gSL_9 = 0.75;       9个以上单止损设置位
+gUnlockProfit = 0.0 锁单后盈利多少个点才平仓
+gMagicNo = 668866;  区分订单用的，暂时不需要修改
+gTestBuy = true;    允许开多单
+gTestSell = true;   允许开空单

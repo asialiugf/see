@@ -1,0 +1,12 @@
+!Extreme TMA Indicator Version 22 - Additional Instructions
+
+It is now posible to have more than 1 Dashboard. For multiple Dashboards, change the IndicatorID to a different number than any others.
+
+Set vertical_offset and horizontal_offset to position the dashboard on the chart.
+
+Enter whatever timeframes you want in the parameters provided.  Enter a zero, to not use that spot.
+
+You can enter any valid timeframe in any timeframe space.
+The dashboard will only use valid timeframes.
+
+The dashboard will only use valid symbols.  If a symbol is invalid, it will be highlighted WHITE.

@@ -1,0 +1,26 @@
+TMA INFO INDICATOR INSTRUCTIONS
+
+Some of the display options and periods used in this indicator are configurable and hopefully self explanatory.
+
+
+TMA Size = This is the distance in pips from Upper band to lower band. This seems to be the unit of volatility that people use on this forum.
+
+Extreme TMA = Current price in relation to the TMA. -1 = Lower band, 0 = MidLine, 1 = UpperLine. And everything in between and beyond.
+
+TMA Slope = Slope of the Tma line.
+
+Slope Change = The Change of the Slope. Whether it is steepening or leveling.
+
+Price Change = Linear regression of price. This is something I have in there to play around with the same concept as the arrows that used to be on slope. Helps to spot when price is moving opposite of Slope Change. This was a referred to as divergence here but is not in anyway related to divergence as it is use in trading. Hopefully true divergence can be introduced into the system again since it is a nice way to go counter trend. The current rules do not allow for any counter trend trading.
+
+Pivot Distance = Distance to the nearest Pivot point. (Please don't ask me about this. It works for me on my broker. It can certainly be off by a few pips but this is related to the brokers High,Low,Close prices from the previous day. Not any time offsets) Daylight savings is this weekend here so who knows what that is going to do to our trying to all get on the same page.
+
+MA Crossover = This is the original MA crossover used as confirmation in the direction of the trade. It is not a MACD but the crossover of a single moving averge displaced in time. This is set the same as the defaults in packet do not change the 1 value in shift unless you know what you are doing.
+
+Heiken Ashi = The heiken ashi body size and direction. Or basically a crossover of a typical price (OHLC/4) over a moving average of that price.
+
+I word of caution about the colors. The general jist of the rules on this forum have so far been about fading extreme movements after confirmation and the coloring generally follows this theory. I would say that if this system where a software project the rules are still in prototype stage therefore so are colors in this indicator. Also alot of the successes with these rules have come from people using them in multiple time frames which is not encapsulated in this indicator at all.
+
+Here is one example where I feel price action is saying a very differant thing than these rules. You have consolidation (even trendline) then break higher through pivot and then a slight pullback below the pivot and HA candle down. The pullback is weak though so price is still above the upper band because previous breakout was large. Here you will have 5 colors with the exception of MA Cross all extreme RED but the price action is a nice volatility breakout with a weak pullback giving you a nice buy price.
+
+One way you could use the colors that I have not yet played around with is you could change the Bear and Bull colors both to Red and the Extreme colors both to green. Then basically you use them as a red light green light of when to trade but you use your own interpretation of price action to decide how to trade.

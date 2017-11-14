@@ -1,0 +1,1 @@
+1;113;C:\MetaTrader 4\experts\indicators\send_email.mq4;23:34;'OrderClosePrice,OrderCloseTime,OrderComment,OrderCommission,OrderExpiration,OrderLots,OrderMagicNumber, OrderOpenPrice, OrderOpenTime, OrderProfit, OrderStopLoss, OrderSwap, OrderSymbol, OrderTakeProfit, OrderTicket, OrderType,AccountServer,AccountCompany' - too long string (255 characters maximum allowed)
