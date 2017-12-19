@@ -27,13 +27,14 @@ int main()
     char buf[16];/// 消息缓冲区  
     while(1)  
     {  
-        ret = zmq_recv(subscriber, buf, 16, ZMQ_DONTWAIT);/// 接收消息，非堵塞式  
+        //ret = zmq_recv(subscriber, buf, 16, ZMQ_DONTWAIT);/// 接收消息，非堵塞式  
+        ret = zmq_recv(subscriber, buf, 16, 0);/// 接收消息，非堵塞式  
         if (ret != -1)/// 打印消息  
         {  
             buf[ret] = '\0';  
             printf("%s\n", buf);  
         }  
-        printf( " this is a news!!\n" );
+        //printf( " this is a news!!\n" );
         sleep(1);  
     }  
   
